@@ -786,6 +786,17 @@
             }
         }
 
+        function searchToHome(q) {
+            const clean = (q || '').trim();
+            if (clean) {
+                window.location.href = `index.html?q=${encodeURIComponent(clean)}`;
+            }
+        }
+
+        function escapeQuotes(str) {
+            return (str || '').replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
+        }
+
         window.onload = initWatch;
     </script>
 </body>
