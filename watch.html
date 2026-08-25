@@ -347,33 +347,34 @@
                 })
                 .catch(e => console.warn(e));
 
-            // 3. If item not yet found, fetch full movies.json in background
+            // 3. If item not yet found, look up from modular category JSON files in parallel
             if (!currentItem && targetTitle) {
                 try {
-                    const res = await fetch('./movies.json');
-                    const rawMovies = await res.json();
                     const cleanTitle = targetTitle.toLowerCase().trim();
+                    const categoryFiles = [
+                        'data/kdrama.json', 'data/tv_series.json', 'data/hollywood.json',
+                        'data/bollywood.json', 'data/south_action.json', 'data/south_original.json',
+                        'data/animation.json', 'data/bangla.json', 'data/foreign.json',
+                        'data/top_rated.json', 'data/3d.json', 'data/english.json'
+                    ];
 
-                    for (const m of rawMovies) {
-                        const mTitle = Array.isArray(m) ? m[0] : m.title;
-                        if (mTitle && mTitle.toLowerCase().trim() === cleanTitle) {
-                            currentItem = Array.isArray(m) ? {
-                                title: m[0], poster: m[1], url: m[2], tag: m[3], category: m[4], size: m[5], date: m[6]
-                            } : m;
-                            break;
-                        }
-                    }
-
-                    if (!currentItem) {
-                        for (const m of rawMovies) {
-                            const mTitle = Array.isArray(m) ? m[0] : m.title;
-                            if (mTitle && (mTitle.toLowerCase().includes(cleanTitle) || cleanTitle.includes(mTitle.toLowerCase()))) {
-                                currentItem = Array.isArray(m) ? {
-                                    title: m[0], poster: m[1], url: m[2], tag: m[3], category: m[4], size: m[5], date: m[6]
-                                } : m;
-                                break;
+                    for (const f of categoryFiles) {
+                        try {
+                            const res = await fetch(`./${f}`);
+                            if (res.ok) {
+                                const list = await res.json();
+                                for (const m of list) {
+                                    const mTitle = Array.isArray(m) ? m[0] : m.title;
+                                    if (mTitle && mTitle.toLowerCase().trim() === cleanTitle) {
+                                        currentItem = Array.isArray(m) ? {
+                                            title: m[0], poster: m[1], url: m[2], tag: m[3], category: m[4], size: m[5], date: m[6]
+                                        } : m;
+                                        break;
+                                    }
+                                }
+                                if (currentItem) break;
                             }
-                        }
+                        } catch (e) {}
                     }
 
                     if (currentItem) {
@@ -845,10 +846,9 @@
             watchLiveSearchTimer = setTimeout(async () => {
                 if (watchAllMovies.length === 0) {
                     try {
-                        const res = await fetch('./movies.json');
-                        if (res.ok) {
-                            watchAllMovies = await res.json();
-                        }
+                        const files = ['data/top_rated.json', 'data/animation.json', 'data/hollywood.json', 'data/bollywood.json', 'data/south_action.json', 'data/south_original.json', 'data/tv_series.json', 'data/kdrama.json', 'data/bangla.json', 'data/foreign.json', 'data/3d.json'];
+                        const lists = await Promise.all(files.map(f => fetch(`./${f}`).then(r => r.ok ? r.json() : []).catch(() => [])));
+                        watchAllMovies = lists.flat();
                     } catch (e) {}
                 }
 

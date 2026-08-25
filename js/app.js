@@ -100,17 +100,31 @@ function applyHomeData(data) {
     }
 }
 
+const ALL_CATEGORY_FILES = [
+    'data/top_rated.json',
+    'data/animation.json',
+    'data/hollywood.json',
+    'data/bollywood.json',
+    'data/south_action.json',
+    'data/south_original.json',
+    'data/tv_series.json',
+    'data/kdrama.json',
+    'data/bangla.json',
+    'data/foreign.json',
+    'data/3d.json',
+    'data/english.json'
+];
+
 async function loadFullCatalogInBackground() {
     if (isFullCatalogLoaded && allMovies.length > 0) return;
 
     try {
-        const res = await fetch('./movies.json');
-        if (!res.ok) return;
-        const rawMovies = await res.json();
-        
-        allMovies = rawMovies.map(item => {
-            if (Array.isArray(item)) {
-                return {
+        const fetchPromises = ALL_CATEGORY_FILES.map(async file => {
+            try {
+                const res = await fetch(`./${file}`);
+                if (!res.ok) return [];
+                const data = await res.json();
+                return data.map(item => Array.isArray(item) ? {
                     title: item[0] || '',
                     poster: item[1] || '',
                     url: item[2] || '',
@@ -118,10 +132,14 @@ async function loadFullCatalogInBackground() {
                     category: item[4] || 'Cinema',
                     size: item[5] || 'HD',
                     date: item[6] || ''
-                };
+                } : item);
+            } catch (e) {
+                return [];
             }
-            return item;
-        }).filter(m => {
+        });
+
+        const categoryResults = await Promise.all(fetchPromises);
+        allMovies = categoryResults.flat().filter(m => {
             const t = (m.title || '').trim().toLowerCase();
             return t && !t.includes('parent directory') && t !== '..' && t !== '.';
         });
@@ -136,7 +154,7 @@ async function loadFullCatalogInBackground() {
             renderView();
         }
     } catch (e) {
-        console.warn('Background catalog load:', e);
+        console.warn('Modular catalog load notice:', e);
     }
 }
 
