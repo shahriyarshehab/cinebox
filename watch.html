@@ -243,10 +243,18 @@
         <div id="relatedSection" style="margin-top: 10px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
                 <h2 class="row-heading" style="font-size: 18px;" id="relatedHeading">More Like This</h2>
-                <a class="btn-see-all" id="relatedSeeAllBtn" href="index.html">
-                    <span>Explore Category</span>
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                </a>
+                <div class="row-controls">
+                    <button class="row-nav-btn prev" onclick="slideRow('relatedSlider', -1)" aria-label="Previous">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <button class="row-nav-btn next" onclick="slideRow('relatedSlider', 1)" aria-label="Next">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
+                    <a class="btn-see-all" id="relatedSeeAllBtn" href="index.html">
+                        <span>Explore Category</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
             </div>
             <div class="row-slider" id="relatedSlider"></div>
         </div>
@@ -827,6 +835,14 @@
             } else {
                 document.getElementById('relatedSection').style.display = 'none';
             }
+        }
+
+        function slideRow(rowId, direction) {
+            const slider = document.getElementById(rowId);
+            if (!slider) return;
+            const cardWidth = 186;
+            const scrollAmount = Math.max(cardWidth * 3, Math.floor(slider.clientWidth * 0.75)) * direction;
+            slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
 
         let watchLiveSearchTimer = null;

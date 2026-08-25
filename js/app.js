@@ -260,12 +260,20 @@ function renderView() {
     }
 }
 
+function slideRow(rowId, direction) {
+    const slider = document.getElementById(rowId);
+    if (!slider) return;
+    const cardWidth = 186;
+    const scrollAmount = Math.max(cardWidth * 3, Math.floor(slider.clientWidth * 0.75)) * direction;
+    slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+}
+
 function renderHomeRowsFromPayload(categoriesMap) {
     const container = document.getElementById('mainContent');
     if (!categoriesMap) return;
 
     let html = '';
-    CATEGORY_ROWS.forEach(cat => {
+    CATEGORY_ROWS.forEach((cat, catIdx) => {
         const rawItems = categoriesMap[cat.tag] || [];
         if (rawItems.length === 0) return;
 
@@ -273,19 +281,29 @@ function renderHomeRowsFromPayload(categoriesMap) {
             title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
         } : item);
 
+        const rowSliderId = `rowSlider_${catIdx}`;
+
         html += `
             <div class="category-row-block">
                 <div class="row-header">
                     <div class="row-title-wrap">
                         <h2 class="row-heading">${cat.name}</h2>
                     </div>
-                    <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
-                        <span>Show All</span>
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </button>
+                    <div class="row-controls">
+                        <button class="row-nav-btn prev" onclick="slideRow('${rowSliderId}', -1)" aria-label="Previous">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                        <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
+                            <span>Show All</span>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="row-slider">
+                <div class="row-slider" id="${rowSliderId}">
                     ${items.map((item) => renderMovieCardHtml(item)).join('')}
                 </div>
             </div>
@@ -298,11 +316,12 @@ function renderHomeRowsFromPayload(categoriesMap) {
 function renderHomeRows(container) {
     let html = '';
 
-    CATEGORY_ROWS.forEach(cat => {
+    CATEGORY_ROWS.forEach((cat, catIdx) => {
         const catMovies = allMovies.filter(m => m.tag === cat.tag || (m.category && m.category.includes(cat.tag)));
         if (catMovies.length === 0) return;
 
-        const topSlice = catMovies.slice(0, 14);
+        const topSlice = catMovies.slice(0, 16);
+        const rowSliderId = `rowSlider_${catIdx}`;
 
         html += `
             <div class="category-row-block">
@@ -311,13 +330,21 @@ function renderHomeRows(container) {
                         <h2 class="row-heading">${cat.name}</h2>
                         <span class="row-badge">${catMovies.length.toLocaleString()} items</span>
                     </div>
-                    <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
-                        <span>Show All</span>
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </button>
+                    <div class="row-controls">
+                        <button class="row-nav-btn prev" onclick="slideRow('${rowSliderId}', -1)" aria-label="Previous">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+                        </button>
+                        <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+                        </button>
+                        <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
+                            <span>Show All</span>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="row-slider">
+                <div class="row-slider" id="${rowSliderId}">
                     ${topSlice.map((item) => renderMovieCardHtml(item)).join('')}
                 </div>
             </div>
