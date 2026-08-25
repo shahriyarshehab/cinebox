@@ -1,0 +1,23 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/phisher98/cloudstream-extensions-phisher/builds/MovieBoxProvider.cs3",
+    "status": 1,
+    "version": 26,
+    "name": "MovieBoxProvider",
+    "internalName": "MovieBoxProvider",
+    "authors": [
+      "NivinCNC,Phisher98"
+    ],
+    "description": "Multi Language Movies and Series Provider",
+    "fileSize": 72427,
+    "repositoryUrl": "https://github.com/phisher98/cloudstream-extensions-phisher",
+    "language": "hi",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "iconUrl": "https://raw.githubusercontent.com/phisher98/TVVVV/refs/heads/main/Icons/moviebox.png",
+    "apiVersion": 1,
+    "fileHash": "sha256-43e4593be338e8c1ebe10ab9043e19cb2c9b79e64dea2c40b5e38d6f84a344e9"
+  }
+]
