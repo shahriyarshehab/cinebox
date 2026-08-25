@@ -23,6 +23,186 @@
     --radius-lg: 20px;
 }
 
+[data-theme="light"] {
+    --bg-base: #f4f6fb;
+    --bg-surface: #ffffff;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f0f4f9;
+    --border: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 140, 255, 0.45);
+    
+    --primary: #0088cc;
+    --primary-glow: rgba(0, 136, 204, 0.25);
+    --text-main: #0c121e;
+    --text-muted: #556377;
+    --text-dim: #8b99ab;
+}
+
+[data-theme="light"] header {
+    background: rgba(255, 255, 255, 0.94);
+    border-bottom-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .brand-name {
+    color: #0c121e;
+}
+
+[data-theme="light"] .search-wrap input {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #0c121e;
+}
+
+[data-theme="light"] .carousel-wrapper {
+    background: #ffffff;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+}
+
+[data-theme="light"] .slide-overlay {
+    background: linear-gradient(90deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.3) 100%),
+                linear-gradient(0deg, #ffffff 0%, transparent 60%);
+}
+
+[data-theme="light"] .slide-title {
+    color: #0c121e;
+    text-shadow: none;
+}
+
+[data-theme="light"] .row-heading {
+    color: #0c121e;
+}
+
+[data-theme="light"] .card-title {
+    color: #0c121e;
+}
+
+[data-theme="light"] .card-cover {
+    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+}
+
+[data-theme="light"] .tag-badge {
+    background: rgba(255, 255, 255, 0.92);
+    color: #0088cc;
+    border-color: rgba(0, 136, 204, 0.3);
+}
+
+[data-theme="light"] .rating-badge {
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(255, 184, 0, 0.4);
+}
+
+[data-theme="light"] .row-badge {
+    background: rgba(0, 0, 0, 0.06);
+    color: #556377;
+}
+
+[data-theme="light"] .btn-ghost {
+    background: rgba(0, 0, 0, 0.04);
+    color: #0c121e;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .btn-ghost:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .watch-hero-card {
+    background: #ffffff;
+    box-shadow: 0 16px 36px rgba(0,0,0,0.12);
+}
+
+[data-theme="light"] .watch-title {
+    color: #0c121e;
+}
+
+[data-theme="light"] #tvExplorerWrap {
+    background: #ffffff;
+}
+
+/* Animated Sun/Moon Theme Toggle */
+.theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    transition: transform 0.2s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.05);
+}
+
+.theme-toggle-track {
+    width: 56px;
+    height: 30px;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+    position: relative;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    padding: 0 3px;
+}
+
+[data-theme="light"] .theme-toggle-track {
+    background: #e2e8f0;
+    border-color: rgba(0, 0, 0, 0.12);
+}
+
+.theme-toggle-thumb {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #07090e;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+[data-theme="light"] .theme-toggle-thumb {
+    transform: translateX(26px);
+    background: linear-gradient(135deg, #ffb800 0%, #ff8800 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(255, 184, 0, 0.4);
+}
+
+.sun-icon {
+    width: 13px;
+    height: 13px;
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.5);
+}
+
+.moon-icon {
+    width: 13px;
+    height: 13px;
+    position: absolute;
+    transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .sun-icon {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+}
+
+[data-theme="light"] .moon-icon {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.5);
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
