@@ -45,7 +45,7 @@ async function init() {
     const main = document.getElementById('mainContent');
 
     // 1. Check client-side cached home data for 0ms instant render
-    const cachedHome = sessionStorage.getItem('cinebox_home_v1');
+    const cachedHome = sessionStorage.getItem('cinebox_home_v2');
     if (cachedHome) {
         try {
             homeData = JSON.parse(cachedHome);
@@ -55,13 +55,11 @@ async function init() {
 
     // 2. Fetch lightweight home_data.json (~90 KB, downloads in ~25ms)
     try {
-        if (!homeData) {
-            const res = await fetch('./home_data.json');
-            if (res.ok) {
-                homeData = await res.json();
-                sessionStorage.setItem('cinebox_home_v1', JSON.stringify(homeData));
-                applyHomeData(homeData);
-            }
+        const res = await fetch('./home_data.json?v=' + Date.now());
+        if (res.ok) {
+            homeData = await res.json();
+            sessionStorage.setItem('cinebox_home_v2', JSON.stringify(homeData));
+            applyHomeData(homeData);
         }
     } catch (e) {
         console.warn('Fast home load notice:', e);

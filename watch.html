@@ -303,7 +303,7 @@
                 } catch (e) {}
             }
 
-            const cachedHome = sessionStorage.getItem('cinebox_home_v1');
+            const cachedHome = sessionStorage.getItem('cinebox_home_v2');
             if (!currentItem && targetTitle && cachedHome) {
                 try {
                     const hData = JSON.parse(cachedHome);
@@ -753,7 +753,7 @@
             let candidateList = [];
 
             // 1. Try from cached home data (instant)
-            const cachedHome = sessionStorage.getItem('cinebox_home_v1');
+            const cachedHome = sessionStorage.getItem('cinebox_home_v2');
             if (cachedHome) {
                 try {
                     const hData = JSON.parse(cachedHome);
@@ -854,7 +854,7 @@
 
                 let dataset = watchAllMovies;
                 if (dataset.length === 0) {
-                    const cachedHome = sessionStorage.getItem('cinebox_home_v1');
+                    const cachedHome = sessionStorage.getItem('cinebox_home_v2');
                     if (cachedHome) {
                         try {
                             const hData = JSON.parse(cachedHome);
