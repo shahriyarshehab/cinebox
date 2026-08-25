@@ -415,16 +415,22 @@ function renderCategoryFullGrid(container) {
     `;
 }
 
+function matchesCategory(m, tag) {
+    if (tag === 'All') return true;
+    if (m.tag === tag) return true;
+    if (tag === 'K-Drama' && (m.tag === 'K-Drama' || (m.category && m.category.includes('Korean')) || (m.url && m.url.includes('KOREAN')))) return true;
+    if (tag === 'TV Series' && (m.tag === 'TV Series' || (m.category && m.category.includes('Series')))) return true;
+    if (tag === 'Bollywood' && (m.tag === 'Bollywood' || (m.category && m.category.includes('Hindi')))) return true;
+    if (tag === 'Animation' && (m.tag === 'Animation' || (m.category && m.category.includes('Animation')))) return true;
+    if (tag === 'Bangla' && (m.tag === 'Bangla' || (m.category && m.category.includes('Bangla')))) return true;
+    return m.category && m.category.toLowerCase().includes(tag.toLowerCase());
+}
+
 function selectFilterPill(tag, label) {
     currentCategoryTag = tag;
     currentCategoryName = label;
 
-    if (tag === 'All') {
-        filteredMovies = [...allMovies];
-    } else {
-        filteredMovies = allMovies.filter(m => m.tag === tag || (m.category && m.category.includes(tag)));
-    }
-
+    filteredMovies = allMovies.filter(m => matchesCategory(m, tag));
     applyCurrentSorting();
     displayedCount = BATCH_SIZE;
     renderView();
@@ -470,12 +476,7 @@ async function openCategoryView(tag, name) {
         await loadFullCatalogInBackground();
     }
 
-    if (tag === 'All') {
-        filteredMovies = [...allMovies];
-    } else {
-        filteredMovies = allMovies.filter(m => m.tag === tag || (m.category && m.category.includes(tag)));
-    }
-
+    filteredMovies = allMovies.filter(m => matchesCategory(m, tag));
     applyCurrentSorting();
     displayedCount = BATCH_SIZE;
     renderView();
