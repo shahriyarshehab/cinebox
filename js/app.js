@@ -67,12 +67,16 @@ async function init() {
         console.warn('Fast home load notice:', e);
     }
 
-    // 3. Check for URL search parameters (e.g. from watch.html back-search)
+    // 3. Check for URL search parameters or tab parameters
     const urlParams = new URLSearchParams(window.location.search);
     const queryParam = urlParams.get('q');
+    const tabParam = urlParams.get('tab');
+
     if (queryParam) {
         document.getElementById('searchInput').value = queryParam;
         loadFullCatalogInBackground().then(() => handleSearch());
+    } else if (tabParam) {
+        loadFullCatalogInBackground().then(() => switchNavTab(tabParam));
     } else {
         // Asynchronously load the 36,000+ full catalog in background without blocking UI
         setTimeout(loadFullCatalogInBackground, 300);
@@ -300,20 +304,76 @@ function renderHomeRows(container) {
     container.innerHTML = html;
 }
 
+const ALL_CATEGORY_PILLS = [
+    { label: 'All Categories', tag: 'All' },
+    { label: 'IMDb Top 250', tag: 'Top Rated' },
+    { label: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
+    { label: 'Animation & Anime', tag: 'Animation' },
+    { label: 'Bollywood (Hindi)', tag: 'Bollywood' },
+    { label: 'South Action (Dubbed)', tag: 'South Action' },
+    { label: 'South Original', tag: 'South Original' },
+    { label: 'TV & Web Series', tag: 'TV Series' },
+    { label: 'Korean Drama', tag: 'K-Drama' },
+    { label: 'Bangla Movies', tag: 'Bangla' },
+    { label: 'Foreign Cinema', tag: 'Foreign Movies' },
+    { label: '3D Movies', tag: '3D Movies' },
+    { label: 'English Classic', tag: 'English Movies' }
+];
+
+let activeNavTab = 'home';
+let currentSort = 'latest';
+
+function switchNavTab(tab) {
+    activeNavTab = tab;
+    document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+    
+    if (tab === 'home') {
+        const b = document.getElementById('navHome'); if (b) b.classList.add('active');
+        showHomeView();
+    } else if (tab === 'tv') {
+        const b = document.getElementById('navTv'); if (b) b.classList.add('active');
+        openCategoryView('TV Series', 'TV & Web Series');
+    } else if (tab === 'movies') {
+        const b = document.getElementById('navMovies'); if (b) b.classList.add('active');
+        openCategoryView('Hollywood 1080p', 'Movies Collection');
+    } else if (tab === 'animation') {
+        const b = document.getElementById('navAnimation'); if (b) b.classList.add('active');
+        openCategoryView('Animation', 'Animation & Anime');
+    }
+}
+
 function renderCategoryFullGrid(container) {
     const toShow = filteredMovies.slice(0, displayedCount);
 
     container.innerHTML = `
-        <div class="category-view-bar">
-            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                <button class="btn btn-ghost" onclick="showHomeView()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Back to All Rows</span>
-                </button>
-                <h1 class="row-heading" style="font-size: 24px;">${currentCategoryName}</h1>
+        <!-- MovieBox Filter Bar with Horizontal Pills -->
+        <div class="filter-bar-wrap">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 12px;" onclick="showHomeView()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        <span>Home Rows</span>
+                    </button>
+                    <h1 class="row-heading" style="font-size: 20px;">${currentCategoryName}</h1>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 12px; color: var(--text-muted);">${filteredMovies.length.toLocaleString()} titles</span>
+                    <select class="sort-select" onchange="handleSortChange(this.value)">
+                        <option value="latest" ${currentSort === 'latest' ? 'selected' : ''}>Sort: Latest Releases</option>
+                        <option value="title" ${currentSort === 'title' ? 'selected' : ''}>Sort: Name (A-Z)</option>
+                        <option value="rating" ${currentSort === 'rating' ? 'selected' : ''}>Sort: Top Rated ★</option>
+                    </select>
+                </div>
             </div>
-            <div style="font-size: 13px; color: var(--text-muted);">
-                Showing ${toShow.length} of ${filteredMovies.length.toLocaleString()} titles
+
+            <!-- Horizontal Category Filter Pills -->
+            <div class="filter-pills-row">
+                ${ALL_CATEGORY_PILLS.map(p => `
+                    <button class="filter-pill ${currentCategoryTag === p.tag ? 'active' : ''}" onclick="selectFilterPill('${p.tag}', '${escapeQuotes(p.label)}')">
+                        ${p.label}
+                    </button>
+                `).join('')}
             </div>
         </div>
 
@@ -327,53 +387,42 @@ function renderCategoryFullGrid(container) {
     `;
 }
 
-function renderMovieCardHtml(item) {
-    const rawTitle = item.title || '';
-    const safeTitle = escapeQuotes(rawTitle);
-    const itemData = encodeURIComponent(JSON.stringify(item));
-    const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
-    const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
+function selectFilterPill(tag, label) {
+    currentCategoryTag = tag;
+    currentCategoryName = label;
 
-    return `
-        <a class="movie-card" href="${linkUrl}">
-            <div class="card-cover">
-                <img src="${item.poster}" alt="${safeTitle}" loading="lazy"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="cover-fallback" style="display: none;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
-                    <div style="font-size: 11.5px; font-weight: 600;">${item.title}</div>
-                </div>
+    if (tag === 'All') {
+        filteredMovies = [...allMovies];
+    } else {
+        filteredMovies = allMovies.filter(m => m.tag === tag || (m.category && m.category.includes(tag)));
+    }
 
-                <div class="tag-badge">${item.tag || 'HD'}</div>
-                <div class="rating-badge">
-                    <svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="12" height="12"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <span>8.8</span>
-                </div>
+    applyCurrentSorting();
+    displayedCount = BATCH_SIZE;
+    renderView();
+}
 
-                <div class="cover-overlay">
-                    <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
-                        ${isSeries ? 
-                            '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="20" height="20"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
-                            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>'
-                        }
-                    </div>
-                    <span style="font-size: 11px; font-weight: 700; color: #fff;">${isSeries ? 'Browse Seasons & Episodes' : 'Watch in Full Page'}</span>
-                </div>
-            </div>
+function handleSortChange(sortVal) {
+    currentSort = sortVal;
+    applyCurrentSorting();
+    displayedCount = BATCH_SIZE;
+    renderView();
+}
 
-            <div class="card-body">
-                <div class="card-title" title="${item.title}">${item.title}</div>
-                <div class="card-meta">
-                    <span>${item.size || 'HD'}</span>
-                    <span>${item.date || ''}</span>
-                </div>
-            </div>
-        </a>
-    `;
+function applyCurrentSorting() {
+    if (currentSort === 'title') {
+        filteredMovies.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+    } else if (currentSort === 'rating') {
+        // High score top
+        filteredMovies.sort((a, b) => (b.title.includes('2026') ? 1 : 0) - (a.title.includes('2026') ? 1 : 0));
+    }
 }
 
 function showHomeView() {
     currentView = 'home';
+    activeNavTab = 'home';
+    document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+    const b = document.getElementById('navHome'); if (b) b.classList.add('active');
     document.getElementById('searchInput').value = '';
     renderView();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -387,13 +436,19 @@ async function openCategoryView(tag, name) {
     if (!isFullCatalogLoaded) {
         document.getElementById('mainContent').innerHTML = `
             <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 15px; font-weight: 600; color: var(--text-muted);">Loading full ${name} catalog...</div>
+                <div style="font-size: 15px; font-weight: 600; color: var(--text-muted);">Loading catalog...</div>
             </div>
         `;
         await loadFullCatalogInBackground();
     }
 
-    filteredMovies = allMovies.filter(m => m.tag === tag || (m.category && m.category.includes(tag)));
+    if (tag === 'All') {
+        filteredMovies = [...allMovies];
+    } else {
+        filteredMovies = allMovies.filter(m => m.tag === tag || (m.category && m.category.includes(tag)));
+    }
+
+    applyCurrentSorting();
     displayedCount = BATCH_SIZE;
     renderView();
     window.scrollTo({ top: 0, behavior: 'smooth' });

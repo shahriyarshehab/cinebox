@@ -237,24 +237,25 @@ header {
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
-    padding: 14px 40px;
+    padding: 12px 36px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 20px;
 }
 
 .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     cursor: pointer;
     text-decoration: none;
+    flex-shrink: 0;
 }
 
 .brand-mark {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     border-radius: 10px;
     background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
     display: flex;
@@ -266,7 +267,7 @@ header {
 
 .brand-name {
     font-family: var(--font-display);
-    font-size: 22px;
+    font-size: 21px;
     font-weight: 700;
     letter-spacing: -0.5px;
     color: #fff;
@@ -274,6 +275,134 @@ header {
 
 .brand-name span {
     color: var(--primary);
+}
+
+/* Nav Links (MovieBox Style) */
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-link {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .nav-link:hover {
+    color: #0c121e;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.nav-link.active {
+    color: var(--primary);
+    background: rgba(0, 229, 255, 0.12);
+    font-weight: 700;
+}
+
+[data-theme="light"] .nav-link.active {
+    color: #0088cc;
+    background: rgba(0, 136, 204, 0.12);
+}
+
+/* MovieBox Category Filter Bar */
+.filter-bar-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 24px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.filter-pills-row {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+}
+
+.filter-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.filter-pill:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+}
+
+[data-theme="light"] .filter-pill:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: #0c121e;
+}
+
+.filter-pill.active {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+    font-weight: 700;
+    box-shadow: 0 2px 10px var(--primary-glow);
+}
+
+[data-theme="light"] .filter-pill.active {
+    background: #0088cc;
+    color: #ffffff;
+}
+
+.filter-sort-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.sort-select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+
+[data-theme="light"] .sort-select {
+    background: #f1f5f9;
+    color: #0c121e;
 }
 
 .live-status {
