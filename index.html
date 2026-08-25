@@ -228,15 +228,15 @@
             position: relative;
             border-radius: var(--radius-lg);
             overflow: hidden;
-            background: #111624;
+            background: linear-gradient(135deg, #0d121c 0%, #07090e 100%);
             border: 1px solid var(--border);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
         .carousel-track {
             position: relative;
             width: 100%;
-            height: 320px;
+            height: 380px;
         }
 
         .carousel-slide {
@@ -244,7 +244,7 @@
             top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
             display: flex;
             align-items: center;
         }
@@ -259,24 +259,32 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-size: cover;
             background-position: center;
-            filter: blur(24px) opacity(0.35);
-            transform: scale(1.1);
+            filter: blur(32px) opacity(0.35);
+            transform: scale(1.15);
         }
 
         .slide-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.88) 50%, rgba(7, 9, 14, 0.25) 100%);
+            background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.88) 55%, rgba(7, 9, 14, 0.3) 100%);
+        }
+
+        .slide-container {
+            position: relative;
+            z-index: 2;
+            padding: 36px 54px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
         }
 
         .slide-content {
-            position: relative;
-            z-index: 2;
-            padding: 36px 48px;
-            max-width: 720px;
+            max-width: 620px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
         }
 
         .slide-tag {
@@ -284,19 +292,20 @@
             align-items: center;
             gap: 6px;
             background: rgba(0, 229, 255, 0.12);
-            border: 1px solid rgba(0, 229, 255, 0.3);
+            border: 1px solid rgba(0, 229, 255, 0.35);
             color: var(--primary);
             font-size: 11px;
             font-weight: 700;
             padding: 4px 12px;
             border-radius: 20px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
             width: fit-content;
         }
 
         .slide-title {
             font-family: var(--font-display);
-            font-size: 30px;
+            font-size: 32px;
             font-weight: 700;
             line-height: 1.25;
             color: #fff;
@@ -314,15 +323,53 @@
             color: var(--text-muted);
         }
 
+        .slide-poster-showcase {
+            position: relative;
+            width: 190px;
+            height: 280px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 2px solid var(--border-hover);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.8), 0 0 24px rgba(0, 229, 255, 0.3);
+            flex-shrink: 0;
+            display: block;
+            transform: perspective(600px) rotateY(-8deg);
+            transition: transform 0.4s ease;
+        }
+
+        .slide-poster-showcase:hover {
+            transform: perspective(600px) rotateY(0deg) scale(1.04);
+        }
+
+        .slide-poster-showcase img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slide-poster-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(7, 9, 14, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+        }
+
         .carousel-btn {
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
             z-index: 10;
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: rgba(7, 9, 14, 0.7);
+            background: rgba(7, 9, 14, 0.75);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border);
             color: #fff;
@@ -336,14 +383,16 @@
         .carousel-btn:hover {
             background: var(--primary);
             color: #07090e;
+            border-color: var(--primary);
+            box-shadow: 0 0 16px var(--primary-glow);
         }
 
-        .carousel-btn.prev { left: 16px; }
-        .carousel-btn.next { right: 16px; }
+        .carousel-btn.prev { left: 18px; }
+        .carousel-btn.next { right: 18px; }
 
         .carousel-dots {
             position: absolute;
-            bottom: 14px;
+            bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -355,15 +404,16 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
             cursor: pointer;
             transition: all 0.25s ease;
         }
 
         .carousel-dot.active {
-            width: 24px;
+            width: 28px;
             border-radius: 10px;
             background: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
         }
 
         /* Categories Slider */
@@ -889,40 +939,65 @@
         }
 
         function setupCarousel() {
-            // Pick top 6 latest releases (e.g. from 2026/2025/Top)
-            carouselMovies = allMovies.filter(m => m.poster && (m.title.includes('2026') || m.title.includes('2025') || m.tag === 'Top Rated')).slice(0, 6);
-            if (carouselMovies.length === 0) {
-                carouselMovies = allMovies.slice(0, 6);
+            // Select 10 diverse top & latest releases across categories
+            const featuredList = [];
+            const seenTitles = new Set();
+
+            const candidates = [
+                ...allMovies.filter(m => m.poster && m.title.includes('2026')),
+                ...allMovies.filter(m => m.poster && m.title.includes('2025')),
+                ...allMovies.filter(m => m.poster && m.tag === 'Top Rated'),
+                ...allMovies.filter(m => m.poster && m.tag === 'Animation'),
+                ...allMovies.filter(m => m.poster && m.tag === 'Bollywood'),
+                ...allMovies.filter(m => m.poster && m.tag === 'South Action')
+            ];
+
+            for (const c of candidates) {
+                if (!seenTitles.has(c.title) && c.poster) {
+                    seenTitles.add(c.title);
+                    featuredList.push(c);
+                    if (featuredList.length >= 10) break;
+                }
             }
+
+            carouselMovies = featuredList.length > 0 ? featuredList : allMovies.slice(0, 10);
 
             const track = document.getElementById('carouselTrack');
             track.innerHTML = carouselMovies.map((m, idx) => `
                 <div class="carousel-slide ${idx === 0 ? 'active' : ''}" id="slide-${idx}">
                     <div class="slide-bg" style="background-image: url('${m.poster}')"></div>
                     <div class="slide-overlay"></div>
-                    <div class="slide-content">
-                        <div class="slide-tag">Latest Update • ${m.tag || 'Featured'}</div>
-                        <h2 class="slide-title">${m.title}</h2>
-                        <div class="slide-meta">
-                            <span style="color: var(--accent-gold); font-weight: 700;">★ 8.9</span>
-                            <span>•</span>
-                            <span>${m.size || 'HD'}</span>
-                            <span>•</span>
-                            <span>${m.category || 'Movie'}</span>
+                    <div class="slide-container">
+                        <div class="slide-content">
+                            <div class="slide-tag">Featured • ${m.tag || 'Latest Release'}</div>
+                            <h2 class="slide-title" title="${escapeQuotes(m.title)}">${m.title}</h2>
+                            <div class="slide-meta">
+                                <span style="color: var(--accent-gold); font-weight: 700;">★ 8.9 / 10</span>
+                                <span>•</span>
+                                <span>${m.size || 'HD 1080P'}</span>
+                                <span>•</span>
+                                <span>${m.category || 'Cinema'}</span>
+                            </div>
+                            <div style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
+                                <button class="btn btn-primary" onclick="openDirectMovie('${escapeQuotes(m.title)}')">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+                                    <span>Watch Stream</span>
+                                </button>
+                                <button class="btn btn-vlc" onclick="openInVLC('${m.url}', '${escapeQuotes(m.title)}')">
+                                    ${VLC_ICON_SVG}
+                                    <span>Play in VLC</span>
+                                </button>
+                                <a class="btn btn-ghost" href="${m.url}" download>
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    <span>Download</span>
+                                </a>
+                            </div>
                         </div>
-                        <div style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
-                            <button class="btn btn-primary" onclick="openDirectMovie('${escapeQuotes(m.title)}')">
-                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
-                                <span>Watch Stream</span>
-                            </button>
-                            <button class="btn btn-vlc" onclick="openInVLC('${m.url}', '${escapeQuotes(m.title)}')">
-                                ${VLC_ICON_SVG}
-                                <span>Play in VLC</span>
-                            </button>
-                            <a class="btn btn-ghost" href="${m.url}" download>
-                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                                <span>Download</span>
-                            </a>
+
+                        <div class="slide-poster-showcase" onclick="openDirectMovie('${escapeQuotes(m.title)}')">
+                            <img src="${m.poster}" alt="${escapeQuotes(m.title)}" loading="eager"
+                                 onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400';">
+                            <div class="slide-poster-badge">${m.tag || 'HD'}</div>
                         </div>
                     </div>
                 </div>
