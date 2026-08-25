@@ -535,6 +535,44 @@ window.addEventListener('scroll', () => {
     }, 100);
 });
 
+function renderMovieCardHtml(item) {
+    const rawTitle = item.title || '';
+    const safeTitle = escapeQuotes(rawTitle);
+    const itemData = encodeURIComponent(JSON.stringify(item));
+    const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
+    const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
+
+    return `
+        <a class="movie-card" href="${linkUrl}">
+            <div class="card-cover">
+                <img src="${item.poster}" alt="${safeTitle}" loading="lazy"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="cover-fallback" style="display: none;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                    <div style="font-size: 11px; font-weight: 600;">${item.title}</div>
+                </div>
+                <div class="tag-badge">${item.tag || 'HD'}</div>
+                <div class="cover-overlay">
+                    <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
+                        ${isSeries ? 
+                            '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="18" height="18"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
+                            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>'
+                        }
+                    </div>
+                    <span style="font-size: 10.5px; font-weight: 700; color: #fff;">${isSeries ? 'View Series' : 'Watch Now'}</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="card-title" title="${item.title}">${item.title}</div>
+                <div class="card-meta">
+                    <span>${item.size || 'HD'}</span>
+                    <span>${item.date || ''}</span>
+                </div>
+            </div>
+        </a>
+    `;
+}
+
 function escapeQuotes(str) {
     return (str || '').replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
 }
