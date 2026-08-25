@@ -932,10 +932,37 @@
         `;
 
         async function init() {
+            const grid = document.getElementById('movieGrid');
+            // Show loading skeleton
+            grid.innerHTML = Array(12).fill(0).map(() => `
+                <div class="movie-card" style="opacity: 0.5; pointer-events: none;">
+                    <div class="card-cover" style="background: linear-gradient(90deg, #131924 25%, #1c2434 50%, #131924 75%); background-size: 200% 100%; animation: skeleton 1.5s infinite;"></div>
+                    <div class="card-body">
+                        <div style="height: 14px; background: rgba(255,255,255,0.1); border-radius: 4px; width: 80%;"></div>
+                        <div style="height: 10px; background: rgba(255,255,255,0.05); border-radius: 4px; width: 40%; margin-top: 6px;"></div>
+                    </div>
+                </div>
+            `).join('');
+
             try {
-                const res = await fetch('./movies.json');
+                const res = await fetch('./movies.json?v=' + Date.now());
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
                 const rawMovies = await res.json();
-                allMovies = rawMovies.filter(m => {
+                
+                allMovies = rawMovies.map(item => {
+                    if (Array.isArray(item)) {
+                        return {
+                            title: item[0] || '',
+                            poster: item[1] || '',
+                            url: item[2] || '',
+                            tag: item[3] || 'HD',
+                            category: item[4] || 'Cinema',
+                            size: item[5] || 'HD',
+                            date: item[6] || ''
+                        };
+                    }
+                    return item;
+                }).filter(m => {
                     const t = (m.title || '').trim().toLowerCase();
                     return t && !t.includes('parent directory') && t !== '..' && t !== '.';
                 });
@@ -947,7 +974,16 @@
                 renderCategoryChips();
                 renderGrid();
             } catch (err) {
-                document.getElementById('movieGrid').innerHTML = `<p style="color: var(--accent); grid-column: 1/-1; text-align: center; padding: 40px;">Failed to load catalog: ${err.message}</p>`;
+                console.error("Load error:", err);
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                        <p style="color: #ff527b; font-size: 15px; margin-bottom: 16px;">Failed to load catalog: ${err.message}</p>
+                        <button class="btn btn-primary" onclick="init()">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                            <span>Retry Loading</span>
+                        </button>
+                    </div>
+                `;
             }
         }
 
