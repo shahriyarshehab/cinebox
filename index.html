@@ -933,15 +933,19 @@
             document.getElementById('mActions').innerHTML = `
                 <button class="btn btn-primary" onclick="startStream('${item.url}')">
                     <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
-                    <span>Play / Stream Video</span>
+                    <span>Play in Browser</span>
+                </button>
+                <button class="btn btn-primary" style="background: linear-gradient(135deg, #ff8800 0%, #ff5500 100%); border: none;" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="12 2 2 22 22 22 12 2"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="12" y1="7" x2="12" y2="7.01"/></svg>
+                    <span>Play in VLC</span>
                 </button>
                 <a class="btn btn-accent" href="${item.url}" download>
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span>Download File</span>
+                    <span>Download</span>
                 </a>
                 <button class="btn btn-ghost" onclick="copyLink('${item.url}')">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    <span>Copy Link</span>
+                    <span>Copy URL</span>
                 </button>
             `;
 
@@ -952,6 +956,32 @@
             player.src = '';
 
             document.getElementById('movieModal').style.display = 'flex';
+        }
+
+        function openInVLC(url, title) {
+            const cleanTitle = (title || 'movie').replace(/[/\\?%*:|"<>]/g, '_');
+            const m3uContent = `#EXTM3U\n#EXTINF:-1,${title}\n${url}\n`;
+            const blob = new Blob([m3uContent], { type: 'application/x-mpegurl' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `${cleanTitle}.m3u`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+
+            setTimeout(() => {
+                try {
+                    window.location.href = `vlc://${url}`;
+                } catch (e) {}
+            }, 300);
+
+            const toast = document.getElementById('toast');
+            toast.textContent = 'Opening stream in VLC Player...';
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
         function startStream(url) {
