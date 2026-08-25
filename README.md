@@ -1,6 +1,6 @@
 # 🎬 CineBox - Stream & Download Unlimited Movies
 
-CineBox is an ultra-fast, modern cinema & streaming web portal featuring **7,920+ movies**, posters, and direct links.
+CineBox is an ultra-fast, modern cinema & streaming web portal featuring **36000+ movies**, posters, and direct links.
 
 ---
 
@@ -10,7 +10,7 @@ CineBox is an ultra-fast, modern cinema & streaming web portal featuring **7,920
 ---
 
 ## ✨ Features:
-- **7,920+ Movies**: Hollywood 1080p, Bollywood, South Action, K-Drama, Animation & Bangla.
+- **36000+ Movies**: Hollywood 1080p, Bollywood, South Action, K-Drama, Animation & Bangla.
 - **Instant Search**: 0ms instant search across the whole database.
 - **Cinema Posters**: High-definition movie posters for every title.
 - **Stream & Download**: Direct in-browser video playback and 1-click downloading.

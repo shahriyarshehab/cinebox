@@ -1,7 +1,7 @@
 import json
 import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TV_INDEX_FILE = os.path.join(BASE_DIR, "tv_index.json")
 
 with open(TV_INDEX_FILE, "r", encoding="utf-8") as f:

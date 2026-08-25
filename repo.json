@@ -1,9 +1,0 @@
-{
-  "name": "CineBox - MovieBox Provider",
-  "iconUrl": "https://raw.githubusercontent.com/phisher98/TVVVV/refs/heads/main/Icons/moviebox.png",
-  "description": "Exclusive MovieBox Extension Repository for Cloudstream",
-  "manifestVersion": 1,
-  "pluginLists": [
-    "https://raw.githubusercontent.com/shahriyarshehab/cinebox/main/plugins.json"
-  ]
-}

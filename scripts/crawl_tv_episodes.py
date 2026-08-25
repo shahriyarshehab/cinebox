@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 if sys.stdout and hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MOVIES_FILE = os.path.join(BASE_DIR, "movies.json")
 TV_INDEX_FILE = os.path.join(BASE_DIR, "tv_index.json")
 
