@@ -2281,3 +2281,329 @@ video::cue {
     background: #edf2f7;
     color: #0c121e;
 }
+
+/* ==========================================================================
+   📱 COMPREHENSIVE WATCH PAGE MOBILE ERGONOMICS & TOUCH ENHANCEMENTS
+   ========================================================================== */
+
+/* Hero Action Layout */
+.hero-actions-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 6px;
+}
+
+.hero-btn-primary {
+    width: 100%;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
+    color: #07090e;
+    box-shadow: 0 6px 20px var(--primary-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.hero-btn-primary:active {
+    transform: scale(0.98);
+}
+
+.hero-sub-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 8px;
+    width: 100%;
+}
+
+.hero-sub-actions-grid .btn {
+    padding: 9px 12px;
+    font-size: 12px;
+    border-radius: 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Season Pill Selector */
+.season-pill-btn {
+    font-size: 12px;
+    padding: 7px 15px;
+    border-radius: 24px;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.season-pill-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.season-pill-btn.active {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+    font-weight: 800;
+    box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+.season-pill-btn.specials-pill {
+    border-color: rgba(255, 184, 0, 0.4);
+    color: #ffb800;
+}
+
+.season-pill-btn.specials-pill.active {
+    background: var(--accent-gold);
+    color: #07090e;
+    border-color: var(--accent-gold);
+    box-shadow: 0 4px 14px rgba(255, 184, 0, 0.4);
+}
+
+/* Episode Search Filter */
+.ep-filter-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 8px 16px;
+    color: #fff;
+    font-size: 12px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+[data-theme="light"] .ep-filter-input {
+    background: #f1f5f9;
+    color: #0c121e;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.ep-filter-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* Episode Cards (Touch Ergonomic) */
+.ep-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 52px;
+}
+
+.ep-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(0, 229, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.ep-card:active {
+    transform: scale(0.985);
+}
+
+.ep-card.playing {
+    background: linear-gradient(90deg, rgba(0, 229, 255, 0.16) 0%, rgba(0, 119, 182, 0.08) 100%);
+    border-color: var(--primary);
+    box-shadow: 0 0 16px var(--primary-glow);
+}
+
+.ep-index-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11.5px;
+    font-weight: 800;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.ep-card.playing .ep-index-badge {
+    background: var(--primary);
+    color: #07090e;
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.ep-info-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.ep-title-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.35;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+[data-theme="light"] .ep-title-text {
+    color: #0c121e;
+}
+
+.ep-card.playing .ep-title-text {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.ep-meta-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ep-action-btns {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.ep-icon-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.ep-icon-btn:hover, .ep-icon-btn:active {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+}
+
+.ep-icon-btn.btn-vlc-sm {
+    background: rgba(255, 119, 0, 0.15);
+    border-color: rgba(255, 119, 0, 0.35);
+    color: #ff8800;
+}
+
+.ep-icon-btn.btn-vlc-sm:hover {
+    background: #ff8800;
+    color: #fff;
+}
+
+/* Responsive Adjustments for Watch Page */
+@media (max-width: 768px) {
+    .hero-sub-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .ep-card {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+
+    .ep-title-text {
+        font-size: 12px;
+    }
+
+    .ep-index-badge {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+
+    .ep-icon-btn {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .watch-container {
+        padding: 0 10px;
+        margin: 6px auto 30px;
+        gap: 12px;
+    }
+
+    .watch-hero-card {
+        border-radius: var(--radius-md);
+    }
+
+    .watch-poster-big {
+        width: 125px;
+        height: 185px;
+    }
+
+    .watch-title {
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .hero-sub-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .hero-sub-actions-grid .btn {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+
+    .player-hub-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .player-hub-grid .btn {
+        padding: 8px 6px;
+        font-size: 11px;
+    }
+
+    #tvExplorerWrap {
+        padding: 14px 10px !important;
+        border-radius: var(--radius-md) !important;
+    }
+
+    .ep-card {
+        padding: 8px 8px;
+        gap: 8px;
+    }
+}

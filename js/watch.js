@@ -1,6 +1,6 @@
 /**
  * CineBox Watch Page Controller
- * Handles Video Streaming, Subtitles, Double-Tap Seek, TV Explorer, External Players
+ * Optimized for Mobile Touch, Subtitles, Double-Tap Seek, TV Explorer & External Players
  */
 
 let currentItem = null;
@@ -13,15 +13,15 @@ let currentSeasonEpisodes = [];
 let currentPlayingEpisodeIdx = -1;
 let currentSeasonName = 'Season 1';
 let currentSelectedSeasonIdx = 0;
+let episodeFilterQuery = '';
 
-// Player enhancement state
+// Player state
 const playbackSpeeds = [0.75, 1.0, 1.25, 1.5, 2.0];
 let currentSpeedIdx = 1;
 const aspectRatios = ['contain', 'cover', 'fill'];
 let currentAspectIdx = 0;
 let nextEpCountdownTimer = null;
 let currentSubtitleTrack = null;
-let subtitleOffsetSecs = 0;
 
 // Official VLC Cone SVG
 const VLC_ICON_SVG = `
@@ -96,7 +96,7 @@ async function initWatch() {
         })
         .catch(e => console.warn(e));
 
-    // 3. Fallback modular category lookup if title was passed without payload
+    // 3. Fallback modular category lookup
     if (!currentItem && targetTitle) {
         try {
             const cleanTitle = targetTitle.toLowerCase().trim();
@@ -169,22 +169,26 @@ function renderWatchPage(item) {
 
     if (isSeries) {
         document.getElementById('wActions').innerHTML = `
-            <button class="btn btn-primary" onclick="scrollTvExplorer()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                <span>Select Episode</span>
-            </button>
-            <button class="btn btn-ghost" onclick="toggleCurrentWatchlist()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                <span>Bookmark</span>
-            </button>
-            <button class="btn btn-ghost" onclick="shareCurrentMedia()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                <span>Share</span>
-            </button>
-            <a class="btn btn-ghost" href="${item.url}" target="_blank">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                <span>Server Folder</span>
-            </a>
+            <div class="hero-actions-container">
+                <button class="btn btn-primary hero-btn-primary" onclick="scrollTvExplorer()">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                    <span>Select Episode</span>
+                </button>
+                <div class="hero-sub-actions-grid">
+                    <button class="btn btn-ghost" onclick="toggleCurrentWatchlist()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <span>Bookmark</span>
+                    </button>
+                    <button class="btn btn-ghost" onclick="shareCurrentMedia()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                        <span>Share</span>
+                    </button>
+                    <a class="btn btn-ghost" href="${item.url}" target="_blank">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>Server Folder</span>
+                    </a>
+                </div>
+            </div>
         `;
 
         document.getElementById('tvExplorerWrap').style.display = 'block';
@@ -194,26 +198,30 @@ function renderWatchPage(item) {
         currentActiveStreamTitle = item.title;
 
         document.getElementById('wActions').innerHTML = `
-            <button class="btn btn-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M8 5v14l11-7z"/></svg>
-                <span>Play Now</span>
-            </button>
-            <button class="btn btn-vlc" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
-                ${VLC_ICON_SVG}
-                <span>Play VLC</span>
-            </button>
-            <a class="btn btn-accent" href="${item.url}" download>
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Download</span>
-            </a>
-            <button class="btn btn-ghost" onclick="toggleCurrentWatchlist()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                <span>Bookmark</span>
-            </button>
-            <button class="btn btn-ghost" onclick="shareCurrentMedia()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                <span>Share</span>
-            </button>
+            <div class="hero-actions-container">
+                <button class="btn btn-primary hero-btn-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
+                    <span>Play Now (In Browser)</span>
+                </button>
+                <div class="hero-sub-actions-grid">
+                    <button class="btn btn-vlc" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
+                        ${VLC_ICON_SVG}
+                        <span>Play VLC</span>
+                    </button>
+                    <a class="btn btn-accent" href="${item.url}" download>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Download</span>
+                    </a>
+                    <button class="btn btn-ghost" onclick="toggleCurrentWatchlist()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <span>Bookmark</span>
+                    </button>
+                    <button class="btn btn-ghost" onclick="shareCurrentMedia()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                        <span>Share</span>
+                    </button>
+                </div>
+            </div>
         `;
 
         startStream(item.url, item.title);
@@ -222,7 +230,7 @@ function renderWatchPage(item) {
 
 function scrollTvExplorer() {
     const exp = document.getElementById('tvExplorerWrap');
-    if (exp) exp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (exp) exp.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function toggleCurrentWatchlist() {
@@ -253,7 +261,7 @@ function shareCurrentMedia() {
     if (!currentItem) return;
     const shareData = {
         title: `${currentItem.title} — CineBox`,
-        text: `Watch ${currentItem.title} in HD on CineBox!`,
+        text: `Watch ${currentItem.title} in 1080p HD on CineBox!`,
         url: window.location.href
     };
     if (navigator.share) {
@@ -285,7 +293,6 @@ function setupPlayerListeners() {
             );
         }
 
-        // Check for Auto-play countdown near end (within last 12s)
         if (currentPlayingEpisodeIdx >= 0 && currentSeasonEpisodes.length > currentPlayingEpisodeIdx + 1) {
             if (player.duration > 30 && player.currentTime >= player.duration - 12 && !nextEpCountdownTimer) {
                 triggerNextEpisodeCountdown();
@@ -387,7 +394,7 @@ function seekRelative(seconds, direction) {
     const ripple = direction === 'left' ? document.getElementById('seekRippleLeft') : document.getElementById('seekRippleRight');
     if (ripple) {
         ripple.classList.remove('active');
-        void ripple.offsetWidth; // trigger reflow
+        void ripple.offsetWidth;
         ripple.classList.add('active');
         setTimeout(() => ripple.classList.remove('active'), 650);
     }
@@ -461,7 +468,6 @@ function loadSubtitleText(content, fileName = 'subtitles.srt') {
     const blob = new Blob([vttContent], { type: 'text/vtt' });
     const blobUrl = URL.createObjectURL(blob);
 
-    // Remove existing tracks
     const existingTracks = player.querySelectorAll('track');
     existingTracks.forEach(t => t.remove());
 
@@ -545,14 +551,14 @@ function cancelNextEpisode() {
 }
 
 // ==========================================
-// 📺 TV Explorer & Episode Management
+// 📺 TV Explorer & Touch Episode Management
 // ==========================================
 async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
     const tabs = document.getElementById('seasonTabs');
     const epList = document.getElementById('episodeList');
     const countBadge = document.getElementById('seasonCountBadge');
 
-    tabs.innerHTML = '<div style="font-size: 12px; color: var(--text-muted);">Loading seasons & episodes...</div>';
+    tabs.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 4px;">Loading seasons...</div>';
     epList.innerHTML = '';
     countBadge.textContent = 'Loading...';
     motherFolderSpecials = [];
@@ -620,7 +626,7 @@ function renderIndexedTvData(tvData, seriesTitle) {
         let tabsHtml = seasons.map((s, idx) => {
             const sName = s[0];
             return `
-            <button class="btn btn-ghost ${idx === 0 ? 'active' : ''}" style="font-size: 11.5px; padding: 5px 12px; border-radius: 20px; white-space: nowrap; ${idx === 0 ? 'background: var(--primary); color: #07090e; font-weight: 700;' : ''}" onclick="selectIndexedSeason(this, ${idx}, '${escapeQuotes(sName)}')">
+            <button class="season-pill-btn ${idx === 0 ? 'active' : ''}" onclick="selectIndexedSeason(this, ${idx}, '${escapeQuotes(sName)}')">
                 ${sName}
             </button>
             `;
@@ -628,7 +634,7 @@ function renderIndexedTvData(tvData, seriesTitle) {
 
         if (specials.length > 0) {
             tabsHtml += `
-                <button class="btn btn-ghost" style="font-size: 11.5px; padding: 5px 12px; border-radius: 20px; border-color: rgba(255, 184, 0, 0.4); color: #ffb800; white-space: nowrap;" onclick="selectSpecialsTab(this)">
+                <button class="season-pill-btn specials-pill" onclick="selectSpecialsTab(this)">
                     ★ Specials (${specials.length})
                 </button>
             `;
@@ -650,14 +656,10 @@ function renderIndexedTvData(tvData, seriesTitle) {
 }
 
 function selectIndexedSeason(btnEl, seasonIdx, seasonName) {
-    document.querySelectorAll('#seasonTabs button').forEach(b => {
-        b.style.background = 'rgba(255, 255, 255, 0.05)';
-        b.style.color = '#fff';
-        b.style.fontWeight = '600';
+    document.querySelectorAll('#seasonTabs .season-pill-btn').forEach(b => {
+        b.classList.remove('active');
     });
-    btnEl.style.background = 'var(--primary)';
-    btnEl.style.color = '#07090e';
-    btnEl.style.fontWeight = '700';
+    btnEl.classList.add('active');
 
     currentSelectedSeasonIdx = seasonIdx;
     loadIndexedSeasonEpisodes(seasonIdx, seasonName);
@@ -682,14 +684,10 @@ function loadIndexedSeasonEpisodes(seasonIdx, seasonName) {
 }
 
 function selectSpecialsTab(btnEl) {
-    document.querySelectorAll('#seasonTabs button').forEach(b => {
-        b.style.background = 'rgba(255, 255, 255, 0.05)';
-        b.style.color = '#fff';
-        b.style.fontWeight = '600';
+    document.querySelectorAll('#seasonTabs .season-pill-btn').forEach(b => {
+        b.classList.remove('active');
     });
-    btnEl.style.background = 'var(--accent-gold)';
-    btnEl.style.color = '#07090e';
-    btnEl.style.fontWeight = '700';
+    btnEl.classList.add('active');
 
     currentSeasonName = 'Specials / Bonus';
     currentSeasonEpisodes = motherFolderSpecials;
@@ -697,33 +695,64 @@ function selectSpecialsTab(btnEl) {
     renderEpisodeListHtml(motherFolderSpecials);
 }
 
+function filterEpisodes(query) {
+    episodeFilterQuery = (query || '').trim().toLowerCase();
+    renderEpisodeListHtml(currentSeasonEpisodes);
+}
+
 function renderEpisodeListHtml(episodes) {
     const epList = document.getElementById('episodeList');
-    epList.innerHTML = episodes.map((ep, idx) => {
-        const isPlaying = idx === currentPlayingEpisodeIdx;
+    if (!episodes || episodes.length === 0) {
+        epList.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 14px; text-align: center;">No episodes found.</div>';
+        return;
+    }
+
+    const filtered = episodeFilterQuery ? episodes.filter(e => e.name.toLowerCase().includes(episodeFilterQuery)) : episodes;
+
+    let html = '';
+    
+    // Add search bar if more than 8 episodes
+    if (episodes.length > 8) {
+        html += `
+            <div style="position: relative; margin-bottom: 8px;">
+                <input type="text" class="ep-filter-input" placeholder="Search ${episodes.length} episodes..." value="${escapeQuotes(episodeFilterQuery)}" oninput="filterEpisodes(this.value)">
+                ${episodeFilterQuery ? `<button onclick="filterEpisodes('');" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">✕</button>` : ''}
+            </div>
+        `;
+    }
+
+    html += filtered.map((ep, idx) => {
+        const originalIdx = episodes.indexOf(ep);
+        const isPlaying = originalIdx === currentPlayingEpisodeIdx;
+        const cleanName = ep.name.replace(/\.(mp4|mkv|avi|webm)$/i, '');
+
         return `
-        <div id="ep-item-${idx}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; background: ${isPlaying ? 'rgba(0, 229, 255, 0.12)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${isPlaying ? 'var(--primary)' : 'var(--border)'}; border-radius: 8px; transition: all 0.2s ease;">
-            <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
-                <span style="font-size: 10.5px; font-weight: 800; color: ${isPlaying ? 'var(--primary)' : 'var(--text-dim)'}; min-width: 18px;">${idx + 1}</span>
-                <div style="font-size: 12px; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeQuotes(ep.name)}">
-                    ${ep.name}
+        <div id="ep-item-${originalIdx}" class="ep-card ${isPlaying ? 'playing' : ''}" onclick="playSpecificEpisode(${originalIdx})">
+            <div class="ep-index-badge">
+                ${isPlaying ? '▶' : (originalIdx + 1)}
+            </div>
+            <div class="ep-info-wrap">
+                <div class="ep-title-text" title="${escapeQuotes(ep.name)}">
+                    ${cleanName}
+                </div>
+                <div class="ep-meta-sub">
+                    <span style="color: ${isPlaying ? 'var(--primary)' : 'var(--text-muted)'}; font-weight: 700;">${isPlaying ? 'NOW PLAYING' : currentSeasonName}</span>
+                    <span>•</span>
+                    <span>1080p HD</span>
                 </div>
             </div>
-            <div style="display: flex; gap: 4px; flex-shrink: 0;">
-                <button class="btn btn-primary" style="padding: 4px 8px; font-size: 10.5px;" onclick="playSpecificEpisode(${idx})">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="9" height="9"><path d="M8 5v14l11-7z"/></svg>
-                    <span>${isPlaying ? 'Playing' : 'Play'}</span>
-                </button>
-                <button class="btn btn-vlc" style="padding: 4px 8px; font-size: 10.5px;" onclick="openInVLC('${ep.url}', '${escapeQuotes(ep.name)}')">
+            <div class="ep-action-btns" onclick="event.stopPropagation();">
+                <button class="ep-icon-btn btn-vlc-sm" onclick="openInVLC('${ep.url}', '${escapeQuotes(ep.name)}')" title="Play in VLC Player">
                     ${VLC_ICON_SVG}
-                    <span>VLC</span>
                 </button>
-                <a class="btn btn-ghost" style="padding: 4px 6px; font-size: 10.5px;" href="${ep.url}" download>
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <a class="ep-icon-btn" href="${ep.url}" download title="Download Episode">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 </a>
             </div>
         </div>
     `;}).join('');
+
+    epList.innerHTML = html;
 }
 
 function playSpecificEpisode(idx) {
@@ -762,13 +791,13 @@ function playPrevEpisode() {
 function fallbackTvView(seriesUrl, seriesTitle) {
     document.getElementById('seasonCountBadge').textContent = 'Directory';
     document.getElementById('seasonTabs').innerHTML = `
-        <a class="btn btn-primary" style="font-size: 11.5px; padding: 6px 12px; border-radius: 20px;" href="${seriesUrl}" target="_blank">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <a class="btn btn-primary" style="font-size: 12px; padding: 8px 14px; border-radius: 20px;" href="${seriesUrl}" target="_blank">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             <span>Browse All Seasons on Server</span>
         </a>
     `;
     document.getElementById('episodeList').innerHTML = `
-        <div style="font-size: 11.5px; color: var(--text-muted); padding: 6px 2px; line-height: 1.4;">
+        <div style="font-size: 12px; color: var(--text-muted); padding: 10px 4px; line-height: 1.5;">
             Click above to browse all season folders and stream/download any episode directly via high-speed BDIX.
         </div>
     `;
