@@ -1212,6 +1212,7 @@
         function renderMovieCardHtml(item) {
             const safeTitle = escapeQuotes(item.title);
             const safeObj = encodeURIComponent(JSON.stringify(item));
+            const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || item.url.endsWith('/');
 
             return `
                 <div class="movie-card" onclick="openItemFromData('${safeObj}')">
@@ -1230,10 +1231,13 @@
                         </div>
 
                         <div class="cover-overlay">
-                            <div class="play-button-symbol">
-                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
+                            <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
+                                ${isSeries ? 
+                                    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="20" height="20"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
+                                    '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>'
+                                }
                             </div>
-                            <span style="font-size: 11.5px; font-weight: 700; color: #fff;">Stream / VLC / Download</span>
+                            <span style="font-size: 11px; font-weight: 700; color: #fff;">${isSeries ? 'Browse Seasons & Episodes' : 'Stream / VLC / Download'}</span>
                         </div>
                     </div>
 
@@ -1337,24 +1341,37 @@
                 <span class="modal-chip">Score: 8.8/10</span>
             `;
 
-            document.getElementById('mActions').innerHTML = `
-                <button class="btn btn-primary" onclick="startStream('${item.url}')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
-                    <span>${isSeries ? 'Play First / Stream' : 'Play in Browser'}</span>
-                </button>
-                <button class="btn btn-vlc" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
-                    ${VLC_ICON_SVG}
-                    <span>Play in VLC</span>
-                </button>
-                <a class="btn btn-accent" href="${item.url}" target="_blank" download>
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    <span>${isSeries ? 'Open Series Folder' : 'Download'}</span>
-                </a>
-                <button class="btn btn-ghost" onclick="copyLink('${item.url}')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    <span>Copy URL</span>
-                </button>
-            `;
+            if (isSeries) {
+                document.getElementById('mActions').innerHTML = `
+                    <a class="btn btn-ghost" href="${item.url}" target="_blank">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>Open Server Directory</span>
+                    </a>
+                    <button class="btn btn-ghost" onclick="copyLink('${item.url}')">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <span>Copy Series Link</span>
+                    </button>
+                `;
+            } else {
+                document.getElementById('mActions').innerHTML = `
+                    <button class="btn btn-primary" onclick="startStream('${item.url}')">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+                        <span>Play in Browser</span>
+                    </button>
+                    <button class="btn btn-vlc" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
+                        ${VLC_ICON_SVG}
+                        <span>Play in VLC</span>
+                    </button>
+                    <a class="btn btn-accent" href="${item.url}" download>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Download</span>
+                    </a>
+                    <button class="btn btn-ghost" onclick="copyLink('${item.url}')">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <span>Copy URL</span>
+                    </button>
+                `;
+            }
 
             const vWrap = document.getElementById('videoWrap');
             vWrap.style.display = 'none';
