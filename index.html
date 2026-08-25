@@ -21,7 +21,6 @@
             --accent: #ff2a5f;
             --accent-gold: #ffb800;
             --accent-green: #00e676;
-            --vlc-orange: #ff7700;
             
             --text-main: #ffffff;
             --text-muted: #8e9bb0;
@@ -222,6 +221,29 @@
             transform: translateY(-2px);
         }
 
+        .btn-see-all {
+            background: rgba(0, 229, 255, 0.08);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            color: var(--primary);
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-see-all:hover {
+            background: var(--primary);
+            color: #07090e;
+            border-color: var(--primary);
+            box-shadow: 0 0 16px var(--primary-glow);
+            transform: translateX(3px);
+        }
+
         /* Carousel Section */
         .carousel-wrapper {
             margin: 24px 40px 0;
@@ -236,7 +258,7 @@
         .carousel-track {
             position: relative;
             width: 100%;
-            height: 440px;
+            height: 430px;
         }
 
         .carousel-slide {
@@ -334,8 +356,8 @@
 
         .slide-poster-showcase {
             position: relative;
-            width: 230px;
-            height: 340px;
+            width: 220px;
+            height: 330px;
             border-radius: 18px;
             overflow: hidden;
             border: 2px solid var(--border-hover);
@@ -428,85 +450,56 @@
             box-shadow: 0 0 12px var(--primary-glow);
         }
 
-        /* Categories Slider */
-        .category-nav {
-            padding: 20px 40px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            overflow-x: auto;
-            scrollbar-width: thin;
-        }
-
-        .cat-tab {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            padding: 8px 16px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .cat-tab:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-            transform: translateY(-2px);
-        }
-
-        .cat-tab.active {
-            background: var(--primary);
-            color: #07090e;
-            font-weight: 700;
-            border-color: var(--primary);
-            box-shadow: 0 4px 14px var(--primary-glow);
-        }
-
-        .cat-count {
-            background: rgba(0, 0, 0, 0.25);
-            font-size: 11px;
-            padding: 2px 7px;
-            border-radius: 10px;
-        }
-
-        /* Main Container */
+        /* Content Area */
         .content-area {
-            padding: 24px 40px 60px;
+            padding: 30px 40px 60px;
             flex: 1;
         }
 
-        .section-bar {
+        /* Row Section Block (Multi-Category View) */
+        .category-row-block {
+            margin-bottom: 44px;
+        }
+
+        .row-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .row-title-wrap {
+            display: flex;
+            align-items: center;
             gap: 12px;
         }
 
-        .section-heading {
+        .row-heading {
             font-family: var(--font-display);
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .counter-badge {
-            font-size: 12.5px;
+        .row-badge {
+            background: rgba(255, 255, 255, 0.07);
             color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
         }
 
-        /* Poster Grid (Large Poster Cinema Cards) */
+        /* Movie Poster Grid (Row & Full Grid) */
         .poster-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
-            gap: 28px 22px;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 24px 20px;
         }
 
         .movie-card {
@@ -653,6 +646,16 @@
             color: var(--text-muted);
         }
 
+        /* Full View Header Bar */
+        .category-view-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
         .pagination-wrap {
             display: flex;
             justify-content: center;
@@ -787,8 +790,8 @@
             header { padding: 12px 18px; }
             .carousel-wrapper { margin: 16px 18px 0; }
             .carousel-track { height: 360px; }
-            .slide-content { padding: 24px 20px; }
-            .category-nav { padding: 16px 18px 0; }
+            .slide-container { padding: 24px 20px; }
+            .slide-poster-showcase { display: none; }
             .content-area { padding: 18px 18px 40px; }
             .poster-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 16px 12px; }
             .modal-row { flex-direction: column; align-items: center; text-align: center; }
@@ -801,7 +804,7 @@
 
     <!-- Header -->
     <header>
-        <div class="brand" onclick="filterCategory('All')">
+        <div class="brand" onclick="showHomeView()">
             <div class="brand-mark">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
             </div>
@@ -820,15 +823,13 @@
         </div>
 
         <div>
-            <a class="btn btn-ghost" href="#categories">Categories</a>
+            <button class="btn btn-ghost" onclick="showHomeView()">All Rows</button>
         </div>
     </header>
 
     <!-- Latest Updates Carousel -->
     <div class="carousel-wrapper" id="heroCarousel">
-        <div class="carousel-track" id="carouselTrack">
-            <!-- Carousel Slides Rendered Here -->
-        </div>
+        <div class="carousel-track" id="carouselTrack"></div>
 
         <button class="carousel-btn prev" onclick="prevSlide()">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
@@ -840,21 +841,9 @@
         <div class="carousel-dots" id="carouselDots"></div>
     </div>
 
-    <!-- Category Nav -->
-    <div class="category-nav" id="categories"></div>
-
     <!-- Main Content Area -->
-    <div class="content-area">
-        <div class="section-bar">
-            <div class="section-heading" id="sectionTitle">All Movies & Releases</div>
-            <div class="counter-badge" id="matchCounter">Loading movies...</div>
-        </div>
-
-        <div class="poster-grid" id="movieGrid"></div>
-
-        <div class="pagination-wrap">
-            <button class="btn btn-ghost" id="loadMoreBtn" onclick="loadMore()">Load More Movies</button>
-        </div>
+    <div class="content-area" id="mainContent">
+        <!-- Rendered dynamically as Category Rows or Full Category Grid -->
     </div>
 
     <!-- Movie Modal -->
@@ -890,6 +879,9 @@
 
     <script>
         let allMovies = [];
+        let currentView = 'home'; // 'home' | 'category' | 'search'
+        let currentCategoryTag = 'All';
+        let currentCategoryName = 'All Movies';
         let filteredMovies = [];
         let displayedCount = 40;
         const BATCH_SIZE = 40;
@@ -898,23 +890,20 @@
         let carouselMovies = [];
         let carouselTimer = null;
 
-        const CATEGORY_DEFS = [
-            { name: 'All Movies', tag: 'All' },
-            { name: 'IMDb Top 250', tag: 'Top Rated' },
-            { name: 'Animation & Anime', tag: 'Animation' },
-            { name: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
-            { name: 'English Movies', tag: 'English Movies' },
-            { name: 'Bollywood (Hindi)', tag: 'Bollywood' },
-            { name: 'South Hindi Dubbed', tag: 'South Action' },
-            { name: 'South Original', tag: 'South Original' },
-            { name: 'TV & Web Series', tag: 'TV Series' },
-            { name: 'Korean Drama', tag: 'K-Drama' },
-            { name: 'Bangla Movies', tag: 'Bangla' },
-            { name: 'Foreign Movies', tag: 'Foreign Movies' },
-            { name: '3D Movies', tag: '3D Movies' }
+        const CATEGORY_ROWS = [
+            { name: 'IMDb Top 250', tag: 'Top Rated', limit: 8 },
+            { name: 'Animation & Anime', tag: 'Animation', limit: 8 },
+            { name: 'Hollywood 1080p', tag: 'Hollywood 1080p', limit: 8 },
+            { name: 'Bollywood (Hindi)', tag: 'Bollywood', limit: 8 },
+            { name: 'South Hindi Dubbed', tag: 'South Action', limit: 8 },
+            { name: 'South Original', tag: 'South Original', limit: 8 },
+            { name: 'TV & Web Series', tag: 'TV Series', limit: 8 },
+            { name: 'Korean Drama', tag: 'K-Drama', limit: 8 },
+            { name: 'Bangla Movies', tag: 'Bangla', limit: 8 },
+            { name: 'Foreign Movies', tag: 'Foreign Movies', limit: 8 },
+            { name: '3D Movies', tag: '3D Movies', limit: 8 },
+            { name: 'English Classic Movies', tag: 'English Movies', limit: 8 }
         ];
-
-        let currentActiveTag = 'All';
 
         // Official VLC Cone SVG (svgrepo:349556)
         const VLC_ICON_SVG = `
@@ -931,17 +920,12 @@
         `;
 
         async function init() {
-            const grid = document.getElementById('movieGrid');
-            // Show loading skeleton
-            grid.innerHTML = Array(12).fill(0).map(() => `
-                <div class="movie-card" style="opacity: 0.5; pointer-events: none;">
-                    <div class="card-cover" style="background: linear-gradient(90deg, #131924 25%, #1c2434 50%, #131924 75%); background-size: 200% 100%; animation: skeleton 1.5s infinite;"></div>
-                    <div class="card-body">
-                        <div style="height: 14px; background: rgba(255,255,255,0.1); border-radius: 4px; width: 80%;"></div>
-                        <div style="height: 10px; background: rgba(255,255,255,0.05); border-radius: 4px; width: 40%; margin-top: 6px;"></div>
-                    </div>
+            const main = document.getElementById('mainContent');
+            main.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 16px; font-weight: 600; color: var(--text-muted);">Loading 36,000+ Movies & Category Rows...</div>
                 </div>
-            `).join('');
+            `;
 
             try {
                 const res = await fetch('./movies.json?v=' + Date.now());
@@ -967,15 +951,13 @@
                 });
 
                 document.getElementById('totalCountBadge').textContent = `${allMovies.length.toLocaleString()} Movies`;
-                filteredMovies = [...allMovies];
                 
                 setupCarousel();
-                renderCategoryChips();
-                renderGrid();
+                renderView();
             } catch (err) {
                 console.error("Load error:", err);
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px;">
+                main.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px;">
                         <p style="color: #ff527b; font-size: 15px; margin-bottom: 16px;">Failed to load catalog: ${err.message}</p>
                         <button class="btn btn-primary" onclick="init()">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
@@ -987,7 +969,6 @@
         }
 
         function setupCarousel() {
-            // Select 10 diverse top & latest releases across categories
             const featuredList = [];
             const seenTitles = new Set();
 
@@ -1090,86 +1071,91 @@
         }
 
         function openDirectMovie(title) {
-            const idx = filteredMovies.findIndex(m => m.title === title);
-            if (idx !== -1) {
-                openModal(idx);
+            const item = allMovies.find(m => m.title === title);
+            if (item) {
+                renderModalContent(item);
             }
         }
 
-        function renderCategoryChips() {
-            const counts = {};
-            counts['All'] = allMovies.length;
-            
-            allMovies.forEach(m => {
-                const t = m.tag || 'Other';
-                counts[t] = (counts[t] || 0) + 1;
-            });
+        function renderView() {
+            const main = document.getElementById('mainContent');
 
-            const nav = document.getElementById('categories');
-            nav.innerHTML = CATEGORY_DEFS.map(def => {
-                const cnt = counts[def.tag] || 0;
-                return `
-                    <div class="cat-tab ${def.tag === currentActiveTag ? 'active' : ''}" onclick="filterCategory('${def.tag}')">
-                        <span>${def.name}</span>
-                        <span class="cat-count">${cnt.toLocaleString()}</span>
+            if (currentView === 'home') {
+                document.getElementById('heroCarousel').style.display = 'block';
+                renderHomeRows(main);
+            } else {
+                document.getElementById('heroCarousel').style.display = 'none';
+                renderCategoryFullGrid(main);
+            }
+        }
+
+        function renderHomeRows(container) {
+            let html = '';
+
+            CATEGORY_ROWS.forEach(cat => {
+                const catMovies = allMovies.filter(m => m.tag === cat.tag || (m.category && m.category.includes(cat.tag)));
+                if (catMovies.length === 0) return;
+
+                const topSlice = catMovies.slice(0, cat.limit || 8);
+
+                html += `
+                    <div class="category-row-block">
+                        <div class="row-header">
+                            <div class="row-title-wrap">
+                                <h2 class="row-heading">${cat.name}</h2>
+                                <span class="row-badge">${catMovies.length.toLocaleString()} items</span>
+                            </div>
+                            <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
+                                <span>Show All</span>
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="poster-grid">
+                            ${topSlice.map((item) => renderMovieCardHtml(item)).join('')}
+                        </div>
                     </div>
                 `;
-            }).join('');
+            });
+
+            container.innerHTML = html;
         }
 
-        function filterCategory(tag) {
-            currentActiveTag = tag;
-            renderCategoryChips();
-
-            document.getElementById('searchInput').value = '';
-            const activeDef = CATEGORY_DEFS.find(d => d.tag === tag);
-            document.getElementById('sectionTitle').textContent = activeDef ? activeDef.name : tag;
-
-            if (tag === 'All') {
-                filteredMovies = [...allMovies];
-            } else {
-                filteredMovies = allMovies.filter(m => m.tag === tag || (m.category && m.category.includes(tag)));
-            }
-
-            displayedCount = BATCH_SIZE;
-            renderGrid();
-            document.querySelector('.content-area').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function handleSearch() {
-            const q = document.getElementById('searchInput').value.toLowerCase().trim();
-            if (!q) {
-                filterCategory(currentActiveTag);
-                return;
-            }
-
-            filteredMovies = allMovies.filter(m => 
-                (m.title && m.title.toLowerCase().includes(q)) || 
-                (m.category && m.category.toLowerCase().includes(q)) || 
-                (m.tag && m.tag.toLowerCase().includes(q))
-            );
-
-            document.getElementById('sectionTitle').textContent = `Search: "${q}"`;
-            displayedCount = BATCH_SIZE;
-            renderGrid();
-        }
-
-        function renderGrid() {
-            const grid = document.getElementById('movieGrid');
+        function renderCategoryFullGrid(container) {
             const toShow = filteredMovies.slice(0, displayedCount);
 
-            document.getElementById('matchCounter').textContent = `Showing ${toShow.length} of ${filteredMovies.length.toLocaleString()} titles`;
+            container.innerHTML = `
+                <div class="category-view-bar">
+                    <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                        <button class="btn btn-ghost" onclick="showHomeView()">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span>Back to All Categories</span>
+                        </button>
+                        <h1 class="row-heading" style="font-size: 24px;">${currentCategoryName}</h1>
+                    </div>
+                    <div style="font-size: 13px; color: var(--text-muted);">
+                        Showing ${toShow.length} of ${filteredMovies.length.toLocaleString()} titles
+                    </div>
+                </div>
 
-            if (toShow.length === 0) {
-                grid.innerHTML = '<p style="color: var(--text-muted); grid-column: 1/-1; text-align: center; padding: 48px;">No matching titles found in this selection.</p>';
-                document.getElementById('loadMoreBtn').style.display = 'none';
-                return;
-            }
+                <div class="poster-grid" id="movieGrid">
+                    ${toShow.map((item) => renderMovieCardHtml(item)).join('')}
+                </div>
 
-            grid.innerHTML = toShow.map((item, idx) => `
-                <div class="movie-card" onclick="openModal(${idx})">
+                <div class="pagination-wrap">
+                    <button class="btn btn-ghost" id="loadMoreBtn" style="${displayedCount < filteredMovies.length ? 'display:block' : 'display:none'}" onclick="loadMore()">Load More Movies</button>
+                </div>
+            `;
+        }
+
+        function renderMovieCardHtml(item) {
+            const safeTitle = escapeQuotes(item.title);
+            const safeObj = encodeURIComponent(JSON.stringify(item));
+
+            return `
+                <div class="movie-card" onclick="openItemFromData('${safeObj}')">
                     <div class="card-cover">
-                        <img src="${item.poster}" alt="${escapeQuotes(item.title)}" loading="lazy"
+                        <img src="${item.poster}" alt="${safeTitle}" loading="lazy"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="cover-fallback" style="display: none;">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
@@ -1198,20 +1184,60 @@
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `;
+        }
 
-            document.getElementById('loadMoreBtn').style.display = displayedCount < filteredMovies.length ? 'block' : 'none';
+        function showHomeView() {
+            currentView = 'home';
+            document.getElementById('searchInput').value = '';
+            renderView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openCategoryView(tag, name) {
+            currentView = 'category';
+            currentCategoryTag = tag;
+            currentCategoryName = name || tag;
+            filteredMovies = allMovies.filter(m => m.tag === tag || (m.category && m.category.includes(tag)));
+            displayedCount = BATCH_SIZE;
+            renderView();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function handleSearch() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!q) {
+                showHomeView();
+                return;
+            }
+
+            currentView = 'search';
+            currentCategoryName = `Search: "${q}"`;
+            filteredMovies = allMovies.filter(m => 
+                (m.title && m.title.toLowerCase().includes(q)) || 
+                (m.category && m.category.toLowerCase().includes(q)) || 
+                (m.tag && m.tag.toLowerCase().includes(q))
+            );
+            displayedCount = BATCH_SIZE;
+            renderView();
         }
 
         function loadMore() {
             if (displayedCount >= filteredMovies.length) return;
             displayedCount += BATCH_SIZE;
-            renderGrid();
+            
+            const grid = document.getElementById('movieGrid');
+            if (grid) {
+                const toShow = filteredMovies.slice(0, displayedCount);
+                grid.innerHTML = toShow.map(item => renderMovieCardHtml(item)).join('');
+                document.getElementById('loadMoreBtn').style.display = displayedCount < filteredMovies.length ? 'block' : 'none';
+            }
         }
 
         // Auto-load on scroll
         let scrollTimeout = null;
         window.addEventListener('scroll', () => {
+            if (currentView === 'home') return;
             if (scrollTimeout) return;
             scrollTimeout = setTimeout(() => {
                 scrollTimeout = null;
@@ -1227,10 +1253,16 @@
             }, 100);
         });
 
-        function openModal(idx) {
-            const item = filteredMovies[idx];
-            if (!item) return;
+        function openItemFromData(encodedJson) {
+            try {
+                const item = JSON.parse(decodeURIComponent(encodedJson));
+                renderModalContent(item);
+            } catch (e) {
+                console.error(e);
+            }
+        }
 
+        function renderModalContent(item) {
             document.getElementById('mTitle').textContent = item.title;
             document.getElementById('mPoster').src = item.poster;
             document.getElementById('mPoster').style.display = 'block';
