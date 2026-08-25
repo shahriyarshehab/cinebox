@@ -911,9 +911,28 @@
         }
 
         function loadMore() {
+            if (displayedCount >= filteredMovies.length) return;
             displayedCount += BATCH_SIZE;
             renderGrid();
         }
+
+        // Auto-load more movies on infinite scroll
+        let scrollTimeout = null;
+        window.addEventListener('scroll', () => {
+            if (scrollTimeout) return;
+            scrollTimeout = setTimeout(() => {
+                scrollTimeout = null;
+                const scrollHeight = document.documentElement.scrollHeight;
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const clientHeight = window.innerHeight || document.documentElement.clientHeight;
+
+                if (scrollTop + clientHeight >= scrollHeight - 500) {
+                    if (displayedCount < filteredMovies.length) {
+                        loadMore();
+                    }
+                }
+            }, 100);
+        });
 
         function openModal(idx) {
             const item = filteredMovies[idx];
