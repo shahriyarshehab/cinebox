@@ -930,6 +930,7 @@
 
     <script>
         let allMovies = [];
+        let tvCatalog = {};
         let currentView = 'home'; // 'home' | 'category' | 'search'
         let currentCategoryTag = 'All';
         let currentCategoryName = 'All Movies';
@@ -977,6 +978,15 @@
                     <div style="font-size: 16px; font-weight: 600; color: var(--text-muted);">Loading 36,000+ Movies & Category Rows...</div>
                 </div>
             `;
+
+            // Load TV Series catalog index in background
+            fetch('./tv_index.json?v=' + Date.now())
+                .then(r => r.json())
+                .then(data => {
+                    tvCatalog = data || {};
+                    console.log('TV Catalog loaded with', Object.keys(tvCatalog).length, 'series');
+                })
+                .catch(e => console.warn('TV catalog load notice:', e));
 
             try {
                 const res = await fetch('./movies.json?v=' + Date.now());
@@ -1363,7 +1373,7 @@
             document.getElementById('movieModal').style.display = 'flex';
         }
 
-        let motherFolderSpecials = [];
+        let currentTvEntry = null;
 
         async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
             const tabs = document.getElementById('seasonTabs');
@@ -1372,72 +1382,126 @@
 
             tabs.innerHTML = '<div style="font-size: 12px; color: var(--text-muted);">Loading seasons & episodes...</div>';
             epList.innerHTML = '';
-            countBadge.textContent = 'Scanning...';
+            countBadge.textContent = 'Loading...';
             motherFolderSpecials = [];
 
-            try {
-                const res = await fetch(seriesUrl);
-                if (!res.ok) throw new Error('Cannot fetch directory directly');
-                const html = await res.text();
-
-                // Extract all hrefs
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                const links = Array.from(doc.querySelectorAll('a'));
-
-                const seasonDirs = [];
-                const directVideos = [];
-
-                links.forEach(a => {
-                    const href = a.getAttribute('href');
-                    const text = (a.textContent || '').trim();
-                    if (!href || text.toLowerCase().includes('parent directory') || text === '..' || text === '.' || href.includes('browsehappy')) return;
-                    if (href.endsWith('.jpg') || href.endsWith('.png') || href.endsWith('.nfo') || href.endsWith('.txt')) return;
-
-                    const absoluteUrl = new URL(href, seriesUrl).href;
-                    if (href.endsWith('/') || text.toLowerCase().includes('season') || text.toLowerCase().includes('s0')) {
-                        seasonDirs.push({ name: text, url: absoluteUrl });
-                    } else if (href.match(/\.(mp4|mkv|avi|webm)$/i)) {
-                        directVideos.push({ name: text, url: absoluteUrl });
-                    }
-                });
-
-                motherFolderSpecials = directVideos;
-
-                if (seasonDirs.length > 0) {
-                    const totalSeasons = seasonDirs.length + (directVideos.length > 0 ? 1 : 0);
-                    countBadge.textContent = `${seasonDirs.length} Seasons ${directVideos.length > 0 ? '+ Specials' : ''}`;
-
-                    let tabsHtml = seasonDirs.map((s, idx) => `
-                        <button class="btn btn-ghost ${idx === 0 ? 'active' : ''}" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; ${idx === 0 ? 'background: var(--primary); color: #07090e; font-weight: 700;' : ''}" onclick="selectSeason(this, '${s.url}', '${escapeQuotes(s.name)}')">
-                            ${s.name}
-                        </button>
-                    `).join('');
-
-                    if (directVideos.length > 0) {
-                        tabsHtml += `
-                            <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; border-color: rgba(255, 184, 0, 0.4); color: #ffb800;" onclick="selectSpecialsTab(this)">
-                                ★ Specials / Bonus (${directVideos.length})
-                            </button>
-                        `;
-                    }
-
-                    tabs.innerHTML = tabsHtml;
-
-                    // Load first season episodes by default
-                    loadSeasonEpisodes(seasonDirs[0].url, seasonDirs[0].name);
-                } else if (directVideos.length > 0) {
-                    countBadge.textContent = `${directVideos.length} Episodes`;
-                    tabs.innerHTML = '<span style="font-size: 12px; color: var(--primary); font-weight: 700;">Episodes</span>';
-                    currentSeasonEpisodes = directVideos;
-                    currentPlayingEpisodeIdx = -1;
-                    renderEpisodeListHtml(directVideos);
-                } else {
-                    fallbackTvView(seriesUrl, seriesTitle);
-                }
-            } catch (err) {
-                fallbackTvView(seriesUrl, seriesTitle);
+            // 1. Check if tvCatalog has this series
+            let matchedData = tvCatalog[seriesTitle];
+            if (!matchedData) {
+                // Try fuzzy lookup
+                const lowerTitle = seriesTitle.toLowerCase();
+                const key = Object.keys(tvCatalog).find(k => k.toLowerCase() === lowerTitle || lowerTitle.includes(k.toLowerCase()) || k.toLowerCase().includes(lowerTitle));
+                if (key) matchedData = tvCatalog[key];
             }
+
+            if (matchedData) {
+                renderIndexedTvData(matchedData, seriesTitle);
+                return;
+            }
+
+            // If tvCatalog is not yet loaded, wait a brief moment and check again
+            if (Object.keys(tvCatalog).length === 0) {
+                try {
+                    const res = await fetch('./tv_index.json?v=' + Date.now());
+                    tvCatalog = await res.json();
+                    matchedData = tvCatalog[seriesTitle];
+                    if (!matchedData) {
+                        const lowerTitle = seriesTitle.toLowerCase();
+                        const key = Object.keys(tvCatalog).find(k => k.toLowerCase() === lowerTitle || lowerTitle.includes(k.toLowerCase()) || k.toLowerCase().includes(lowerTitle));
+                        if (key) matchedData = tvCatalog[key];
+                    }
+                    if (matchedData) {
+                        renderIndexedTvData(matchedData, seriesTitle);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('tvCatalog direct load notice:', e);
+                }
+            }
+
+            // 2. Fallback to live server directory fetch
+            fallbackTvView(seriesUrl, seriesTitle);
+        }
+
+        function renderIndexedTvData(tvData, seriesTitle) {
+            const tabs = document.getElementById('seasonTabs');
+            const countBadge = document.getElementById('seasonCountBadge');
+
+            // tvData format: [ folderUrl, seasons_array, specials_array ]
+            const folderUrl = tvData[0] || '';
+            const seasons = tvData[1] || [];
+            const specials = tvData[2] || [];
+
+            motherFolderSpecials = specials.map(spName => ({
+                name: spName,
+                url: folderUrl.endsWith('/') ? folderUrl + encodeURI(spName) : folderUrl + '/' + encodeURI(spName)
+            }));
+
+            if (seasons.length > 0) {
+                countBadge.textContent = `${seasons.length} Seasons ${specials.length > 0 ? '+ Specials' : ''}`;
+
+                let tabsHtml = seasons.map((s, idx) => {
+                    const sName = s[0];
+                    return `
+                    <button class="btn btn-ghost ${idx === 0 ? 'active' : ''}" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; ${idx === 0 ? 'background: var(--primary); color: #07090e; font-weight: 700;' : ''}" onclick="selectIndexedSeason(this, ${idx}, '${escapeQuotes(sName)}')">
+                        ${sName}
+                    </button>
+                    `;
+                }).join('');
+
+                if (specials.length > 0) {
+                    tabsHtml += `
+                        <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; border-color: rgba(255, 184, 0, 0.4); color: #ffb800;" onclick="selectSpecialsTab(this)">
+                            ★ Specials / Bonus (${specials.length})
+                        </button>
+                    `;
+                }
+
+                tabs.innerHTML = tabsHtml;
+
+                // Load first season episodes
+                currentTvEntry = tvData;
+                loadIndexedSeasonEpisodes(0, seasons[0][0]);
+            } else if (specials.length > 0) {
+                countBadge.textContent = `${specials.length} Specials / Episodes`;
+                tabs.innerHTML = '<span style="font-size: 12px; color: var(--primary); font-weight: 700;">Bonus Videos</span>';
+                currentSeasonEpisodes = motherFolderSpecials;
+                currentPlayingEpisodeIdx = -1;
+                renderEpisodeListHtml(motherFolderSpecials);
+            } else {
+                fallbackTvView(folderUrl, seriesTitle);
+            }
+        }
+
+        function selectIndexedSeason(btnEl, seasonIdx, seasonName) {
+            document.querySelectorAll('#seasonTabs button').forEach(b => {
+                b.style.background = 'rgba(255, 255, 255, 0.05)';
+                b.style.color = '#fff';
+                b.style.fontWeight = '600';
+            });
+            btnEl.style.background = 'var(--primary)';
+            btnEl.style.color = '#07090e';
+            btnEl.style.fontWeight = '700';
+
+            loadIndexedSeasonEpisodes(seasonIdx, seasonName);
+        }
+
+        function loadIndexedSeasonEpisodes(seasonIdx, seasonName) {
+            if (!currentTvEntry || !currentTvEntry[1] || !currentTvEntry[1][seasonIdx]) return;
+
+            currentSeasonName = seasonName;
+            const seasonData = currentTvEntry[1][seasonIdx];
+            const sUrl = seasonData[1];
+            const epNames = seasonData[2] || [];
+
+            const episodes = epNames.map(name => {
+                const cleanUrl = sUrl.endsWith('/') ? sUrl + encodeURI(name) : sUrl + '/' + encodeURI(name);
+                return { name, url: cleanUrl };
+            });
+
+            currentSeasonEpisodes = episodes;
+            currentPlayingEpisodeIdx = -1;
+            renderEpisodeListHtml(episodes);
         }
 
         function selectSpecialsTab(btnEl) {
