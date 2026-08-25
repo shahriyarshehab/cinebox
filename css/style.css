@@ -2169,3 +2169,115 @@ kbd {
         width: 120px;
     }
 }
+
+/* ==========================================================================
+   💬 SUBTITLES (CC) & 📱 TOUCH DOUBLE-TAP SEEK ENHANCEMENTS
+   ========================================================================== */
+
+.player-mini-btn.active {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+/* Touch Double-Tap Seek Overlay */
+.touch-seek-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 50px;
+    display: flex;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.seek-touch-zone {
+    flex: 1;
+    height: 100%;
+    pointer-events: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.seek-ripple {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(0, 229, 255, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    opacity: 0;
+    transform: scale(0.6);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    box-shadow: 0 0 24px rgba(0, 229, 255, 0.4);
+}
+
+.seek-ripple.active {
+    opacity: 1;
+    transform: scale(1);
+    animation: ripplePulse 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes ripplePulse {
+    0% { opacity: 0; transform: scale(0.6); }
+    30% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1.3); }
+}
+
+/* Video Subtitles (::cue) Styling */
+video::cue {
+    background-color: rgba(0, 0, 0, 0.85) !important;
+    color: #ffffff !important;
+    font-family: var(--font-body), sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
+    line-height: 1.4 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+}
+
+/* Subtitle Drag-and-drop feedback */
+.video-container.drag-over {
+    outline: 2px dashed var(--primary);
+    outline-offset: -4px;
+}
+
+/* Recent Search Suggestions */
+.search-pill-suggestion {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.search-pill-suggestion:hover {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+}
+
+[data-theme="light"] .search-pill-suggestion {
+    background: #edf2f7;
+    color: #0c121e;
+}

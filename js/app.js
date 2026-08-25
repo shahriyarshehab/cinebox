@@ -1,16 +1,7 @@
-function initTheme() {
-    const saved = localStorage.getItem('cinebox_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', saved);
-}
-
-function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('cinebox_theme', next);
-}
-
-initTheme();
+/**
+ * CineBox Main Application Controller
+ * Handles Homepage, Category Grids, Fullscreen Filtering, Live Fuzzy Search & PWA
+ */
 
 let allMovies = [];
 let homeData = null;
@@ -122,6 +113,7 @@ async function init() {
     }
 
     setupGlobalShortcuts();
+    setupSearchFocusEvents();
 }
 
 function applyHomeData(data) {
@@ -175,6 +167,9 @@ async function loadFullCatalogInBackground() {
     }
 }
 
+// ==========================================
+// 🎠 Hero Carousel
+// ==========================================
 function setupCarousel(moviesList) {
     const rawList = moviesList || (homeData && homeData.carousel) || allMovies.slice(0, 10);
     carouselMovies = rawList.map(item => Array.isArray(item) ? {
@@ -209,7 +204,7 @@ function setupCarousel(moviesList) {
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
                             <span>Watch Now</span>
                         </a>
-                        <button class="btn btn-ghost" onclick="toggleWatchlistFromObj(${escapeQuotesJson(m)})">
+                        <button class="btn btn-ghost" onclick="toggleWatchlistAndRefresh(${escapeQuotesJson(m)})">
                             <svg class="icon" viewBox="0 0 24 24" fill="${inWatchlist ? 'var(--accent)' : 'none'}" stroke="${inWatchlist ? 'var(--accent)' : 'currentColor'}" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
                             <span>${inWatchlist ? 'In List' : 'Save'}</span>
                         </button>
@@ -265,22 +260,9 @@ function goToSlide(idx) {
     startCarouselAuto();
 }
 
-// Watch History & Continue Watching
-function getWatchHistory() {
-    try {
-        return JSON.parse(localStorage.getItem('cinebox_watch_history') || '[]');
-    } catch (e) { return []; }
-}
-
-function removeWatchHistory(url, event) {
-    if (event) event.stopPropagation();
-    let history = getWatchHistory();
-    history = history.filter(h => h.url !== url);
-    localStorage.setItem('cinebox_watch_history', JSON.stringify(history));
-    showToast('Removed from Continue Watching');
-    if (currentView === 'home') renderView();
-}
-
+// ==========================================
+// ⏱️ Continue Watching UI
+// ==========================================
 function renderContinueWatchingHtml() {
     const history = getWatchHistory();
     if (!history || history.length === 0) return '';
@@ -336,57 +318,21 @@ function renderContinueWatchingHtml() {
     `;
 }
 
-// Watchlist Store
-function getWatchlist() {
-    try {
-        return JSON.parse(localStorage.getItem('cinebox_watchlist') || '[]');
-    } catch (e) { return []; }
-}
-
-function isInWatchlist(title) {
-    const list = getWatchlist();
-    return list.some(m => (m.title || '').toLowerCase().trim() === (title || '').toLowerCase().trim());
-}
-
-function toggleWatchlistFromObj(movieObj, event) {
+// Watchlist bridge
+function toggleWatchlistAndRefresh(movieObj, event) {
     if (event) {
         event.preventDefault();
         event.stopPropagation();
     }
-    const list = getWatchlist();
-    const cleanTitle = (movieObj.title || '').toLowerCase().trim();
-    const idx = list.findIndex(m => (m.title || '').toLowerCase().trim() === cleanTitle);
-
-    if (idx >= 0) {
-        list.splice(idx, 1);
-        localStorage.setItem('cinebox_watchlist', JSON.stringify(list));
-        showToast('Removed from Watchlist');
-    } else {
-        list.unshift(movieObj);
-        localStorage.setItem('cinebox_watchlist', JSON.stringify(list));
-        showToast('Added to Watchlist ❤️');
-    }
-    updateWatchlistNavBadge();
+    toggleWatchlist(movieObj);
     if (currentView === 'watchlist') {
         renderWatchlistView();
     }
 }
 
-function updateWatchlistNavBadge() {
-    const list = getWatchlist();
-    const badges = [document.getElementById('watchlistNavCount'), document.getElementById('mobWatchlistNavCount')];
-    badges.forEach(badge => {
-        if (badge) {
-            if (list.length > 0) {
-                badge.textContent = list.length;
-                badge.style.display = 'inline-block';
-            } else {
-                badge.style.display = 'none';
-            }
-        }
-    });
-}
-
+// ==========================================
+// 🖼️ Views Rendering (Home, Category, Watchlist)
+// ==========================================
 function renderView() {
     const main = document.getElementById('mainContent');
 
@@ -404,14 +350,6 @@ function renderView() {
         document.getElementById('heroCarousel').style.display = 'none';
         renderCategoryFullGrid(main);
     }
-}
-
-function slideRow(rowId, direction) {
-    const slider = document.getElementById(rowId);
-    if (!slider) return;
-    const cardWidth = 140;
-    const scrollAmount = Math.max(cardWidth * 2, Math.floor(slider.clientWidth * 0.75)) * direction;
-    slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 }
 
 function renderHomeRowsFromPayload(categoriesMap) {
@@ -828,17 +766,30 @@ async function openCategoryView(tag, name) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Live Autocomplete Search
+// ==========================================
+// 🔍 Live Fuzzy Search & Recent Searches UI
+// ==========================================
 let liveSearchTimer = null;
+
+function setupSearchFocusEvents() {
+    const input = document.getElementById('searchInput');
+    if (!input) return;
+
+    input.addEventListener('focus', () => {
+        if (!input.value.trim()) {
+            showRecentSearchesDropdown(document.getElementById('searchDropdown'));
+        }
+    });
+}
 
 function handleLiveSearch(val) {
     clearTimeout(liveSearchTimer);
-    const query = (val || '').trim().toLowerCase();
+    const query = (val || '').trim();
     const dropdown = document.getElementById('searchDropdown');
     if (!dropdown) return;
 
     if (!query) {
-        dropdown.style.display = 'none';
+        showRecentSearchesDropdown(dropdown);
         return;
     }
 
@@ -852,21 +803,7 @@ function handleLiveSearch(val) {
             dataset = (homeData.carousel || []).concat(Object.values(homeData.categories || {}).flat());
         }
 
-        const matches = [];
-        for (const item of dataset) {
-            const obj = Array.isArray(item) ? {
-                title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
-            } : item;
-
-            const t = (obj.title || '').toLowerCase();
-            const c = (obj.category || '').toLowerCase();
-            const g = (obj.tag || '').toLowerCase();
-
-            if (t.includes(query) || c.includes(query) || g.includes(query)) {
-                matches.push(obj);
-                if (matches.length >= 8) break;
-            }
-        }
+        const matches = filterFuzzyMatches(dataset, query, 8);
 
         if (matches.length > 0) {
             dropdown.innerHTML = matches.map(m => {
@@ -875,7 +812,7 @@ function handleLiveSearch(val) {
                 const isSeries = m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.url && m.url.endsWith('/'));
 
                 return `
-                    <a class="search-dropdown-item" href="${linkUrl}">
+                    <a class="search-dropdown-item" href="${linkUrl}" onclick="saveRecentSearch('${escapeQuotes(m.title)}')">
                         <img class="search-item-thumb" src="${m.poster}" alt="${escapeQuotes(m.title)}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100';">
                         <div class="search-item-info">
                             <div class="search-item-title">${m.title}</div>
@@ -904,6 +841,55 @@ function handleLiveSearch(val) {
     }, 150);
 }
 
+function showRecentSearchesDropdown(dropdown) {
+    if (!dropdown) return;
+    const recent = getRecentSearches();
+
+    if (recent.length === 0) {
+        dropdown.innerHTML = `
+            <div style="padding: 12px; font-size: 11.5px; color: var(--text-muted);">
+                <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">🔥 Popular Searches</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <span class="search-pill-suggestion" onclick="fillAndSearchHome('Oppenheimer')">Oppenheimer</span>
+                    <span class="search-pill-suggestion" onclick="fillAndSearchHome('Solo Leveling')">Solo Leveling</span>
+                    <span class="search-pill-suggestion" onclick="fillAndSearchHome('All of Us Are Dead')">All of Us Are Dead</span>
+                    <span class="search-pill-suggestion" onclick="fillAndSearchHome('Avengers')">Avengers</span>
+                    <span class="search-pill-suggestion" onclick="fillAndSearchHome('Interstellar')">Interstellar</span>
+                </div>
+            </div>
+        `;
+        dropdown.style.display = 'block';
+        return;
+    }
+
+    dropdown.innerHTML = `
+        <div style="padding: 6px 10px 4px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">🕒 Recent Searches</span>
+            <button onclick="clearRecentSearches(event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; font-size: 10.5px; color: var(--accent); cursor: pointer; font-weight: 600;">Clear All</button>
+        </div>
+        <div style="padding: 4px 0;">
+            ${recent.map(q => `
+                <div class="search-dropdown-item" style="justify-content: space-between;" onclick="fillAndSearchHome('${escapeQuotes(q)}')">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color: var(--text-dim);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span style="font-size: 12.5px; font-weight: 600;">${q}</span>
+                    </div>
+                    <button onclick="removeRecentSearch('${escapeQuotes(q)}', event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 6px; font-size: 13px;" title="Remove">✕</button>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    dropdown.style.display = 'block';
+}
+
+function fillAndSearchHome(query) {
+    const input = document.getElementById('searchInput');
+    if (input) {
+        input.value = query;
+        handleSearch();
+    }
+}
+
 function hideSearchDropdown() {
     const dropdown = document.getElementById('searchDropdown');
     if (dropdown) dropdown.style.display = 'none';
@@ -917,11 +903,13 @@ document.addEventListener('click', (e) => {
 
 async function handleSearch() {
     hideSearchDropdown();
-    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const q = document.getElementById('searchInput').value.trim();
     if (!q) {
         showHomeView();
         return;
     }
+
+    saveRecentSearch(q);
 
     if (!isFullCatalogLoaded) {
         await loadFullCatalogInBackground();
@@ -929,11 +917,9 @@ async function handleSearch() {
 
     currentView = 'search';
     currentCategoryName = `Search: "${q}"`;
-    rawCategoryPool = allMovies.filter(m => 
-        (m.title && m.title.toLowerCase().includes(q)) || 
-        (m.category && m.category.toLowerCase().includes(q)) || 
-        (m.tag && m.tag.toLowerCase().includes(q))
-    );
+    
+    // Use fuzzy matching for full catalog search
+    rawCategoryPool = filterFuzzyMatches(allMovies, q, 300);
     applyAllFilters();
     renderView();
 }
@@ -969,7 +955,9 @@ window.addEventListener('scroll', () => {
     }, 100);
 });
 
-// Surprise Me (Random Pick) Modal
+// ==========================================
+// 🎲 Surprise Me (Random Pick) Modal
+// ==========================================
 async function openSurpriseModal() {
     const modal = document.getElementById('surpriseModal');
     const body = document.getElementById('surpriseModalBody');
@@ -1035,7 +1023,6 @@ function closeSurpriseModal() {
     if (modal) modal.style.display = 'none';
 }
 
-// Shortcuts modal
 function toggleShortcutsModal() {
     const modal = document.getElementById('shortcutsModal');
     if (modal) {
@@ -1060,14 +1047,6 @@ function setupGlobalShortcuts() {
             if (scModal) scModal.style.display = 'none';
         }
     });
-}
-
-function showToast(msg) {
-    const toast = document.getElementById('toast');
-    if (!toast) return;
-    toast.textContent = msg;
-    toast.style.display = 'block';
-    setTimeout(() => { toast.style.display = 'none'; }, 2800);
 }
 
 function renderMovieCardHtml(item) {
@@ -1106,14 +1085,6 @@ function renderMovieCardHtml(item) {
             </div>
         </a>
     `;
-}
-
-function escapeQuotes(str) {
-    return (str || '').replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
-}
-
-function escapeQuotesJson(obj) {
-    return JSON.stringify(obj).replace(/"/g, '&quot;');
 }
 
 window.onload = init;
