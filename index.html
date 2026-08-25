@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineBox — Stream & Download Movies</title>
+    <title>CineBox — Stream & Download 36,000+ Movies</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-base: #07090e;
@@ -21,6 +21,7 @@
             --accent: #ff2a5f;
             --accent-gold: #ffb800;
             --accent-green: #00e676;
+            --vlc-orange: #ff7700;
             
             --text-main: #ffffff;
             --text-muted: #8e9bb0;
@@ -50,7 +51,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* SVG Icon styling */
         .icon {
             display: inline-flex;
             align-items: center;
@@ -64,7 +64,7 @@
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(7, 9, 14, 0.88);
+            background: rgba(7, 9, 14, 0.92);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
@@ -118,7 +118,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            letter-spacing: 0.3px;
         }
 
         .live-status-dot {
@@ -186,7 +185,19 @@
         .btn-primary:hover {
             background: #33ebff;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 229, 255, 0.5);
+        }
+
+        .btn-vlc {
+            background: linear-gradient(135deg, #ff7700 0%, #e65100 100%);
+            color: #fff;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(255, 119, 0, 0.35);
+        }
+
+        .btn-vlc:hover {
+            background: linear-gradient(135deg, #ff8800 0%, #f57c00 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 119, 0, 0.5);
         }
 
         .btn-accent {
@@ -208,68 +219,151 @@
 
         .btn-ghost:hover {
             background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
             transform: translateY(-2px);
         }
 
-        /* Hero Spotlight */
-        .spotlight {
+        /* Carousel Section */
+        .carousel-wrapper {
             margin: 24px 40px 0;
+            position: relative;
             border-radius: var(--radius-lg);
             overflow: hidden;
-            position: relative;
-            background: linear-gradient(135deg, #111624 0%, #0a0d14 100%);
+            background: #111624;
             border: 1px solid var(--border);
-            min-height: 260px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .carousel-track {
+            position: relative;
+            width: 100%;
+            height: 320px;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
             display: flex;
             align-items: center;
         }
 
-        .spotlight-bg {
+        .carousel-slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .slide-bg {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background-size: cover;
             background-position: center;
-            filter: blur(28px) opacity(0.3);
+            filter: blur(24px) opacity(0.35);
             transform: scale(1.1);
         }
 
-        .spotlight-overlay {
+        .slide-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.85) 50%, rgba(7, 9, 14, 0.2) 100%);
+            background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.88) 50%, rgba(7, 9, 14, 0.25) 100%);
         }
 
-        .spotlight-content {
+        .slide-content {
             position: relative;
             z-index: 2;
-            padding: 36px 44px;
-            max-width: 680px;
+            padding: 36px 48px;
+            max-width: 720px;
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        .spotlight-label {
+        .slide-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0, 229, 255, 0.12);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            color: var(--primary);
             font-size: 11px;
             font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--primary);
+            width: fit-content;
         }
 
-        .spotlight-title {
+        .slide-title {
             font-family: var(--font-display);
             font-size: 30px;
             font-weight: 700;
-            line-height: 1.2;
+            line-height: 1.25;
             color: #fff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
-        .spotlight-desc {
+        .slide-meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 13px;
             color: var(--text-muted);
-            font-size: 13.5px;
-            line-height: 1.6;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(7, 9, 14, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .carousel-btn:hover {
+            background: var(--primary);
+            color: #07090e;
+        }
+
+        .carousel-btn.prev { left: 16px; }
+        .carousel-btn.next { right: 16px; }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .carousel-dot.active {
+            width: 24px;
+            border-radius: 10px;
+            background: var(--primary);
         }
 
         /* Categories Slider */
@@ -280,15 +374,6 @@
             gap: 10px;
             overflow-x: auto;
             scrollbar-width: thin;
-        }
-
-        .category-nav::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .category-nav::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
         }
 
         .cat-tab {
@@ -355,7 +440,7 @@
             color: var(--text-muted);
         }
 
-        /* Movie Poster Grid (2:3 aspect ratio) */
+        /* Poster Grid */
         .poster-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
@@ -443,12 +528,6 @@
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 16px var(--primary-glow);
-            transform: scale(0.9);
-            transition: transform 0.2s ease;
-        }
-
-        .movie-card:hover .play-button-symbol {
-            transform: scale(1);
         }
 
         .tag-badge {
@@ -464,7 +543,6 @@
             padding: 3px 8px;
             border-radius: 6px;
             z-index: 2;
-            letter-spacing: 0.3px;
         }
 
         .rating-badge {
@@ -513,7 +591,6 @@
             color: var(--text-muted);
         }
 
-        /* Load More Button */
         .pagination-wrap {
             display: flex;
             justify-content: center;
@@ -628,7 +705,6 @@
             outline: none;
         }
 
-        /* Toast */
         .toast {
             position: fixed;
             bottom: 32px;
@@ -647,7 +723,9 @@
 
         @media (max-width: 768px) {
             header { padding: 12px 18px; }
-            .spotlight { margin: 16px 18px 0; }
+            .carousel-wrapper { margin: 16px 18px 0; }
+            .carousel-track { height: 360px; }
+            .slide-content { padding: 24px 20px; }
             .category-nav { padding: 16px 18px 0; }
             .content-area { padding: 18px 18px 40px; }
             .poster-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 16px 12px; }
@@ -676,7 +754,7 @@
             <span class="search-icon">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </span>
-            <input type="text" id="searchInput" placeholder="Search by movie title, actor, year or language..." oninput="handleSearch()">
+            <input type="text" id="searchInput" placeholder="Search across 36,000+ movies, Hollywood, Bollywood, Anime..." oninput="handleSearch()">
         </div>
 
         <div>
@@ -684,23 +762,20 @@
         </div>
     </header>
 
-    <!-- Spotlight Hero -->
-    <div class="spotlight">
-        <div class="spotlight-bg" id="heroBg"></div>
-        <div class="spotlight-overlay"></div>
-        <div class="spotlight-content">
-            <div class="spotlight-label">Featured Selection</div>
-            <h1 class="spotlight-title" id="heroTitle">CineBox Cinema Portal</h1>
-            <p class="spotlight-desc">
-                High-speed direct media streaming and downloading for Hollywood, Bollywood, South Indian, Animation, and International cinema.
-            </p>
-            <div style="display: flex; gap: 12px; margin-top: 6px;">
-                <button class="btn btn-primary" onclick="playRandom()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
-                    <span>Play Random</span>
-                </button>
-            </div>
+    <!-- Latest Updates Carousel -->
+    <div class="carousel-wrapper" id="heroCarousel">
+        <div class="carousel-track" id="carouselTrack">
+            <!-- Carousel Slides Rendered Here -->
         </div>
+
+        <button class="carousel-btn prev" onclick="prevSlide()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button class="carousel-btn next" onclick="nextSlide()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+
+        <div class="carousel-dots" id="carouselDots"></div>
     </div>
 
     <!-- Category Nav -->
@@ -736,14 +811,14 @@
                         <div class="modal-title" id="mTitle">Movie Title</div>
                         <div class="modal-chips" id="mTags"></div>
                         <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-                            Direct high-speed media stream and download enabled. Compatible with browser video player and IDM.
+                            Direct high-speed media stream and download enabled. Compatible with browser video player and VLC Media Player.
                         </p>
                         <div class="modal-btn-row" id="mActions"></div>
                     </div>
                 </div>
 
-                <div class="player-frame" id="videoWrap" style="display: none; margin-top: 16px; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
-                    <video id="videoPlayer" controls style="width: 100%; max-height: 480px; outline: none; background: #000;"></video>
+                <div class="player-frame" id="videoWrap">
+                    <video id="videoPlayer" controls></video>
                 </div>
             </div>
         </div>
@@ -756,6 +831,10 @@
         let filteredMovies = [];
         let displayedCount = 40;
         const BATCH_SIZE = 40;
+
+        let currentSlide = 0;
+        let carouselMovies = [];
+        let carouselTimer = null;
 
         const CATEGORY_DEFS = [
             { name: 'All Movies', tag: 'All' },
@@ -775,6 +854,17 @@
 
         let currentActiveTag = 'All';
 
+        // Official VLC Cone SVG
+        const VLC_ICON_SVG = `
+            <svg class="icon" viewBox="0 0 48 48" width="16" height="16" fill="none">
+                <path d="M21.5 4.5C22.3 2.5 25.7 2.5 26.5 4.5L38.2 34.5C38.6 35.5 37.8 36.5 36.7 36.5H11.3C10.2 36.5 9.4 35.5 9.8 34.5L21.5 4.5Z" fill="#FF7700"/>
+                <path d="M19.4 12H28.6L30.5 17H17.5L19.4 12Z" fill="#FFFFFF"/>
+                <path d="M15.5 23H32.5L34.8 29H13.2L15.5 23Z" fill="#FFFFFF"/>
+                <ellipse cx="24" cy="38.5" rx="18" ry="4.5" fill="#FF5500"/>
+                <ellipse cx="24" cy="37.5" rx="15" ry="3.5" fill="#FF8800"/>
+            </svg>
+        `;
+
         async function init() {
             try {
                 const res = await fetch('./movies.json');
@@ -787,11 +877,96 @@
                 document.getElementById('totalCountBadge').textContent = `${allMovies.length.toLocaleString()} Movies`;
                 filteredMovies = [...allMovies];
                 
+                setupCarousel();
                 renderCategoryChips();
                 renderGrid();
-                setupHero();
             } catch (err) {
                 document.getElementById('movieGrid').innerHTML = `<p style="color: var(--accent); grid-column: 1/-1; text-align: center; padding: 40px;">Failed to load catalog: ${err.message}</p>`;
+            }
+        }
+
+        function setupCarousel() {
+            // Pick top 6 latest releases (e.g. from 2026/2025/Top)
+            carouselMovies = allMovies.filter(m => m.poster && (m.title.includes('2026') || m.title.includes('2025') || m.tag === 'Top Rated')).slice(0, 6);
+            if (carouselMovies.length === 0) {
+                carouselMovies = allMovies.slice(0, 6);
+            }
+
+            const track = document.getElementById('carouselTrack');
+            track.innerHTML = carouselMovies.map((m, idx) => `
+                <div class="carousel-slide ${idx === 0 ? 'active' : ''}" id="slide-${idx}">
+                    <div class="slide-bg" style="background-image: url('${m.poster}')"></div>
+                    <div class="slide-overlay"></div>
+                    <div class="slide-content">
+                        <div class="slide-tag">Latest Update • ${m.tag || 'Featured'}</div>
+                        <h2 class="slide-title">${m.title}</h2>
+                        <div class="slide-meta">
+                            <span style="color: var(--accent-gold); font-weight: 700;">★ 8.9</span>
+                            <span>•</span>
+                            <span>${m.size || 'HD'}</span>
+                            <span>•</span>
+                            <span>${m.category || 'Movie'}</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="openDirectMovie('${escapeQuotes(m.title)}')">
+                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+                                <span>Watch Stream</span>
+                            </button>
+                            <button class="btn btn-vlc" onclick="openInVLC('${m.url}', '${escapeQuotes(m.title)}')">
+                                ${VLC_ICON_SVG}
+                                <span>Play in VLC</span>
+                            </button>
+                            <a class="btn btn-ghost" href="${m.url}" download>
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span>Download</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const dots = document.getElementById('carouselDots');
+            dots.innerHTML = carouselMovies.map((_, idx) => `
+                <div class="carousel-dot ${idx === 0 ? 'active' : ''}" onclick="goToSlide(${idx})"></div>
+            `).join('');
+
+            startCarouselAuto();
+        }
+
+        function startCarouselAuto() {
+            clearInterval(carouselTimer);
+            carouselTimer = setInterval(nextSlide, 5000);
+        }
+
+        function showSlide(idx) {
+            document.querySelectorAll('.carousel-slide').forEach((el, i) => {
+                el.classList.toggle('active', i === idx);
+            });
+            document.querySelectorAll('.carousel-dot').forEach((el, i) => {
+                el.classList.toggle('active', i === idx);
+            });
+            currentSlide = idx;
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % carouselMovies.length;
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + carouselMovies.length) % carouselMovies.length;
+            showSlide(currentSlide);
+        }
+
+        function goToSlide(idx) {
+            showSlide(idx);
+            startCarouselAuto();
+        }
+
+        function openDirectMovie(title) {
+            const idx = filteredMovies.findIndex(m => m.title === title);
+            if (idx !== -1) {
+                openModal(idx);
             }
         }
 
@@ -814,14 +989,6 @@
                     </div>
                 `;
             }).join('');
-        }
-
-        function setupHero() {
-            if (allMovies.length > 0) {
-                const rand = allMovies[Math.floor(Math.random() * Math.min(25, allMovies.length))];
-                document.getElementById('heroTitle').textContent = rand.title;
-                document.getElementById('heroBg').style.backgroundImage = `url('${rand.poster}')`;
-            }
         }
 
         function filterCategory(tag) {
@@ -893,7 +1060,7 @@
                             <div class="play-button-symbol">
                                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
                             </div>
-                            <span style="font-size: 11.5px; font-weight: 700; color: #fff;">Stream / Download</span>
+                            <span style="font-size: 11.5px; font-weight: 700; color: #fff;">Stream / VLC / Download</span>
                         </div>
                     </div>
 
@@ -916,7 +1083,7 @@
             renderGrid();
         }
 
-        // Auto-load more movies on infinite scroll
+        // Auto-load on scroll
         let scrollTimeout = null;
         window.addEventListener('scroll', () => {
             if (scrollTimeout) return;
@@ -954,8 +1121,8 @@
                     <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
                     <span>Play in Browser</span>
                 </button>
-                <button class="btn btn-primary" style="background: linear-gradient(135deg, #ff8800 0%, #ff5500 100%); border: none;" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="12 2 2 22 22 22 12 2"/><line x1="12" y1="12" x2="12" y2="17"/><line x1="12" y1="7" x2="12" y2="7.01"/></svg>
+                <button class="btn btn-vlc" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
+                    ${VLC_ICON_SVG}
                     <span>Play in VLC</span>
                 </button>
                 <a class="btn btn-accent" href="${item.url}" download>
@@ -1020,16 +1187,10 @@
             document.getElementById('movieModal').style.display = 'none';
         }
 
-        function playRandom() {
-            if (filteredMovies.length > 0) {
-                const rIdx = Math.floor(Math.random() * filteredMovies.length);
-                openModal(rIdx);
-            }
-        }
-
         function copyLink(url) {
             navigator.clipboard.writeText(url);
             const toast = document.getElementById('toast');
+            toast.textContent = 'Link copied to clipboard';
             toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
