@@ -238,22 +238,61 @@
             const targetTitle = urlParams.get('title');
             const dataParam = urlParams.get('data');
 
-            // 1. Fetch TV Catalog index in background
-            fetch('./tv_index.json?v=' + Date.now())
+            // 1. Fast match from home_data or session cache (instant 10ms)
+            if (dataParam) {
+                try {
+                    currentItem = JSON.parse(decodeURIComponent(dataParam));
+                } catch (e) {}
+            }
+
+            const cachedHome = sessionStorage.getItem('cinebox_home_v1');
+            if (!currentItem && targetTitle && cachedHome) {
+                try {
+                    const hData = JSON.parse(cachedHome);
+                    const cleanT = targetTitle.toLowerCase().trim();
+                    // check carousel
+                    for (const m of (hData.carousel || [])) {
+                        const mTitle = (Array.isArray(m) ? m[0] : m.title) || '';
+                        if (mTitle.toLowerCase().trim() === cleanT) {
+                            currentItem = Array.isArray(m) ? { title: m[0], poster: m[1], url: m[2], tag: m[3], category: m[4], size: m[5], date: m[6] } : m;
+                            break;
+                        }
+                    }
+                    // check categories
+                    if (!currentItem && hData.categories) {
+                        for (const catList of Object.values(hData.categories)) {
+                            for (const m of catList) {
+                                const mTitle = (Array.isArray(m) ? m[0] : m.title) || '';
+                                if (mTitle.toLowerCase().trim() === cleanT) {
+                                    currentItem = Array.isArray(m) ? { title: m[0], poster: m[1], url: m[2], tag: m[3], category: m[4], size: m[5], date: m[6] } : m;
+                                    break;
+                                }
+                            }
+                            if (currentItem) break;
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            if (currentItem) {
+                renderWatchPage(currentItem);
+            }
+
+            // 2. Fetch TV Catalog index in background if series
+            fetch('./tv_index.json')
                 .then(r => r.json())
-                .then(data => { tvCatalog = data || {}; })
+                .then(data => {
+                    tvCatalog = data || {};
+                    if (currentItem && (currentItem.tag === 'TV Series' || currentItem.tag === 'K-Drama' || (currentItem.url && currentItem.url.endsWith('/')))) {
+                        loadTvSeriesSeasons(currentItem.url, currentItem.title);
+                    }
+                })
                 .catch(e => console.warn(e));
 
-            // 2. Fetch movies catalog to find item
-            try {
-                if (dataParam) {
-                    try {
-                        currentItem = JSON.parse(decodeURIComponent(dataParam));
-                    } catch (e) {}
-                }
-
-                if (!currentItem && targetTitle) {
-                    const res = await fetch('./movies.json?v=' + Date.now());
+            // 3. If item not yet found, fetch full movies.json in background
+            if (!currentItem && targetTitle) {
+                try {
+                    const res = await fetch('./movies.json');
                     const rawMovies = await res.json();
                     const cleanTitle = targetTitle.toLowerCase().trim();
 
@@ -278,15 +317,15 @@
                             }
                         }
                     }
-                }
 
-                if (currentItem) {
-                    renderWatchPage(currentItem);
-                } else {
-                    document.getElementById('wTitle').textContent = 'Title Not Found';
+                    if (currentItem) {
+                        renderWatchPage(currentItem);
+                    } else {
+                        document.getElementById('wTitle').textContent = 'Title Not Found';
+                    }
+                } catch (err) {
+                    console.error(err);
                 }
-            } catch (err) {
-                console.error(err);
             }
         }
 
