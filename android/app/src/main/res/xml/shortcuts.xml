@@ -3,7 +3,7 @@
         android:shortcutId="shortcut_tv"
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"
-        android:shortLabel="@string/shortcut_tv_name">
+        android:shortcutShortLabel="@string/shortcut_tv_name">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="https://shahriyarshehab.github.io/cinebox/index.html#tv"
@@ -15,7 +15,7 @@
         android:shortcutId="shortcut_movies"
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"
-        android:shortLabel="@string/shortcut_movies_name">
+        android:shortcutShortLabel="@string/shortcut_movies_name">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="https://shahriyarshehab.github.io/cinebox/index.html#movies"
@@ -27,7 +27,7 @@
         android:shortcutId="shortcut_watchlist"
         android:enabled="true"
         android:icon="@mipmap/ic_launcher"
-        android:shortLabel="@string/shortcut_watchlist_name">
+        android:shortcutShortLabel="@string/shortcut_watchlist_name">
         <intent
             android:action="android.intent.action.VIEW"
             android:data="https://shahriyarshehab.github.io/cinebox/index.html#watchlist"
