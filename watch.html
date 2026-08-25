@@ -237,6 +237,18 @@
             <!-- Episode List -->
             <div id="episodeList" style="display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; padding-right: 6px;"></div>
         </div>
+
+        <!-- Related / More Like This Interlink Row -->
+        <div id="relatedSection" style="margin-top: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                <h2 class="row-heading" style="font-size: 18px;" id="relatedHeading">More Like This</h2>
+                <a class="btn-see-all" id="relatedSeeAllBtn" href="index.html">
+                    <span>Explore Category</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+            <div class="row-slider" id="relatedSlider"></div>
+        </div>
     </div>
 
     <div class="toast" id="toast">Link copied to clipboard</div>
@@ -381,15 +393,22 @@
             document.getElementById('watchBackdrop').style.backgroundImage = `url('${item.poster}')`;
             document.getElementById('wTag').textContent = item.tag || 'HD Cinema';
 
-            const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || item.url.endsWith('/');
+            const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
 
             document.getElementById('wChips').innerHTML = `
-                <span class="modal-chip">Category: ${item.category || item.tag}</span>
-                <span class="modal-chip">Type: ${isSeries ? 'TV Series' : 'Movie'}</span>
+                <a class="modal-chip" href="index.html?cat=${encodeURIComponent(item.tag || item.category)}" style="text-decoration: none; color: var(--primary); font-weight: 700;">📁 ${item.category || item.tag}</a>
+                <a class="modal-chip" href="index.html?tab=${isSeries ? 'tv' : 'movies'}" style="text-decoration: none; color: var(--text-muted);">📺 ${isSeries ? 'TV Series' : 'Movie'}</a>
                 <span class="modal-chip">Quality: ${item.tag || 'HD'}</span>
                 <span class="modal-chip">Size: ${item.size || 'HD'}</span>
-                <span class="modal-chip">Score: 8.8 / 10</span>
+                <span class="modal-chip" style="color: var(--accent-gold); font-weight: 700;">★ 8.9 / 10</span>
             `;
+
+            // Setup Related Section Link
+            const relatedTag = item.tag || 'Top Rated';
+            document.getElementById('relatedHeading').textContent = `More in ${item.category || item.tag}`;
+            document.getElementById('relatedSeeAllBtn').href = `index.html?cat=${encodeURIComponent(relatedTag)}`;
+
+            loadRelatedMedia(relatedTag, item.title);
 
             if (isSeries) {
                 document.getElementById('wActions').innerHTML = `
@@ -684,14 +703,87 @@
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
-        function searchToHome(q) {
-            if (q) {
-                window.location.href = `index.html?q=${encodeURIComponent(q)}`;
-            }
-        }
+        async function loadRelatedMedia(tag, currentTitle) {
+            const slider = document.getElementById('relatedSlider');
+            if (!slider) return;
 
-        function escapeQuotes(str) {
-            return (str || '').replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
+            let candidateList = [];
+
+            // 1. Try from cached home data (instant)
+            const cachedHome = sessionStorage.getItem('cinebox_home_v1');
+            if (cachedHome) {
+                try {
+                    const hData = JSON.parse(cachedHome);
+                    if (hData.categories && hData.categories[tag]) {
+                        candidateList = hData.categories[tag];
+                    }
+                } catch (e) {}
+            }
+
+            // 2. Fallback fetch home_data if empty
+            if (candidateList.length === 0) {
+                try {
+                    const res = await fetch('./home_data.json');
+                    if (res.ok) {
+                        const hData = await res.json();
+                        if (hData.categories && hData.categories[tag]) {
+                            candidateList = hData.categories[tag];
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            const cleanT = (currentTitle || '').toLowerCase().trim();
+            const filtered = candidateList.filter(item => {
+                const title = (Array.isArray(item) ? item[0] : item.title) || '';
+                return title.toLowerCase().trim() !== cleanT;
+            });
+
+            if (filtered.length > 0) {
+                slider.innerHTML = filtered.slice(0, 14).map(item => {
+                    const obj = Array.isArray(item) ? {
+                        title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
+                    } : item;
+                    const rawTitle = obj.title || '';
+                    const safeTitle = escapeQuotes(rawTitle);
+                    const itemData = encodeURIComponent(JSON.stringify(obj));
+                    const isSeries = obj.tag === 'TV Series' || obj.tag === 'K-Drama' || (obj.url && obj.url.endsWith('/'));
+                    const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
+
+                    return `
+                        <a class="movie-card" href="${linkUrl}">
+                            <div class="card-cover">
+                                <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="cover-fallback" style="display: none;">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                                    <div style="font-size: 11px; font-weight: 600;">${obj.title}</div>
+                                </div>
+                                <div class="tag-badge">${obj.tag || 'HD'}</div>
+                                <div class="cover-overlay">
+                                    <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
+                                        ${isSeries ? 
+                                            '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="18" height="18"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
+                                            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>'
+                                        }
+                                    </div>
+                                    <span style="font-size: 10.5px; font-weight: 700; color: #fff;">${isSeries ? 'View Series' : 'Watch Now'}</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-title" title="${obj.title}">${obj.title}</div>
+                                <div class="card-meta">
+                                    <span>${obj.size || 'HD'}</span>
+                                    <span>${obj.date || ''}</span>
+                                </div>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+                document.getElementById('relatedSection').style.display = 'block';
+            } else {
+                document.getElementById('relatedSection').style.display = 'none';
+            }
         }
 
         window.onload = initWatch;

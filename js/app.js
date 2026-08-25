@@ -67,14 +67,17 @@ async function init() {
         console.warn('Fast home load notice:', e);
     }
 
-    // 3. Check for URL search parameters or tab parameters
+    // 3. Check for URL search parameters, tab parameters, or category parameters
     const urlParams = new URLSearchParams(window.location.search);
     const queryParam = urlParams.get('q');
     const tabParam = urlParams.get('tab');
+    const catParam = urlParams.get('cat');
 
     if (queryParam) {
         document.getElementById('searchInput').value = queryParam;
         loadFullCatalogInBackground().then(() => handleSearch());
+    } else if (catParam) {
+        loadFullCatalogInBackground().then(() => openCategoryView(catParam, catParam));
     } else if (tabParam) {
         loadFullCatalogInBackground().then(() => switchNavTab(tabParam));
     } else {
