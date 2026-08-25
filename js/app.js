@@ -327,10 +327,48 @@ const ALL_CATEGORY_PILLS = [
     { label: 'English Classic', tag: 'English Movies' }
 ];
 
+const CATEGORY_JSON_MAP = {
+    'K-Drama': 'data/kdrama.json',
+    'TV Series': 'data/tv_series.json',
+    'Hollywood 1080p': 'data/hollywood.json',
+    'Bollywood': 'data/bollywood.json',
+    'South Action': 'data/south_action.json',
+    'South Original': 'data/south_original.json',
+    'Animation': 'data/animation.json',
+    'Bangla': 'data/bangla.json',
+    'Foreign Movies': 'data/foreign.json',
+    '3D Movies': 'data/3d.json',
+    'English Movies': 'data/english.json',
+    'Top Rated': 'data/top_rated.json'
+};
+
+const categoryCache = {};
+
+async function fetchCategoryData(tag) {
+    if (categoryCache[tag]) return categoryCache[tag];
+    const file = CATEGORY_JSON_MAP[tag];
+    if (file) {
+        try {
+            const res = await fetch(`./${file}`);
+            if (res.ok) {
+                const data = await res.json();
+                const clean = data.map(item => Array.isArray(item) ? {
+                    title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
+                } : item);
+                categoryCache[tag] = clean;
+                return clean;
+            }
+        } catch (e) {
+            console.warn('Category fetch notice:', e);
+        }
+    }
+    return allMovies.filter(m => matchesCategory(m, tag));
+}
+
 let activeNavTab = 'home';
 let currentSort = 'latest';
 
-function switchNavTab(tab) {
+async function switchNavTab(tab) {
     activeNavTab = tab;
     document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
     
@@ -339,35 +377,22 @@ function switchNavTab(tab) {
         showHomeView();
     } else if (tab === 'tv') {
         const b = document.getElementById('navTv'); if (b) b.classList.add('active');
-        openSpecialSectionView('TV Shows & Web Series', m => m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.category && m.category.includes('Series')), 'TV Series');
+        currentView = 'category';
+        currentCategoryTag = 'TV Series';
+        currentCategoryName = 'TV Shows & Korean Dramas';
+        const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
+        filteredMovies = [...tv, ...kdrama];
+        applyCurrentSorting();
+        displayedCount = BATCH_SIZE;
+        renderView();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (tab === 'movies') {
         const b = document.getElementById('navMovies'); if (b) b.classList.add('active');
-        openSpecialSectionView('Movies Collection', m => m.tag !== 'TV Series' && m.tag !== 'K-Drama', 'All');
+        openCategoryView('Hollywood 1080p', 'Movies Collection');
     } else if (tab === 'animation') {
         const b = document.getElementById('navAnimation'); if (b) b.classList.add('active');
-        openSpecialSectionView('Animation & Anime Collection', m => m.tag === 'Animation' || (m.category && m.category.includes('Animation')), 'Animation');
+        openCategoryView('Animation', 'Animation & Anime Collection');
     }
-}
-
-async function openSpecialSectionView(title, filterFn, defaultTag) {
-    currentView = 'category';
-    currentCategoryTag = defaultTag || 'All';
-    currentCategoryName = title;
-
-    if (!isFullCatalogLoaded) {
-        document.getElementById('mainContent').innerHTML = `
-            <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 15px; font-weight: 600; color: var(--text-muted);">Loading ${title}...</div>
-            </div>
-        `;
-        await loadFullCatalogInBackground();
-    }
-
-    filteredMovies = allMovies.filter(filterFn);
-    applyCurrentSorting();
-    displayedCount = BATCH_SIZE;
-    renderView();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderCategoryFullGrid(container) {
@@ -426,11 +451,19 @@ function matchesCategory(m, tag) {
     return m.category && m.category.toLowerCase().includes(tag.toLowerCase());
 }
 
-function selectFilterPill(tag, label) {
+async function selectFilterPill(tag, label) {
     currentCategoryTag = tag;
     currentCategoryName = label;
 
-    filteredMovies = allMovies.filter(m => matchesCategory(m, tag));
+    if (tag === 'All') {
+        if (!isFullCatalogLoaded && allMovies.length === 0) {
+            await loadFullCatalogInBackground();
+        }
+        filteredMovies = [...allMovies];
+    } else {
+        filteredMovies = await fetchCategoryData(tag);
+    }
+
     applyCurrentSorting();
     displayedCount = BATCH_SIZE;
     renderView();
@@ -467,16 +500,20 @@ async function openCategoryView(tag, name) {
     currentCategoryTag = tag;
     currentCategoryName = name || tag;
 
-    if (!isFullCatalogLoaded) {
-        document.getElementById('mainContent').innerHTML = `
-            <div style="text-align: center; padding: 60px 20px;">
-                <div style="font-size: 15px; font-weight: 600; color: var(--text-muted);">Loading catalog...</div>
-            </div>
-        `;
-        await loadFullCatalogInBackground();
+    if (tag === 'All') {
+        if (!isFullCatalogLoaded && allMovies.length === 0) {
+            document.getElementById('mainContent').innerHTML = `
+                <div style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 15px; font-weight: 600; color: var(--text-muted);">Loading catalog...</div>
+                </div>
+            `;
+            await loadFullCatalogInBackground();
+        }
+        filteredMovies = [...allMovies];
+    } else {
+        filteredMovies = await fetchCategoryData(tag);
     }
 
-    filteredMovies = allMovies.filter(m => matchesCategory(m, tag));
     applyCurrentSorting();
     displayedCount = BATCH_SIZE;
     renderView();
