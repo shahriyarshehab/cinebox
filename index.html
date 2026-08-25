@@ -230,13 +230,13 @@
             overflow: hidden;
             background: #07090e;
             border: 1px solid var(--border);
-            box-shadow: 0 24px 48px rgba(0,0,0,0.7);
+            box-shadow: 0 24px 50px rgba(0,0,0,0.7);
         }
 
         .carousel-track {
             position: relative;
             width: 100%;
-            height: 450px;
+            height: 440px;
         }
 
         .carousel-slide {
@@ -244,7 +244,7 @@
             top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.6s ease, visibility 0.6s ease;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.6s ease;
             display: flex;
             align-items: center;
         }
@@ -258,17 +258,22 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background-size: cover;
-            background-position: center top;
-            filter: blur(4px) brightness(0.55);
-            transform: scale(1.05);
-            opacity: 0.75;
+            background-position: center 25%;
+            filter: blur(10px) brightness(0.65);
+            opacity: 0.6;
+            transform: scale(1.08);
+            transition: transform 6s ease;
+        }
+
+        .carousel-slide.active .slide-bg {
+            transform: scale(1.15);
         }
 
         .slide-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.85) 45%, rgba(7, 9, 14, 0.35) 75%, rgba(7, 9, 14, 0.15) 100%),
-                        linear-gradient(0deg, #07090e 0%, transparent 40%);
+            background: linear-gradient(90deg, #07090e 0%, rgba(7, 9, 14, 0.85) 45%, rgba(7, 9, 14, 0.35) 100%),
+                        linear-gradient(0deg, #07090e 0%, transparent 60%);
         }
 
         .slide-container {
@@ -283,7 +288,7 @@
         }
 
         .slide-content {
-            max-width: 680px;
+            max-width: 650px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -301,13 +306,14 @@
             padding: 5px 14px;
             border-radius: 20px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             width: fit-content;
+            backdrop-filter: blur(8px);
         }
 
         .slide-title {
             font-family: var(--font-display);
-            font-size: 38px;
+            font-size: 36px;
             font-weight: 800;
             line-height: 1.2;
             color: #fff;
@@ -321,15 +327,15 @@
         .slide-meta {
             display: flex;
             align-items: center;
-            gap: 16px;
-            font-size: 14px;
+            gap: 14px;
+            font-size: 13.5px;
             color: var(--text-muted);
         }
 
         .slide-poster-showcase {
             position: relative;
-            width: 240px;
-            height: 350px;
+            width: 230px;
+            height: 340px;
             border-radius: 18px;
             overflow: hidden;
             border: 2px solid var(--border-hover);
@@ -344,6 +350,7 @@
         .slide-poster-showcase:hover {
             transform: perspective(700px) rotateY(0deg) scale(1.05);
             border-color: var(--primary);
+            box-shadow: 0 24px 56px rgba(0, 0, 0, 0.95), 0 0 40px rgba(0, 229, 255, 0.5);
         }
 
         .slide-poster-showcase img {
@@ -354,16 +361,16 @@
 
         .slide-poster-badge {
             position: absolute;
-            top: 14px;
-            right: 14px;
-            background: rgba(7, 9, 14, 0.9);
+            top: 12px;
+            right: 12px;
+            background: rgba(7, 9, 14, 0.85);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 229, 255, 0.5);
+            border: 1px solid rgba(0, 229, 255, 0.4);
             color: var(--primary);
             font-size: 11px;
             font-weight: 800;
             padding: 4px 10px;
-            border-radius: 8px;
+            border-radius: 6px;
         }
 
         .carousel-btn {
@@ -401,15 +408,15 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 10px;
+            gap: 8px;
             z-index: 10;
         }
 
         .carousel-dot {
-            width: 9px;
-            height: 9px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.25);
             cursor: pointer;
             transition: all 0.25s ease;
         }
@@ -495,11 +502,11 @@
             color: var(--text-muted);
         }
 
-        /* Poster Grid */
+        /* Poster Grid (Large Poster Cinema Cards) */
         .poster-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-            gap: 28px 20px;
+            grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 28px 22px;
         }
 
         .movie-card {
@@ -515,9 +522,9 @@
         }
 
         .movie-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-6px);
             border-color: var(--border-hover);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 24px rgba(0, 229, 255, 0.2);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 229, 255, 0.15);
         }
 
         .card-cover {
@@ -538,7 +545,7 @@
         }
 
         .movie-card:hover .card-cover img {
-            transform: scale(1.07);
+            transform: scale(1.06);
         }
 
         .cover-fallback {
@@ -557,14 +564,14 @@
         .cover-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.88) 100%);
+            background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);
             opacity: 0;
             transition: opacity 0.25s ease;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             padding: 16px;
             z-index: 3;
         }
@@ -574,44 +581,43 @@
         }
 
         .play-button-symbol {
-            width: 52px;
-            height: 52px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             background: var(--primary);
             color: #07090e;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px var(--primary-glow);
+            box-shadow: 0 4px 16px var(--primary-glow);
         }
 
         .tag-badge {
             position: absolute;
-            top: 12px;
-            left: 12px;
+            top: 10px;
+            left: 10px;
             background: rgba(7, 9, 14, 0.85);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(0, 229, 255, 0.35);
+            border: 1px solid rgba(0, 229, 255, 0.3);
             color: var(--primary);
-            font-size: 10.5px;
-            font-weight: 800;
-            padding: 3px 9px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
             border-radius: 6px;
             z-index: 2;
-            letter-spacing: 0.3px;
         }
 
         .rating-badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
+            top: 10px;
+            right: 10px;
             background: rgba(7, 9, 14, 0.85);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 184, 0, 0.35);
+            border: 1px solid rgba(255, 184, 0, 0.3);
             color: var(--accent-gold);
-            font-size: 11.5px;
-            font-weight: 800;
-            padding: 3px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
             border-radius: 6px;
             display: flex;
             align-items: center;
@@ -620,16 +626,16 @@
         }
 
         .card-body {
-            padding: 16px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
             background: var(--bg-card);
         }
 
         .card-title {
-            font-size: 14.5px;
-            font-weight: 700;
+            font-size: 13.5px;
+            font-weight: 600;
             line-height: 1.35;
             color: #fff;
             display: -webkit-box;
@@ -643,7 +649,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 11.5px;
+            font-size: 11px;
             color: var(--text-muted);
         }
 
@@ -671,7 +677,7 @@
             border: 1px solid var(--border-hover);
             border-radius: var(--radius-lg);
             width: 100%;
-            max-width: 960px;
+            max-width: 920px;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
@@ -688,7 +694,7 @@
         }
 
         .modal-body {
-            padding: 28px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -696,18 +702,17 @@
 
         .modal-row {
             display: flex;
-            gap: 28px;
+            gap: 24px;
             align-items: flex-start;
         }
 
         .modal-poster-thumb {
-            width: 210px;
-            height: 310px;
-            border-radius: 14px;
+            width: 160px;
+            height: 240px;
+            border-radius: 12px;
             object-fit: cover;
-            border: 2px solid var(--border);
+            border: 1px solid var(--border);
             flex-shrink: 0;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.6);
         }
 
         .modal-info {
@@ -814,11 +819,7 @@
             <input type="text" id="searchInput" placeholder="Search across 36,000+ movies, Hollywood, Bollywood, Anime..." oninput="handleSearch()">
         </div>
 
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <a class="btn btn-primary" href="cloudstreamrepo://https://raw.githubusercontent.com/shahriyarshehab/cinebox/main/repo.json" title="1-Click Install MovieBox in Cloudstream App">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                <span>Add to Cloudstream</span>
-            </a>
+        <div>
             <a class="btn btn-ghost" href="#categories">Categories</a>
         </div>
     </header>
