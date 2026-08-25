@@ -124,7 +124,10 @@ function setupCarousel(moviesList) {
     if (carouselMovies.length === 0) return;
 
     const track = document.getElementById('carouselTrack');
-    track.innerHTML = carouselMovies.map((m, idx) => `
+    track.innerHTML = carouselMovies.map((m, idx) => {
+        const itemData = encodeURIComponent(JSON.stringify(m));
+        const linkUrl = `watch.html?title=${encodeURIComponent(m.title)}&data=${itemData}`;
+        return `
         <div class="carousel-slide ${idx === 0 ? 'active' : ''}" id="slide-${idx}">
             <div class="slide-bg" style="background-image: url('${m.poster}')"></div>
             <div class="slide-overlay"></div>
@@ -140,21 +143,21 @@ function setupCarousel(moviesList) {
                         <span>${m.category || 'Cinema'}</span>
                     </div>
                     <div style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
-                        <button class="btn btn-primary" onclick="navigateToWatch('${escapeQuotes(m.title)}')">
+                        <a class="btn btn-primary" href="${linkUrl}">
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
                             <span>Watch Now</span>
-                        </button>
+                        </a>
                     </div>
                 </div>
 
-                <div class="slide-poster-showcase" onclick="navigateToWatch('${escapeQuotes(m.title)}')">
+                <a class="slide-poster-showcase" href="${linkUrl}">
                     <img src="${m.poster}" alt="${escapeQuotes(m.title)}" loading="eager"
                          onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=400';">
                     <div class="slide-poster-badge">${m.tag || 'HD'}</div>
-                </div>
+                </a>
             </div>
         </div>
-    `).join('');
+    `;}).join('');
 
     const dots = document.getElementById('carouselDots');
     dots.innerHTML = carouselMovies.map((_, idx) => `
@@ -311,11 +314,14 @@ function renderCategoryFullGrid(container) {
 }
 
 function renderMovieCardHtml(item) {
-    const safeTitle = escapeQuotes(item.title);
+    const rawTitle = item.title || '';
+    const safeTitle = escapeQuotes(rawTitle);
+    const itemData = encodeURIComponent(JSON.stringify(item));
     const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
+    const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
 
     return `
-        <div class="movie-card" onclick="navigateToWatch('${safeTitle}')">
+        <a class="movie-card" href="${linkUrl}">
             <div class="card-cover">
                 <img src="${item.poster}" alt="${safeTitle}" loading="lazy"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -348,7 +354,7 @@ function renderMovieCardHtml(item) {
                     <span>${item.date || ''}</span>
                 </div>
             </div>
-        </div>
+        </a>
     `;
 }
 
