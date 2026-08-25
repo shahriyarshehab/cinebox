@@ -272,7 +272,20 @@ function renderHomeRowsFromPayload(categoriesMap) {
     const container = document.getElementById('mainContent');
     if (!categoriesMap) return;
 
-    let html = '';
+    let html = `
+        <!-- MovieBox Quick-Category Filter Bar -->
+        <div class="home-category-pills-bar">
+            <div class="filter-pills-row">
+                <button class="filter-pill active" onclick="showHomeView()">🔥 All Categories</button>
+                ${ALL_CATEGORY_PILLS.map(p => `
+                    <button class="filter-pill" onclick="openCategoryView('${p.tag}', '${escapeQuotes(p.label)}')">
+                        ${p.label}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
     CATEGORY_ROWS.forEach((cat, catIdx) => {
         const rawItems = categoriesMap[cat.tag] || [];
         if (rawItems.length === 0) return;
@@ -314,7 +327,19 @@ function renderHomeRowsFromPayload(categoriesMap) {
 }
 
 function renderHomeRows(container) {
-    let html = '';
+    let html = `
+        <!-- MovieBox Quick-Category Filter Bar -->
+        <div class="home-category-pills-bar">
+            <div class="filter-pills-row">
+                <button class="filter-pill active" onclick="showHomeView()">🔥 All Categories</button>
+                ${ALL_CATEGORY_PILLS.map(p => `
+                    <button class="filter-pill" onclick="openCategoryView('${p.tag}', '${escapeQuotes(p.label)}')">
+                        ${p.label}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
 
     CATEGORY_ROWS.forEach((cat, catIdx) => {
         const catMovies = allMovies.filter(m => m.tag === cat.tag || (m.category && m.category.includes(cat.tag)));
