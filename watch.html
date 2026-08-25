@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Watch Media — CineBox</title>
     <meta name="description" content="Stream and download high-quality HD cinema, TV shows, and anime with in-browser player, VLC integration, and episode selector.">
     <meta name="theme-color" content="#07090e">
@@ -26,7 +26,7 @@
             <div class="brand-name">Cine<span>Box</span></div>
         </a>
 
-        <nav class="nav-links">
+        <nav class="nav-links desktop-nav-links">
             <a class="nav-link" href="index.html">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 <span>Home</span>
@@ -81,18 +81,18 @@
     <div class="watch-container">
         <!-- Back Navigation & Top Bar -->
         <div class="back-nav">
-            <a class="btn btn-ghost" href="index.html">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back to Home</span>
+            <a class="btn btn-ghost" href="index.html" style="padding: 6px 12px; font-size: 12px;">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Back</span>
             </a>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <button class="btn btn-ghost" id="wWatchlistTopBtn" onclick="toggleCurrentWatchlist()">
-                    <svg class="icon" id="wHeartIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                    <span id="wWatchlistTopText">Save to Watchlist</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button class="btn btn-ghost" id="wWatchlistTopBtn" onclick="toggleCurrentWatchlist()" style="padding: 6px 12px; font-size: 12px;">
+                    <svg class="icon" id="wHeartIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    <span id="wWatchlistTopText">Watchlist</span>
                 </button>
                 <div id="mediaTypeBadge" class="live-status">
                     <span class="live-status-dot"></span>
-                    <span>Ready to Stream</span>
+                    <span>Ready</span>
                 </div>
             </div>
         </div>
@@ -107,11 +107,9 @@
 
                 <div class="player-controls-right">
                     <!-- Speed Selector -->
-                    <div class="player-dropdown-wrap">
-                        <button class="player-mini-btn" id="speedBtn" onclick="cyclePlaybackSpeed()" title="Playback Speed">
-                            <span id="speedLabel">1.0x</span>
-                        </button>
-                    </div>
+                    <button class="player-mini-btn" id="speedBtn" onclick="cyclePlaybackSpeed()" title="Playback Speed">
+                        <span id="speedLabel">1.0x</span>
+                    </button>
 
                     <!-- Aspect Ratio Selector -->
                     <button class="player-mini-btn" onclick="cycleAspectRatio()" title="Aspect Ratio">
@@ -120,30 +118,30 @@
 
                     <!-- PiP Toggle -->
                     <button class="player-mini-btn" onclick="togglePictureInPicture()" title="Picture-in-Picture">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
                     </button>
 
                     <!-- Prev/Next Episode buttons -->
-                    <div id="playerNavBtns" style="display: none; gap: 6px;">
-                        <button class="btn btn-ghost" style="padding: 4px 10px; font-size: 11.5px;" onclick="playPrevEpisode()" title="Previous Episode (P)">◀ Prev</button>
-                        <button class="btn btn-primary" style="padding: 4px 10px; font-size: 11.5px;" onclick="playNextEpisode()" title="Next Episode (N)">Next ▶</button>
+                    <div id="playerNavBtns" style="display: none; gap: 4px;">
+                        <button class="btn btn-ghost" style="padding: 3px 8px; font-size: 11px;" onclick="playPrevEpisode()" title="Previous Episode (P)">◀</button>
+                        <button class="btn btn-primary" style="padding: 3px 8px; font-size: 11px;" onclick="playNextEpisode()" title="Next Episode (N)">Next ▶</button>
                     </div>
                 </div>
             </div>
 
             <!-- Video Player Element -->
             <div class="video-container" id="videoContainer">
-                <video id="videoPlayer" controls playsinline preload="metadata" style="width: 100%; max-height: 600px; outline: none; background: #000;"></video>
+                <video id="videoPlayer" controls playsinline preload="metadata" style="width: 100%; max-height: 580px; outline: none; background: #000;"></video>
                 
                 <!-- Next Episode Countdown Overlay -->
                 <div class="next-ep-countdown" id="nextEpCountdown" style="display: none;">
                     <div class="next-ep-box">
-                        <div style="font-size: 11.5px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Up Next</div>
+                        <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Up Next</div>
                         <div class="next-ep-title" id="nextEpTitle">Next Episode</div>
                         <div class="next-ep-timer">Playing in <span id="countdownSecs">8</span>s</div>
-                        <div style="display: flex; gap: 8px; margin-top: 10px;">
-                            <button class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="confirmNextEpisode()">Play Now</button>
-                            <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 12px;" onclick="cancelNextEpisode()">Cancel</button>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <button class="btn btn-primary" style="padding: 5px 12px; font-size: 11.5px;" onclick="confirmNextEpisode()">Play Now</button>
+                            <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="cancelNextEpisode()">Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -159,8 +157,8 @@
                     <div class="slide-tag" id="wTag">Quality • HD</div>
                     <h1 class="watch-title" id="wTitle">Loading Title...</h1>
                     <div class="modal-chips" id="wChips"></div>
-                    <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
-                        High-speed direct streaming and 1-click download enabled. Compatible with browser HTML5 video, external VLC Player, MX Player, and PotPlayer.
+                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                        High-speed streaming & 1-click download enabled. Supports in-browser player, VLC, MX Player, and PotPlayer.
                     </p>
                     <div class="modal-btn-row" id="wActions"></div>
                 </div>
@@ -168,77 +166,101 @@
         </div>
 
         <!-- TV Series Seasons & Episodes Explorer (For Series) -->
-        <div id="tvExplorerWrap" style="display: none; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px 28px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
-                <div style="font-size: 16px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+        <div id="tvExplorerWrap" style="display: none; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px 24px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
                     <span>Seasons & Episodes</span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="btn btn-ghost" id="btnDownloadSeasonM3u" style="padding: 5px 12px; font-size: 11.5px; border-color: rgba(0, 229, 255, 0.3); color: var(--primary);" onclick="downloadSeasonM3u()" title="Download whole season as .m3u playlist">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <span>Download Season Playlist (.m3u)</span>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-ghost" id="btnDownloadSeasonM3u" style="padding: 4px 10px; font-size: 11px; border-color: rgba(0, 229, 255, 0.3); color: var(--primary);" onclick="downloadSeasonM3u()" title="Download whole season as .m3u playlist">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Season Playlist (.m3u)</span>
                     </button>
-                    <div id="seasonCountBadge" class="badge-count-static">Loading seasons...</div>
+                    <div id="seasonCountBadge" class="badge-count-static">Loading...</div>
                 </div>
             </div>
 
             <!-- Season Tabs -->
-            <div id="seasonTabs" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 18px; padding-bottom: 6px;"></div>
+            <div id="seasonTabs" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; scrollbar-width: none;"></div>
 
             <!-- Episode List -->
-            <div id="episodeList" style="display: flex; flex-direction: column; gap: 8px; max-height: 480px; overflow-y: auto; padding-right: 6px;"></div>
+            <div id="episodeList" style="display: flex; flex-direction: column; gap: 7px; max-height: 480px; overflow-y: auto; padding-right: 4px;"></div>
         </div>
 
         <!-- External Player Hub Modal / Options -->
         <div class="player-hub-card" id="externalPlayerHub">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-                <div style="font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    <span>External App Players & Casting Hub</span>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 6px;">
+                <div style="font-size: 14.5px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>External App Players</span>
                 </div>
-                <span style="font-size: 11.5px; color: var(--text-muted);">Launch direct playback in any media player</span>
+                <span style="font-size: 11px; color: var(--text-muted);">Launch in external media player</span>
             </div>
             <div class="player-hub-grid">
                 <button class="btn btn-vlc" onclick="openCurrentInVLC()">
-                    <span style="font-size: 14px;">🍦</span>
+                    <span>🍦</span>
                     <span>VLC Player</span>
                 </button>
                 <button class="btn btn-ghost" onclick="openInMXPlayer()" style="border-color: rgba(0, 180, 216, 0.4); color: #00b4d8;">
-                    <span style="font-size: 14px;">📱</span>
-                    <span>MX Player (Android)</span>
+                    <span>📱</span>
+                    <span>MX Player</span>
                 </button>
                 <button class="btn btn-ghost" onclick="openInPotPlayer()" style="border-color: rgba(255, 184, 0, 0.4); color: var(--accent-gold);">
-                    <span style="font-size: 14px;">💻</span>
-                    <span>PotPlayer (PC)</span>
+                    <span>💻</span>
+                    <span>PotPlayer</span>
                 </button>
                 <button class="btn btn-ghost" onclick="copyCurrentStreamUrl()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    <span>Copy Stream Link</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <span>Copy URL</span>
                 </button>
             </div>
         </div>
 
         <!-- Related / More Like This Interlink Row -->
-        <div id="relatedSection" style="margin-top: 10px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
-                <h2 class="row-heading" style="font-size: 18px;" id="relatedHeading">More Like This</h2>
+        <div id="relatedSection" style="margin-top: 8px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                <h2 class="row-heading" style="font-size: 17px;" id="relatedHeading">More Like This</h2>
                 <div class="row-controls">
                     <button class="row-nav-btn prev" onclick="slideRow('relatedSlider', -1)" aria-label="Previous">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
                     <button class="row-nav-btn next" onclick="slideRow('relatedSlider', 1)" aria-label="Next">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
                     <a class="btn-see-all" id="relatedSeeAllBtn" href="index.html">
-                        <span>Explore Category</span>
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <span>Explore</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
                 </div>
             </div>
             <div class="row-slider" id="relatedSlider"></div>
         </div>
     </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+        <a class="mobile-nav-btn" href="index.html">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Home</span>
+        </a>
+        <a class="mobile-nav-btn" href="index.html?tab=tv">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            <span>TV Shows</span>
+        </a>
+        <a class="mobile-nav-btn" href="index.html?tab=movies">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            <span>Movies</span>
+        </a>
+        <a class="mobile-nav-btn" href="index.html?tab=animation">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            <span>Animation</span>
+        </a>
+        <a class="mobile-nav-btn" href="index.html?tab=watchlist">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span>Watchlist</span>
+        </a>
+    </nav>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast">Link copied to clipboard</div>
@@ -278,7 +300,7 @@
 
         // Official VLC Cone SVG
         const VLC_ICON_SVG = `
-            <svg class="icon" viewBox="0 0 512 512" width="15" height="15" aria-label="VLC" style="vertical-align: middle;">
+            <svg class="icon" viewBox="0 0 512 512" width="14" height="14" aria-label="VLC" style="vertical-align: middle;">
                 <g fill="#f7901e">
                     <path d="M437 400l-36-94c-3-10-13-16-23-16H134c-10 0-20 6-23 16l-36 94c-2 3-2 7-2 11 0 16 13 29 29 29h308a29 29 0 0 0 27-40z"/>
                     <path d="M299 109l-15-51c-3-11-13-18-24-18h-8c-11 0-21 7-24 18l-15 51a307 307 0 0 0 86 0zM256 183c-24 0-46-2-64-6l-19 65c20 8 49 13 83 13s63-5 83-13l-20-65c-17 4-39 6-63 6z"/>
@@ -415,15 +437,15 @@
             if (isSeries) {
                 document.getElementById('wActions').innerHTML = `
                     <button class="btn btn-primary" onclick="scrollTvExplorer()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
                         <span>Select Episode</span>
                     </button>
                     <button class="btn btn-ghost" onclick="toggleCurrentWatchlist()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                        <span>Bookmark Series</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <span>Bookmark</span>
                     </button>
                     <a class="btn btn-ghost" href="${item.url}" target="_blank">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
                         <span>Server Folder</span>
                     </a>
                 `;
@@ -436,24 +458,20 @@
 
                 document.getElementById('wActions').innerHTML = `
                     <button class="btn btn-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
-                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
-                        <span>Play in Browser</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M8 5v14l11-7z"/></svg>
+                        <span>Play Now</span>
                     </button>
                     <button class="btn btn-vlc" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
                         ${VLC_ICON_SVG}
-                        <span>Play in VLC</span>
+                        <span>Play VLC</span>
                     </button>
                     <a class="btn btn-accent" href="${item.url}" download>
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         <span>Download</span>
                     </a>
                     <button class="btn btn-ghost" onclick="toggleCurrentWatchlist()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                        <span>Watchlist</span>
-                    </button>
-                    <button class="btn btn-ghost" onclick="copyLink('${item.url}')">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                        <span>Copy URL</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <span>Bookmark</span>
                     </button>
                 `;
 
@@ -504,11 +522,11 @@
             const icon = document.getElementById('wHeartIcon');
             if (btnText && icon) {
                 if (inList) {
-                    btnText.textContent = 'In Watchlist ❤️';
+                    btnText.textContent = 'Saved ❤️';
                     icon.style.stroke = 'var(--accent)';
                     icon.style.fill = 'var(--accent)';
                 } else {
-                    btnText.textContent = 'Save to Watchlist';
+                    btnText.textContent = 'Watchlist';
                     icon.style.stroke = 'currentColor';
                     icon.style.fill = 'none';
                 }
@@ -536,7 +554,6 @@
                 if (existingIdx >= 0) history.splice(existingIdx, 1);
                 history.unshift(entry);
 
-                // Keep top 30 history items
                 localStorage.setItem('cinebox_watch_history', JSON.stringify(history.slice(0, 30)));
             } catch (e) {}
         }
@@ -690,7 +707,7 @@
                 let tabsHtml = seasons.map((s, idx) => {
                     const sName = s[0];
                     return `
-                    <button class="btn btn-ghost ${idx === 0 ? 'active' : ''}" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; ${idx === 0 ? 'background: var(--primary); color: #07090e; font-weight: 700;' : ''}" onclick="selectIndexedSeason(this, ${idx}, '${escapeQuotes(sName)}')">
+                    <button class="btn btn-ghost ${idx === 0 ? 'active' : ''}" style="font-size: 11.5px; padding: 5px 12px; border-radius: 20px; white-space: nowrap; ${idx === 0 ? 'background: var(--primary); color: #07090e; font-weight: 700;' : ''}" onclick="selectIndexedSeason(this, ${idx}, '${escapeQuotes(sName)}')">
                         ${sName}
                     </button>
                     `;
@@ -698,7 +715,7 @@
 
                 if (specials.length > 0) {
                     tabsHtml += `
-                        <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; border-color: rgba(255, 184, 0, 0.4); color: #ffb800;" onclick="selectSpecialsTab(this)">
+                        <button class="btn btn-ghost" style="font-size: 11.5px; padding: 5px 12px; border-radius: 20px; border-color: rgba(255, 184, 0, 0.4); color: #ffb800; white-space: nowrap;" onclick="selectSpecialsTab(this)">
                             ★ Specials (${specials.length})
                         </button>
                     `;
@@ -772,24 +789,24 @@
             epList.innerHTML = episodes.map((ep, idx) => {
                 const isPlaying = idx === currentPlayingEpisodeIdx;
                 return `
-                <div id="ep-item-${idx}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: ${isPlaying ? 'rgba(0, 229, 255, 0.12)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${isPlaying ? 'var(--primary)' : 'var(--border)'}; border-radius: 8px; transition: all 0.2s ease;">
-                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden;">
-                        <span style="font-size: 11px; font-weight: 800; color: ${isPlaying ? 'var(--primary)' : 'var(--text-dim)'}; min-width: 22px;">${idx + 1}</span>
-                        <div style="font-size: 12.5px; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeQuotes(ep.name)}">
+                <div id="ep-item-${idx}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; background: ${isPlaying ? 'rgba(0, 229, 255, 0.12)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${isPlaying ? 'var(--primary)' : 'var(--border)'}; border-radius: 8px; transition: all 0.2s ease;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden;">
+                        <span style="font-size: 10.5px; font-weight: 800; color: ${isPlaying ? 'var(--primary)' : 'var(--text-dim)'}; min-width: 18px;">${idx + 1}</span>
+                        <div style="font-size: 12px; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeQuotes(ep.name)}">
                             ${ep.name}
                         </div>
                     </div>
-                    <div style="display: flex; gap: 6px; flex-shrink: 0;">
-                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;" onclick="playSpecificEpisode(${idx})">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="10" height="10"><path d="M8 5v14l11-7z"/></svg>
+                    <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size: 10.5px;" onclick="playSpecificEpisode(${idx})">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="9" height="9"><path d="M8 5v14l11-7z"/></svg>
                             <span>${isPlaying ? 'Playing' : 'Play'}</span>
                         </button>
-                        <button class="btn btn-vlc" style="padding: 5px 10px; font-size: 11px;" onclick="openInVLC('${ep.url}', '${escapeQuotes(ep.name)}')">
+                        <button class="btn btn-vlc" style="padding: 4px 8px; font-size: 10.5px;" onclick="openInVLC('${ep.url}', '${escapeQuotes(ep.name)}')">
                             ${VLC_ICON_SVG}
                             <span>VLC</span>
                         </button>
-                        <a class="btn btn-ghost" style="padding: 5px 8px; font-size: 11px;" href="${ep.url}" download>
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <a class="btn btn-ghost" style="padding: 4px 6px; font-size: 10.5px;" href="${ep.url}" download>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         </a>
                     </div>
                 </div>
@@ -830,15 +847,15 @@
         }
 
         function fallbackTvView(seriesUrl, seriesTitle) {
-            document.getElementById('seasonCountBadge').textContent = 'Series Directory';
+            document.getElementById('seasonCountBadge').textContent = 'Directory';
             document.getElementById('seasonTabs').innerHTML = `
-                <a class="btn btn-primary" style="font-size: 12px; padding: 6px 14px; border-radius: 20px;" href="${seriesUrl}" target="_blank">
+                <a class="btn btn-primary" style="font-size: 11.5px; padding: 6px 12px; border-radius: 20px;" href="${seriesUrl}" target="_blank">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                    <span>Browse All Seasons & Episodes on Server</span>
+                    <span>Browse All Seasons on Server</span>
                 </a>
             `;
             document.getElementById('episodeList').innerHTML = `
-                <div style="font-size: 12px; color: var(--text-muted); padding: 8px 4px; line-height: 1.5;">
+                <div style="font-size: 11.5px; color: var(--text-muted); padding: 6px 2px; line-height: 1.4;">
                     Click above to browse all season folders and stream/download any episode directly via high-speed BDIX.
                 </div>
             `;
@@ -847,7 +864,7 @@
         // Season Playlist Download (.m3u)
         function downloadSeasonM3u() {
             if (!currentSeasonEpisodes || currentSeasonEpisodes.length === 0) {
-                showToast('No episodes available in this season to export');
+                showToast('No episodes in this season');
                 return;
             }
 
@@ -905,7 +922,7 @@
             const title = encodeURIComponent(currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie'));
             const intentUrl = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;type=video/*;S.title=${title};end`;
             window.location.href = intentUrl;
-            showToast('Launching MX Player on Android...');
+            showToast('Launching MX Player...');
         }
 
         function openInPotPlayer() {
@@ -931,11 +948,10 @@
 
             player.src = url;
 
-            // Check if there is saved progress
             const prev = getPlaybackProgress(url, title);
             if (prev && prev.time > 15 && prev.time < prev.duration - 20) {
                 player.currentTime = prev.time;
-                showToast(`Resumed playback from ${formatTime(prev.time)}`);
+                showToast(`Resumed from ${formatTime(prev.time)}`);
             }
 
             player.play().catch(e => console.log(e));
@@ -956,7 +972,7 @@
             const player = document.getElementById('videoPlayer');
             if (player) player.style.objectFit = fit;
             document.getElementById('aspectLabel').textContent = fit.charAt(0).toUpperCase() + fit.slice(1);
-            showToast(`Aspect Ratio: ${fit}`);
+            showToast(`Aspect: ${fit}`);
         }
 
         async function togglePictureInPicture() {
@@ -969,7 +985,7 @@
                     await player.requestPictureInPicture();
                 }
             } catch (e) {
-                showToast('Picture-in-Picture not supported');
+                showToast('PiP not supported');
             }
         }
 
@@ -988,7 +1004,7 @@
             const toast = document.getElementById('toast');
             toast.textContent = msg;
             toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+            setTimeout(() => { toast.style.display = 'none'; }, 2800);
         }
 
         // Keyboard Shortcuts
@@ -1106,8 +1122,8 @@
         function slideRow(rowId, direction) {
             const slider = document.getElementById(rowId);
             if (!slider) return;
-            const cardWidth = 186;
-            const scrollAmount = Math.max(cardWidth * 3, Math.floor(slider.clientWidth * 0.75)) * direction;
+            const cardWidth = 140;
+            const scrollAmount = Math.max(cardWidth * 2, Math.floor(slider.clientWidth * 0.75)) * direction;
             slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         }
 
@@ -1188,7 +1204,7 @@
                     dropdown.style.display = 'block';
                 } else {
                     dropdown.innerHTML = `
-                        <div style="padding: 16px 12px; text-align: center; font-size: 12.5px; color: var(--text-muted);">
+                        <div style="padding: 16px 12px; text-align: center; font-size: 12px; color: var(--text-muted);">
                             No exact title found for "${val}". Press Enter for full search.
                         </div>
                     `;

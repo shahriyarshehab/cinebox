@@ -195,23 +195,23 @@ function setupCarousel(moviesList) {
             <div class="slide-overlay"></div>
             <div class="slide-container">
                 <div class="slide-content">
-                    <div class="slide-tag">Featured • ${m.tag || 'Latest Release'}</div>
+                    <div class="slide-tag">Featured • ${m.tag || 'Latest'}</div>
                     <h2 class="slide-title" title="${escapeQuotes(m.title)}">${m.title}</h2>
                     <div class="slide-meta">
-                        <span style="color: var(--accent-gold); font-weight: 700;">★ 8.9 / 10</span>
+                        <span style="color: var(--accent-gold); font-weight: 700;">★ 8.9</span>
                         <span>•</span>
                         <span>${m.size || 'HD 1080P'}</span>
                         <span>•</span>
                         <span>${m.category || 'Cinema'}</span>
                     </div>
-                    <div style="display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap;">
                         <a class="btn btn-primary" href="${linkUrl}">
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
                             <span>Watch Now</span>
                         </a>
                         <button class="btn btn-ghost" onclick="toggleWatchlistFromObj(${escapeQuotesJson(m)})">
                             <svg class="icon" viewBox="0 0 24 24" fill="${inWatchlist ? 'var(--accent)' : 'none'}" stroke="${inWatchlist ? 'var(--accent)' : 'currentColor'}" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                            <span>${inWatchlist ? 'In Watchlist' : 'Add to List'}</span>
+                            <span>${inWatchlist ? 'In List' : 'Save'}</span>
                         </button>
                     </div>
                 </div>
@@ -287,19 +287,19 @@ function renderContinueWatchingHtml() {
 
     return `
         <div class="continue-watching-block">
-            <div class="row-header" style="border-bottom: none; margin-bottom: 12px;">
+            <div class="row-header" style="border-bottom: none; margin-bottom: 10px;">
                 <div class="row-title-wrap">
                     <h2 class="row-heading">
                         <span style="color: var(--primary);">▶</span> Continue Watching
                     </h2>
-                    <span class="row-badge">${history.length} in progress</span>
+                    <span class="row-badge">${history.length}</span>
                 </div>
                 <div class="row-controls">
                     <button class="row-nav-btn prev" onclick="slideRow('continueSlider', -1)" aria-label="Previous">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M15 18l-6-6 6-6"/></svg>
                     </button>
                     <button class="row-nav-btn next" onclick="slideRow('continueSlider', 1)" aria-label="Next">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
                     </button>
                 </div>
             </div>
@@ -323,7 +323,7 @@ function renderContinueWatchingHtml() {
                                 <div class="card-body">
                                     <div class="card-title" title="${item.title}">${item.title}</div>
                                     <div class="card-meta">
-                                        <span style="color: var(--primary); font-weight: 700;">${item.percent}% watched</span>
+                                        <span style="color: var(--primary); font-weight: 700;">${item.percent}%</span>
                                         <span>${timeLeft}m left</span>
                                     </div>
                                 </div>
@@ -374,15 +374,17 @@ function toggleWatchlistFromObj(movieObj, event) {
 
 function updateWatchlistNavBadge() {
     const list = getWatchlist();
-    const badge = document.getElementById('watchlistNavCount');
-    if (badge) {
-        if (list.length > 0) {
-            badge.textContent = list.length;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.style.display = 'none';
+    const badges = [document.getElementById('watchlistNavCount'), document.getElementById('mobWatchlistNavCount')];
+    badges.forEach(badge => {
+        if (badge) {
+            if (list.length > 0) {
+                badge.textContent = list.length;
+                badge.style.display = 'inline-block';
+            } else {
+                badge.style.display = 'none';
+            }
         }
-    }
+    });
 }
 
 function renderView() {
@@ -407,8 +409,8 @@ function renderView() {
 function slideRow(rowId, direction) {
     const slider = document.getElementById(rowId);
     if (!slider) return;
-    const cardWidth = 186;
-    const scrollAmount = Math.max(cardWidth * 3, Math.floor(slider.clientWidth * 0.75)) * direction;
+    const cardWidth = 140;
+    const scrollAmount = Math.max(cardWidth * 2, Math.floor(slider.clientWidth * 0.75)) * direction;
     slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 }
 
@@ -450,14 +452,14 @@ function renderHomeRowsFromPayload(categoriesMap) {
                     </div>
                     <div class="row-controls">
                         <button class="row-nav-btn prev" onclick="slideRow('${rowSliderId}', -1)" aria-label="Previous">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M15 18l-6-6 6-6"/></svg>
                         </button>
                         <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
                         </button>
                         <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
                             <span>Show All</span>
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </button>
                     </div>
                 </div>
@@ -501,18 +503,18 @@ function renderHomeRows(container) {
                 <div class="row-header">
                     <div class="row-title-wrap">
                         <h2 class="row-heading">${cat.name}</h2>
-                        <span class="row-badge">${catMovies.length.toLocaleString()} items</span>
+                        <span class="row-badge">${catMovies.length.toLocaleString()}</span>
                     </div>
                     <div class="row-controls">
                         <button class="row-nav-btn prev" onclick="slideRow('${rowSliderId}', -1)" aria-label="Previous">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M15 18l-6-6 6-6"/></svg>
                         </button>
                         <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
                         </button>
                         <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
                             <span>Show All</span>
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </button>
                     </div>
                 </div>
@@ -552,13 +554,24 @@ let activeNavTab = 'home';
 
 async function switchNavTab(tab) {
     activeNavTab = tab;
-    document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.nav-link, .mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
+    
+    const navMap = {
+        'home': ['navHome', 'mobNavHome'],
+        'tv': ['navTv', 'mobNavTv'],
+        'movies': ['navMovies', 'mobNavMovies'],
+        'animation': ['navAnimation', 'mobNavAnimation'],
+        'watchlist': ['navWatchlist', 'mobNavWatchlist']
+    };
+
+    (navMap[tab] || []).forEach(id => {
+        const b = document.getElementById(id);
+        if (b) b.classList.add('active');
+    });
     
     if (tab === 'home') {
-        const b = document.getElementById('navHome'); if (b) b.classList.add('active');
         showHomeView();
     } else if (tab === 'tv') {
-        const b = document.getElementById('navTv'); if (b) b.classList.add('active');
         currentView = 'category';
         currentCategoryTag = 'TV Series';
         currentCategoryName = 'TV Shows & Korean Dramas';
@@ -568,13 +581,10 @@ async function switchNavTab(tab) {
         renderView();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (tab === 'movies') {
-        const b = document.getElementById('navMovies'); if (b) b.classList.add('active');
         openCategoryView('Hollywood 1080p', 'Movies Collection');
     } else if (tab === 'animation') {
-        const b = document.getElementById('navAnimation'); if (b) b.classList.add('active');
         openCategoryView('Animation', 'Animation & Anime Collection');
     } else if (tab === 'watchlist') {
-        const b = document.getElementById('navWatchlist'); if (b) b.classList.add('active');
         currentView = 'watchlist';
         renderView();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -590,14 +600,14 @@ function renderWatchlistView() {
     container.innerHTML = `
         <div class="filter-bar-wrap">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 12px;" onclick="showHomeView()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="showHomeView()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Home</span>
                     </button>
-                    <h1 class="row-heading" style="font-size: 20px;">❤️ My Watchlist</h1>
+                    <h1 class="row-heading" style="font-size: 18px;">❤️ My Watchlist</h1>
                 </div>
-                <span style="font-size: 12px; color: var(--text-muted);">${list.length} saved titles</span>
+                <span style="font-size: 11.5px; color: var(--text-muted);">${list.length} saved</span>
             </div>
         </div>
 
@@ -606,13 +616,13 @@ function renderWatchlistView() {
                 ${list.map(item => renderMovieCardHtml(item)).join('')}
             </div>
         ` : `
-            <div style="text-align: center; padding: 80px 20px;">
-                <div style="font-size: 48px; margin-bottom: 12px;">💖</div>
-                <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Your Watchlist is Empty</h2>
-                <p style="font-size: 13.5px; color: var(--text-muted); max-width: 420px; margin: 0 auto 20px;">
-                    Click the bookmark icon on any movie or series to save it here for later streaming!
+            <div style="text-align: center; padding: 60px 16px;">
+                <div style="font-size: 40px; margin-bottom: 10px;">💖</div>
+                <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">Your Watchlist is Empty</h2>
+                <p style="font-size: 13px; color: var(--text-muted); max-width: 380px; margin: 0 auto 16px;">
+                    Bookmark any movie or series to keep track of what you want to watch!
                 </p>
-                <button class="btn btn-primary" onclick="showHomeView()">Browse 36,000+ Movies</button>
+                <button class="btn btn-primary" onclick="showHomeView()">Explore Movies</button>
             </div>
         `}
     `;
@@ -624,21 +634,21 @@ function renderCategoryFullGrid(container) {
     container.innerHTML = `
         <!-- MovieBox Filter Bar with Horizontal Pills & Facets -->
         <div class="filter-bar-wrap">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 12px;" onclick="showHomeView()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="showHomeView()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Home</span>
                     </button>
-                    <h1 class="row-heading" style="font-size: 20px;">${currentCategoryName}</h1>
+                    <h1 class="row-heading" style="font-size: 18px;">${currentCategoryName}</h1>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 12px; color: var(--text-muted);">${filteredMovies.length.toLocaleString()} titles</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 11.5px; color: var(--text-muted);">${filteredMovies.length.toLocaleString()} titles</span>
                     <select class="sort-select" onchange="handleSortChange(this.value)">
-                        <option value="latest" ${currentSort === 'latest' ? 'selected' : ''}>Sort: Latest Releases</option>
-                        <option value="title" ${currentSort === 'title' ? 'selected' : ''}>Sort: Name (A-Z)</option>
-                        <option value="rating" ${currentSort === 'rating' ? 'selected' : ''}>Sort: Top Rated ★</option>
+                        <option value="latest" ${currentSort === 'latest' ? 'selected' : ''}>Latest</option>
+                        <option value="title" ${currentSort === 'title' ? 'selected' : ''}>Name A-Z</option>
+                        <option value="rating" ${currentSort === 'rating' ? 'selected' : ''}>Top Rated ★</option>
                     </select>
                 </div>
             </div>
@@ -657,8 +667,8 @@ function renderCategoryFullGrid(container) {
                 <div class="facet-group">
                     <span class="facet-label">Era:</span>
                     <button class="filter-pill-mini ${filterYear === 'all' ? 'active' : ''}" onclick="setFacetYear('all')">All</button>
-                    <button class="filter-pill-mini ${filterYear === '2024+' ? 'active' : ''}" onclick="setFacetYear('2024+')">2024–2026</button>
-                    <button class="filter-pill-mini ${filterYear === '2020-2023' ? 'active' : ''}" onclick="setFacetYear('2020-2023')">2020–2023</button>
+                    <button class="filter-pill-mini ${filterYear === '2024+' ? 'active' : ''}" onclick="setFacetYear('2024+')">2024–26</button>
+                    <button class="filter-pill-mini ${filterYear === '2020-2023' ? 'active' : ''}" onclick="setFacetYear('2020-2023')">2020–23</button>
                     <button class="filter-pill-mini ${filterYear === '2010s' ? 'active' : ''}" onclick="setFacetYear('2010s')">2010s</button>
                     <button class="filter-pill-mini ${filterYear === 'classic' ? 'active' : ''}" onclick="setFacetYear('classic')">Classic</button>
                 </div>
@@ -673,7 +683,7 @@ function renderCategoryFullGrid(container) {
                 <div class="facet-group">
                     <span class="facet-label">Quality:</span>
                     <button class="filter-pill-mini ${filterQuality === 'all' ? 'active' : ''}" onclick="setFacetQuality('all')">All</button>
-                    <button class="filter-pill-mini ${filterQuality === '1080p' ? 'active' : ''}" onclick="setFacetQuality('1080p')">1080p Full HD</button>
+                    <button class="filter-pill-mini ${filterQuality === '1080p' ? 'active' : ''}" onclick="setFacetQuality('1080p')">1080p</button>
                     <button class="filter-pill-mini ${filterQuality === '720p' ? 'active' : ''}" onclick="setFacetQuality('720p')">720p</button>
                 </div>
             </div>
@@ -786,8 +796,9 @@ function applyCurrentSorting() {
 function showHomeView() {
     currentView = 'home';
     activeNavTab = 'home';
-    document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-    const b = document.getElementById('navHome'); if (b) b.classList.add('active');
+    document.querySelectorAll('.nav-link, .mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
+    const b1 = document.getElementById('navHome'); if (b1) b1.classList.add('active');
+    const b2 = document.getElementById('mobNavHome'); if (b2) b2.classList.add('active');
     document.getElementById('searchInput').value = '';
     renderView();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -802,7 +813,7 @@ async function openCategoryView(tag, name) {
         if (!isFullCatalogLoaded && allMovies.length === 0) {
             document.getElementById('mainContent').innerHTML = `
                 <div style="text-align: center; padding: 60px 20px;">
-                    <div style="font-size: 15px; font-weight: 600; color: var(--text-muted);">Loading catalog...</div>
+                    <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Loading catalog...</div>
                 </div>
             `;
             await loadFullCatalogInBackground();
@@ -884,7 +895,7 @@ function handleLiveSearch(val) {
             dropdown.style.display = 'block';
         } else {
             dropdown.innerHTML = `
-                <div style="padding: 16px 12px; text-align: center; font-size: 12.5px; color: var(--text-muted);">
+                <div style="padding: 16px 12px; text-align: center; font-size: 12px; color: var(--text-muted);">
                     No exact title found for "${val}". Press Enter for full search.
                 </div>
             `;
@@ -996,22 +1007,20 @@ async function openSurpriseModal() {
         body.innerHTML = `
             <div class="surprise-result-grid">
                 <img class="surprise-thumb" src="${randomPick.poster}" alt="${escapeQuotes(randomPick.title)}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300';">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                     <div class="slide-tag">${randomPick.tag || 'HD Cinema'}</div>
-                    <h3 style="font-size: 18px; font-weight: 800; color: #fff; line-height: 1.3;">${randomPick.title}</h3>
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted);">
+                    <h3 style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.3;">${randomPick.title}</h3>
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted);">
                         <span>📁 ${randomPick.category || 'Cinema'}</span>
                         <span>•</span>
-                        <span style="color: var(--accent-gold); font-weight: 700;">★ 9.0 / 10</span>
-                        <span>•</span>
-                        <span>${randomPick.size || 'HD'}</span>
+                        <span style="color: var(--accent-gold); font-weight: 700;">★ 9.0</span>
                     </div>
-                    <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
-                        <a class="btn btn-primary" href="${linkUrl}">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+                    <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
+                        <a class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" href="${linkUrl}">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M8 5v14l11-7z"/></svg>
                             <span>${isSeries ? 'View Series' : 'Watch Now'}</span>
                         </a>
-                        <button class="btn btn-ghost" onclick="openSurpriseModal()">
+                        <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="openSurpriseModal()">
                             <span>🎲 Roll Again</span>
                         </button>
                     </div>
@@ -1074,18 +1083,18 @@ function renderMovieCardHtml(item) {
                 <img src="${item.poster}" alt="${safeTitle}" loading="lazy"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="cover-fallback" style="display: none;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                    <div style="font-size: 11px; font-weight: 600;">${item.title}</div>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                    <div style="font-size: 10px; font-weight: 600;">${item.title}</div>
                 </div>
                 <div class="tag-badge">${item.tag || 'HD'}</div>
                 <div class="cover-overlay">
                     <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
                         ${isSeries ? 
-                            '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="18" height="18"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
-                            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>'
+                            '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
+                            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>'
                         }
                     </div>
-                    <span style="font-size: 10.5px; font-weight: 700; color: #fff;">${isSeries ? 'View Series' : 'Watch Now'}</span>
+                    <span style="font-size: 10px; font-weight: 700; color: #fff;">${isSeries ? 'Series' : 'Watch'}</span>
                 </div>
             </div>
             <div class="card-body">
