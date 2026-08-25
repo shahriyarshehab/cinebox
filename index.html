@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DhakaFlix MovieBox • All Movies & Series</title>
+    <title>CineBox • Stream & Download Unlimited Movies</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -64,6 +64,7 @@
             align-items: center;
             gap: 12px;
             cursor: pointer;
+            text-decoration: none;
         }
 
         .brand-logo {
@@ -80,10 +81,10 @@
 
         .brand-text {
             font-family: var(--font-title);
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             letter-spacing: -0.5px;
-            background: linear-gradient(90deg, #ffffff 40%, #00e5ff 100%);
+            background: linear-gradient(90deg, #ffffff 45%, #00e5ff 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -457,7 +458,6 @@
             color: var(--text-secondary);
         }
 
-        /* Load More Button */
         .load-more-wrap {
             display: flex;
             justify-content: center;
@@ -604,14 +604,14 @@
         <div class="brand" onclick="filterCategory('All')">
             <div class="brand-logo">▶</div>
             <div>
-                <div class="brand-text">Dhaka<span>Flix</span></div>
+                <div class="brand-text">Cine<span>Box</span></div>
             </div>
             <div class="badge-live" id="totalCountBadge">7,900+ Movies</div>
         </div>
 
         <div class="search-container">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Search across all movies, Hindi, Hollywood, South..." oninput="handleSearch()">
+            <input type="text" id="searchInput" placeholder="Search across all movies, Hollywood, Bollywood, South..." oninput="handleSearch()">
         </div>
 
         <div>
@@ -624,10 +624,10 @@
         <div class="hero-bg" id="heroBg"></div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="hero-tag">🔥 Featured Cinema</div>
-            <h1 class="hero-title" id="heroTitle">DhakaFlix MovieBox Portal</h1>
+            <div class="hero-tag">🔥 CineBox Spotlight</div>
+            <h1 class="hero-title" id="heroTitle">CineBox Cinema Portal</h1>
             <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.6;">
-                Stream and download Hollywood, Bollywood, South Indian and Bangla movies directly via high-speed BDIX connection.
+                Stream and download Hollywood, Bollywood, South Indian and Bangla movies directly with high speed and zero buffering.
             </p>
             <div style="display: flex; gap: 12px; margin-top: 6px;">
                 <button class="btn btn-cyan" onclick="playRandom()">▶ Watch Random</button>
@@ -666,7 +666,7 @@
     <div class="modal" id="movieModal">
         <div class="modal-box">
             <div class="modal-head">
-                <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">MovieBox Player & Download</span>
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">CineBox Player & Download</span>
                 <button class="btn btn-glass" style="padding: 4px 10px;" onclick="closeModal()">✕</button>
             </div>
             <div class="modal-body">
@@ -676,7 +676,7 @@
                         <div class="modal-title" id="mTitle">Movie Title</div>
                         <div class="modal-tags" id="mTags"></div>
                         <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-                            Direct BDIX stream and download enabled. Supports browser HTML5 playback and IDM high-speed downloading.
+                            Direct high-speed stream and download enabled. Supports HTML5 playback and IDM downloading.
                         </p>
                         <div class="modal-actions" id="mActions"></div>
                     </div>
@@ -807,7 +807,7 @@
                 <span class="modal-tag">Category: ${item.category}</span>
                 <span class="modal-tag">Size: ${item.size || 'HD'}</span>
                 <span class="modal-tag">⭐ 8.8/10</span>
-                <span class="modal-tag">🚀 DhakaFlix Direct</span>
+                <span class="modal-tag">🚀 CineBox Direct</span>
             `;
 
             document.getElementById('mActions').innerHTML = `
