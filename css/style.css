@@ -1233,14 +1233,19 @@ header {
     color: var(--text-muted);
 }
 
-/* Watch Page Layout */
+/* ==========================================================================
+   🎬 WATCH & DETAILS PAGE STYLING (Spacious & Responsive)
+   ========================================================================== */
+
+/* Main Watch Container */
 .watch-container {
-    max-width: 1200px;
-    margin: 20px auto 60px;
-    padding: 0 24px;
+    width: 100%;
+    max-width: 1360px;
+    margin: 24px auto 70px;
+    padding: 0 32px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
     position: relative;
     z-index: 1;
 }
@@ -1283,7 +1288,7 @@ header {
 }
 
 .player-bar {
-    padding: 10px 16px;
+    padding: 12px 18px;
     background: rgba(14, 18, 26, 0.98);
     border-bottom: 1px solid var(--border);
     display: flex;
@@ -1293,7 +1298,7 @@ header {
 }
 
 .player-title-wrap {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 700;
     color: var(--primary);
     display: flex;
@@ -1325,15 +1330,17 @@ header {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--border);
     color: #fff;
-    padding: 4px 9px;
+    padding: 5px 10px;
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     transition: all 0.15s ease;
+    white-space: nowrap;
+    min-height: 30px;
 }
 
 .player-mini-btn:hover {
@@ -1342,10 +1349,100 @@ header {
     border-color: var(--primary);
 }
 
+.player-mini-btn.active {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
 .video-container {
     position: relative;
     background: #000;
     width: 100%;
+}
+
+.video-container video {
+    width: 100%;
+    max-height: 620px;
+    outline: none;
+    background: #000;
+}
+
+/* Touch Double-Tap Seek Overlay */
+.touch-seek-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 56px;
+    display: flex;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.seek-touch-zone {
+    flex: 1;
+    height: 100%;
+    pointer-events: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.seek-ripple {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(0, 229, 255, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    opacity: 0;
+    transform: scale(0.6);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    box-shadow: 0 0 24px rgba(0, 229, 255, 0.4);
+}
+
+.seek-ripple.active {
+    opacity: 1;
+    transform: scale(1);
+    animation: ripplePulse 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes ripplePulse {
+    0% { opacity: 0; transform: scale(0.6); }
+    30% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1.3); }
+}
+
+/* Video Subtitles (::cue) Styling */
+video::cue {
+    background-color: rgba(0, 0, 0, 0.85) !important;
+    color: #ffffff !important;
+    font-family: var(--font-body), sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
+    line-height: 1.4 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+}
+
+.video-container.drag-over {
+    outline: 2px dashed var(--primary);
+    outline-offset: -4px;
 }
 
 /* Next Episode Countdown Overlay */
@@ -1387,13 +1484,13 @@ header {
     color: var(--text-muted);
 }
 
-/* Media Hero Card */
+/* Media Hero Card (Spacious & Rich) */
 .watch-hero-card {
     background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
+    border-radius: 20px;
     overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
     position: relative;
 }
 
@@ -1415,35 +1512,37 @@ header {
 .watch-content-inner {
     position: relative;
     z-index: 2;
-    padding: 28px 32px;
+    padding: 32px 38px;
     display: flex;
-    gap: 28px;
+    gap: 34px;
     align-items: flex-start;
 }
 
 .watch-poster-big {
-    width: 190px;
-    height: 285px;
+    width: 205px;
+    height: 308px;
     border-radius: 16px;
     object-fit: cover;
     border: 2px solid var(--border-hover);
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
     flex-shrink: 0;
 }
 
 .watch-details {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
 }
 
 .watch-title {
     font-family: var(--font-display);
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 800;
     color: #fff;
     line-height: 1.25;
+    word-break: break-word;
 }
 
 [data-theme="light"] .watch-title {
@@ -1452,25 +1551,262 @@ header {
 
 .modal-chips {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
 }
 
 .modal-chip {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--border);
-    padding: 4px 9px;
-    border-radius: 6px;
-    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-muted);
 }
 
-.modal-btn-row {
+/* Hero Action Buttons */
+.hero-actions-container {
     display: flex;
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-top: 4px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.hero-btn-primary {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
+    color: #07090e;
+    box-shadow: 0 6px 20px var(--primary-glow);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.hero-btn-primary:active {
+    transform: scale(0.98);
+}
+
+.hero-sub-actions-grid {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hero-sub-actions-grid .btn {
+    padding: 10px 18px;
+    font-size: 13px;
+    border-radius: 10px;
+    justify-content: center;
+    min-height: 44px;
+}
+
+/* Season Pill Selector */
+.season-pill-btn {
+    font-size: 13px;
+    padding: 8px 18px;
+    border-radius: 24px;
+    white-space: nowrap;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.season-pill-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.season-pill-btn.active {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+    font-weight: 800;
+    box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+.season-pill-btn.specials-pill {
+    border-color: rgba(255, 184, 0, 0.4);
+    color: #ffb800;
+}
+
+.season-pill-btn.specials-pill.active {
+    background: var(--accent-gold);
+    color: #07090e;
+    border-color: var(--accent-gold);
+    box-shadow: 0 4px 14px rgba(255, 184, 0, 0.4);
+}
+
+/* Episode Search Filter */
+.ep-filter-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 9px 18px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+[data-theme="light"] .ep-filter-input {
+    background: #f1f5f9;
+    color: #0c121e;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+.ep-filter-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* Episode Cards (Touch Ergonomic & Spacious) */
+.ep-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 56px;
+}
+
+.ep-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(0, 229, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.ep-card:active {
+    transform: scale(0.985);
+}
+
+.ep-card.playing {
+    background: linear-gradient(90deg, rgba(0, 229, 255, 0.16) 0%, rgba(0, 119, 182, 0.08) 100%);
+    border-color: var(--primary);
+    box-shadow: 0 0 16px var(--primary-glow);
+}
+
+.ep-index-badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.ep-card.playing .ep-index-badge {
+    background: var(--primary);
+    color: #07090e;
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.ep-info-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ep-title-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.35;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+[data-theme="light"] .ep-title-text {
+    color: #0c121e;
+}
+
+.ep-card.playing .ep-title-text {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.ep-meta-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ep-action-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.ep-icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    flex-shrink: 0;
+}
+
+.ep-icon-btn:hover, .ep-icon-btn:active {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+}
+
+.ep-icon-btn.btn-vlc-sm {
+    background: rgba(255, 119, 0, 0.15);
+    border-color: rgba(255, 119, 0, 0.35);
+    color: #ff8800;
+}
+
+.ep-icon-btn.btn-vlc-sm:hover {
+    background: #ff8800;
+    color: #fff;
 }
 
 /* External Player Hub */
@@ -1478,13 +1814,19 @@ header {
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 18px 22px;
+    padding: 22px 28px;
 }
 
 .player-hub-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 10px;
+    gap: 12px;
+}
+
+.player-hub-grid .btn {
+    padding: 11px 16px;
+    font-size: 13px;
+    min-height: 46px;
 }
 
 /* Modals */
@@ -1833,8 +2175,32 @@ kbd {
 }
 
 /* ==========================================================================
-   📱 COMPREHENSIVE MOBILE OPTIMIZATIONS (Max-Width 768px)
+   📱 RESPONSIVE MEDIA QUERIES (Computers, Tablets & Mobile Devices)
    ========================================================================== */
+
+/* Tablets & Medium Screens (768px - 1024px) */
+@media (max-width: 1024px) {
+    .watch-container {
+        padding: 0 20px;
+        gap: 20px;
+    }
+
+    .watch-content-inner {
+        padding: 28px 28px;
+        gap: 24px;
+    }
+
+    .watch-poster-big {
+        width: 180px;
+        height: 270px;
+    }
+
+    .watch-title {
+        font-size: 26px;
+    }
+}
+
+/* Mobile Devices (Max-Width 768px) */
 @media (max-width: 768px) {
     body {
         padding-bottom: calc(var(--bottom-nav-height) + 10px);
@@ -2065,24 +2431,33 @@ kbd {
         padding: 4px 10px;
     }
 
-    /* Watch Page on Mobile */
+    /* 🎬 WATCH & DETAILS PAGE ON MOBILE (Uncompacted & Spacious) */
     .watch-container {
-        margin: 10px auto 40px;
-        padding: 0 12px;
-        gap: 14px;
+        margin: 12px auto 50px;
+        padding: 0 16px;
+        gap: 20px;
     }
 
     .player-bar {
-        padding: 8px 12px;
+        padding: 10px 14px;
+        gap: 8px;
     }
 
     .player-title-wrap {
-        font-size: 11.5px;
+        font-size: 12.5px;
+    }
+
+    .player-controls-right {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        gap: 4px;
     }
 
     .player-mini-btn {
-        padding: 3px 6px;
-        font-size: 10px;
+        padding: 4px 8px;
+        font-size: 10.5px;
+        min-height: 28px;
     }
 
     .next-ep-countdown {
@@ -2093,50 +2468,113 @@ kbd {
 
     .next-ep-box {
         max-width: none;
-        padding: 10px 14px;
+        padding: 12px 16px;
+    }
+
+    .watch-hero-card {
+        border-radius: 18px;
     }
 
     .watch-content-inner {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        padding: 18px 14px;
-        gap: 14px;
+        padding: 26px 20px;
+        gap: 20px;
     }
 
+    /* Generous, rich poster on mobile - NOT compact */
     .watch-poster-big {
-        width: 140px;
-        height: 210px;
-    }
-
-    .watch-title {
-        font-size: 20px;
+        width: 170px;
+        height: 255px;
+        border-radius: 16px;
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
     }
 
     .watch-details {
         align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .watch-title {
+        font-size: 23px;
+        font-weight: 800;
+        line-height: 1.3;
+        margin: 2px 0;
     }
 
     .modal-chips {
         justify-content: center;
-    }
-
-    .modal-btn-row {
-        justify-content: center;
-        width: 100%;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
     }
 
-    .modal-btn-row .btn {
+    .modal-chip {
+        padding: 6px 12px;
+        font-size: 11.5px;
+        border-radius: 8px;
+    }
+
+    .hero-actions-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
         width: 100%;
-        padding: 8px 10px;
-        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    .hero-btn-primary {
+        width: 100%;
+        padding: 13px 20px;
+        font-size: 14.5px;
+        font-weight: 800;
+        min-height: 48px;
+    }
+
+    .hero-sub-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        width: 100%;
+    }
+
+    .hero-sub-actions-grid .btn {
+        padding: 11px 12px;
+        font-size: 12.5px;
+        min-height: 44px;
+        width: 100%;
     }
 
     #tvExplorerWrap {
-        padding: 16px 14px !important;
+        padding: 20px 16px !important;
+        border-radius: 18px !important;
+    }
+
+    .ep-card {
+        padding: 11px 13px;
+        gap: 10px;
+        min-height: 52px;
+    }
+
+    .ep-title-text {
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    .ep-index-badge {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .ep-icon-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    .player-hub-card {
+        padding: 20px 16px;
+        border-radius: 18px;
     }
 
     .player-hub-grid {
@@ -2145,8 +2583,9 @@ kbd {
     }
 
     .player-hub-grid .btn {
-        font-size: 11.5px;
-        padding: 7px 8px;
+        font-size: 12px;
+        padding: 11px 10px;
+        min-height: 44px;
     }
 
     .pwa-banner {
@@ -2168,442 +2607,34 @@ kbd {
         flex: 0 0 120px;
         width: 120px;
     }
-}
 
-/* ==========================================================================
-   💬 SUBTITLES (CC) & 📱 TOUCH DOUBLE-TAP SEEK ENHANCEMENTS
-   ========================================================================== */
-
-.player-mini-btn.active {
-    background: var(--primary);
-    color: #07090e;
-    border-color: var(--primary);
-    box-shadow: 0 0 10px var(--primary-glow);
-}
-
-/* Touch Double-Tap Seek Overlay */
-.touch-seek-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 50px;
-    display: flex;
-    pointer-events: none;
-    z-index: 10;
-}
-
-.seek-touch-zone {
-    flex: 1;
-    height: 100%;
-    pointer-events: auto;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-.seek-ripple {
-    position: absolute;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: rgba(0, 229, 255, 0.25);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 800;
-    opacity: 0;
-    transform: scale(0.6);
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 229, 255, 0.4);
-    box-shadow: 0 0 24px rgba(0, 229, 255, 0.4);
-}
-
-.seek-ripple.active {
-    opacity: 1;
-    transform: scale(1);
-    animation: ripplePulse 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-@keyframes ripplePulse {
-    0% { opacity: 0; transform: scale(0.6); }
-    30% { opacity: 1; transform: scale(1.1); }
-    100% { opacity: 0; transform: scale(1.3); }
-}
-
-/* Video Subtitles (::cue) Styling */
-video::cue {
-    background-color: rgba(0, 0, 0, 0.85) !important;
-    color: #ffffff !important;
-    font-family: var(--font-body), sans-serif !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
-    line-height: 1.4 !important;
-    padding: 3px 8px !important;
-    border-radius: 6px !important;
-}
-
-/* Subtitle Drag-and-drop feedback */
-.video-container.drag-over {
-    outline: 2px dashed var(--primary);
-    outline-offset: -4px;
-}
-
-/* Recent Search Suggestions */
-.search-pill-suggestion {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--border);
-    color: var(--text-main);
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 14px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
-
-.search-pill-suggestion:hover {
-    background: var(--primary);
-    color: #07090e;
-    border-color: var(--primary);
-}
-
-[data-theme="light"] .search-pill-suggestion {
-    background: #edf2f7;
-    color: #0c121e;
-}
-
-/* ==========================================================================
-   📱 COMPREHENSIVE WATCH PAGE MOBILE ERGONOMICS & TOUCH ENHANCEMENTS
-   ========================================================================== */
-
-/* Hero Action Layout */
-.hero-actions-container {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    margin-top: 6px;
-}
-
-.hero-btn-primary {
-    width: 100%;
-    padding: 12px 18px;
-    font-size: 14px;
-    font-weight: 800;
-    border-radius: var(--radius-md);
-    background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
-    color: #07090e;
-    box-shadow: 0 6px 20px var(--primary-glow);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
-}
-
-.hero-btn-primary:active {
-    transform: scale(0.98);
-}
-
-.hero-sub-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 8px;
-    width: 100%;
-}
-
-.hero-sub-actions-grid .btn {
-    padding: 9px 12px;
-    font-size: 12px;
-    border-radius: 10px;
-    justify-content: center;
-    width: 100%;
-}
-
-/* Season Pill Selector */
-.season-pill-btn {
-    font-size: 12px;
-    padding: 7px 15px;
-    border-radius: 24px;
-    white-space: nowrap;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-muted);
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.season-pill-btn:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.season-pill-btn.active {
-    background: var(--primary);
-    color: #07090e;
-    border-color: var(--primary);
-    font-weight: 800;
-    box-shadow: 0 4px 14px var(--primary-glow);
-}
-
-.season-pill-btn.specials-pill {
-    border-color: rgba(255, 184, 0, 0.4);
-    color: #ffb800;
-}
-
-.season-pill-btn.specials-pill.active {
-    background: var(--accent-gold);
-    color: #07090e;
-    border-color: var(--accent-gold);
-    box-shadow: 0 4px 14px rgba(255, 184, 0, 0.4);
-}
-
-/* Episode Search Filter */
-.ep-filter-input {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 8px 16px;
-    color: #fff;
-    font-size: 12px;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-[data-theme="light"] .ep-filter-input {
-    background: #f1f5f9;
-    color: #0c121e;
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-.ep-filter-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 12px var(--primary-glow);
-}
-
-/* Episode Cards (Touch Ergonomic) */
-.ep-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    min-height: 52px;
-}
-
-.ep-card:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(0, 229, 255, 0.3);
-    transform: translateY(-1px);
-}
-
-.ep-card:active {
-    transform: scale(0.985);
-}
-
-.ep-card.playing {
-    background: linear-gradient(90deg, rgba(0, 229, 255, 0.16) 0%, rgba(0, 119, 182, 0.08) 100%);
-    border-color: var(--primary);
-    box-shadow: 0 0 16px var(--primary-glow);
-}
-
-.ep-index-badge {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11.5px;
-    font-weight: 800;
-    color: var(--text-muted);
-    flex-shrink: 0;
-    transition: all 0.2s ease;
-}
-
-.ep-card.playing .ep-index-badge {
-    background: var(--primary);
-    color: #07090e;
-    box-shadow: 0 0 12px var(--primary-glow);
-}
-
-.ep-info-wrap {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.ep-title-text {
-    font-size: 13px;
-    font-weight: 600;
-    color: #fff;
-    line-height: 1.35;
-    word-break: break-word;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-[data-theme="light"] .ep-title-text {
-    color: #0c121e;
-}
-
-.ep-card.playing .ep-title-text {
-    color: var(--primary);
-    font-weight: 700;
-}
-
-.ep-meta-sub {
-    font-size: 10px;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.ep-action-btns {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-.ep-icon-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-main);
-    cursor: pointer;
-    transition: all 0.15s ease;
-    text-decoration: none;
-    flex-shrink: 0;
-}
-
-.ep-icon-btn:hover, .ep-icon-btn:active {
-    background: var(--primary);
-    color: #07090e;
-    border-color: var(--primary);
-}
-
-.ep-icon-btn.btn-vlc-sm {
-    background: rgba(255, 119, 0, 0.15);
-    border-color: rgba(255, 119, 0, 0.35);
-    color: #ff8800;
-}
-
-.ep-icon-btn.btn-vlc-sm:hover {
-    background: #ff8800;
-    color: #fff;
-}
-
-/* Responsive Adjustments for Watch Page */
-@media (max-width: 768px) {
-    .hero-sub-actions-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-
-    .ep-card {
-        padding: 8px 10px;
-        gap: 8px;
-    }
-
-    .ep-title-text {
-        font-size: 12px;
-    }
-
-    .ep-index-badge {
-        width: 28px;
-        height: 28px;
-        font-size: 11px;
-    }
-
-    .ep-icon-btn {
-        width: 30px;
-        height: 30px;
-    }
-}
-
-@media (max-width: 480px) {
     .watch-container {
-        padding: 0 10px;
-        margin: 6px auto 30px;
-        gap: 12px;
+        padding: 0 12px;
+        margin: 10px auto 40px;
+        gap: 16px;
     }
 
-    .watch-hero-card {
-        border-radius: var(--radius-md);
+    .watch-content-inner {
+        padding: 22px 16px;
+        gap: 16px;
     }
 
     .watch-poster-big {
-        width: 125px;
-        height: 185px;
+        width: 155px;
+        height: 232px;
+        border-radius: 14px;
     }
 
     .watch-title {
-        font-size: 18px;
-        text-align: center;
-    }
-
-    .hero-sub-actions-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-    }
-
-    .hero-sub-actions-grid .btn {
-        padding: 8px 6px;
-        font-size: 11px;
-    }
-
-    .player-hub-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 6px;
-    }
-
-    .player-hub-grid .btn {
-        padding: 8px 6px;
-        font-size: 11px;
+        font-size: 21px;
     }
 
     #tvExplorerWrap {
-        padding: 14px 10px !important;
-        border-radius: var(--radius-md) !important;
+        padding: 18px 12px !important;
     }
 
     .ep-card {
-        padding: 8px 8px;
+        padding: 10px 10px;
         gap: 8px;
     }
 }
