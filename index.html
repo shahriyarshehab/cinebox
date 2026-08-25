@@ -450,35 +450,29 @@
             box-shadow: 0 0 12px var(--primary-glow);
         }
 
-        /* Content Area */
-        .content-area {
-            padding: 30px 40px 60px;
-            flex: 1;
-        }
-
-        /* Row Section Block (Multi-Category View) */
+        /* Row Section Block (Single Horizontal Row per Category) */
         .category-row-block {
-            margin-bottom: 44px;
+            margin-bottom: 38px;
         }
 
         .row-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 18px;
-            padding-bottom: 10px;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .row-title-wrap {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .row-heading {
             font-family: var(--font-display);
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
             color: #fff;
             display: flex;
@@ -489,23 +483,52 @@
         .row-badge {
             background: rgba(255, 255, 255, 0.07);
             color: var(--text-muted);
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
         }
 
-        /* Movie Poster Grid (Row & Full Grid) */
+        /* Single Horizontal Scrolling Row */
+        .row-slider {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .row-slider::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .row-slider::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 4px;
+        }
+
+        .row-slider::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .row-slider .movie-card {
+            flex: 0 0 170px;
+            width: 170px;
+        }
+
+        /* Full Grid Layout (Compact Nice Sizing) */
         .poster-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 24px 20px;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 20px 16px;
         }
 
         .movie-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            border-radius: 12px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -515,15 +538,15 @@
         }
 
         .movie-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-5px);
             border-color: var(--border-hover);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 229, 255, 0.15);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.2);
         }
 
         .card-cover {
             position: relative;
             width: 100%;
-            padding-top: 148%;
+            padding-top: 144%;
             background: linear-gradient(135deg, #151c2a 0%, #0a0e16 100%);
             overflow: hidden;
         }
@@ -548,8 +571,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            padding: 16px;
+            gap: 8px;
+            padding: 12px;
             text-align: center;
             color: var(--text-dim);
         }
@@ -564,8 +587,8 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 8px;
-            padding: 16px;
+            gap: 6px;
+            padding: 12px;
             z-index: 3;
         }
 
@@ -574,62 +597,62 @@
         }
 
         .play-button-symbol {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: var(--primary);
             color: #07090e;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 16px var(--primary-glow);
+            box-shadow: 0 4px 14px var(--primary-glow);
         }
 
         .tag-badge {
             position: absolute;
-            top: 10px;
-            left: 10px;
+            top: 8px;
+            left: 8px;
             background: rgba(7, 9, 14, 0.85);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(0, 229, 255, 0.3);
             color: var(--primary);
-            font-size: 10px;
+            font-size: 9.5px;
             font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 4px;
             z-index: 2;
         }
 
         .rating-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 8px;
+            right: 8px;
             background: rgba(7, 9, 14, 0.85);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 184, 0, 0.3);
             color: var(--accent-gold);
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
+            padding: 2px 6px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 3px;
             z-index: 2;
         }
 
         .card-body {
-            padding: 14px;
+            padding: 10px 12px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
             background: var(--bg-card);
         }
 
         .card-title {
-            font-size: 13.5px;
+            font-size: 12.5px;
             font-weight: 600;
-            line-height: 1.35;
+            line-height: 1.3;
             color: #fff;
             display: -webkit-box;
             -webkit-line-clamp: 2;
@@ -642,7 +665,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 11px;
+            font-size: 10.5px;
             color: var(--text-muted);
         }
 
@@ -1096,7 +1119,7 @@
                 const catMovies = allMovies.filter(m => m.tag === cat.tag || (m.category && m.category.includes(cat.tag)));
                 if (catMovies.length === 0) return;
 
-                const topSlice = catMovies.slice(0, cat.limit || 8);
+                const topSlice = catMovies.slice(0, 12);
 
                 html += `
                     <div class="category-row-block">
@@ -1111,7 +1134,7 @@
                             </button>
                         </div>
 
-                        <div class="poster-grid">
+                        <div class="row-slider">
                             ${topSlice.map((item) => renderMovieCardHtml(item)).join('')}
                         </div>
                     </div>
