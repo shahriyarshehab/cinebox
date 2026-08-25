@@ -1234,10 +1234,10 @@ header {
 }
 
 /* ==========================================================================
-   🎬 MOVIEBOX-STYLE DETAILS & STREAMING PAGE ARCHITECTURE (movie-box.co style)
+   🎬 MOVIEBOX-STYLE DETAILS & DEDICATED STREAMING PAGE ARCHITECTURE
    ========================================================================== */
 
-/* Main Details Page Container */
+/* 1. Default MovieBox Details Page Container */
 .mb-detail-page {
     width: 100%;
     max-width: 1360px;
@@ -1249,7 +1249,7 @@ header {
     z-index: 1;
 }
 
-/* 1. Cinematic Hero Section (Backdrop Banner & Media Details) */
+/* Cinematic Hero Section (Backdrop Banner & Media Details) */
 .mb-hero-section {
     position: relative;
     min-height: 420px;
@@ -1490,218 +1490,7 @@ header {
     color: #fff;
 }
 
-/* 2. Video Player Section */
-.mb-player-wrapper {
-    margin: 0 24px;
-    background: #000;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    border: 1px solid var(--border);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
-}
-
-.player-bar {
-    padding: 10px 16px;
-    background: rgba(14, 18, 26, 0.98);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-}
-
-.player-title-wrap {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.player-live-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #00e676;
-    display: inline-block;
-    box-shadow: 0 0 8px #00e676;
-    flex-shrink: 0;
-}
-
-.player-controls-right {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
-}
-
-.player-mini-btn {
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid var(--border);
-    color: #fff;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: all 0.15s ease;
-    white-space: nowrap;
-    min-height: 28px;
-}
-
-.player-mini-btn:hover {
-    background: var(--primary);
-    color: #07090e;
-    border-color: var(--primary);
-}
-
-.player-mini-btn.active {
-    background: var(--primary);
-    color: #07090e;
-    border-color: var(--primary);
-    box-shadow: 0 0 10px var(--primary-glow);
-}
-
-.video-container {
-    position: relative;
-    background: #000;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.video-container video {
-    width: 100%;
-    height: 100%;
-    outline: none;
-    background: #000;
-}
-
-/* Touch Double-Tap Seek Overlay */
-.touch-seek-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 56px;
-    display: flex;
-    pointer-events: none;
-    z-index: 10;
-}
-
-.seek-touch-zone {
-    flex: 1;
-    height: 100%;
-    pointer-events: auto;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    -webkit-user-select: none;
-}
-
-.seek-ripple {
-    position: absolute;
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    background: rgba(0, 229, 255, 0.25);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 800;
-    opacity: 0;
-    transform: scale(0.6);
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 229, 255, 0.4);
-    box-shadow: 0 0 24px rgba(0, 229, 255, 0.4);
-}
-
-.seek-ripple.active {
-    opacity: 1;
-    transform: scale(1);
-    animation: ripplePulse 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-
-@keyframes ripplePulse {
-    0% { opacity: 0; transform: scale(0.6); }
-    30% { opacity: 1; transform: scale(1.1); }
-    100% { opacity: 0; transform: scale(1.3); }
-}
-
-/* Video Subtitles (::cue) Styling */
-video::cue {
-    background-color: rgba(0, 0, 0, 0.85) !important;
-    color: #ffffff !important;
-    font-family: var(--font-body), sans-serif !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
-    line-height: 1.4 !important;
-    padding: 3px 8px !important;
-    border-radius: 6px !important;
-}
-
-.video-container.drag-over {
-    outline: 2px dashed var(--primary);
-    outline-offset: -4px;
-}
-
-/* Next Episode Countdown Overlay */
-.next-ep-countdown {
-    position: absolute;
-    bottom: 30px;
-    right: 20px;
-    z-index: 100;
-    animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.next-ep-box {
-    background: rgba(14, 18, 26, 0.95);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--primary);
-    border-radius: 12px;
-    padding: 14px 18px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 20px var(--primary-glow);
-    max-width: 260px;
-}
-
-.next-ep-title {
-    font-size: 12.5px;
-    font-weight: 700;
-    color: #fff;
-    margin: 4px 0 2px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.next-ep-timer {
-    font-size: 11.5px;
-    color: var(--text-muted);
-}
-
-/* 3. MovieBox Content Body */
+/* MovieBox Content Body */
 .mb-content-body {
     margin: 0 24px;
     display: flex;
@@ -2032,6 +1821,318 @@ video::cue {
 /* Related Section */
 .mb-related-section {
     margin-top: 4px;
+}
+
+/* ==========================================================================
+   📺 2. DEDICATED ONLINE PLAYER VIEW STYLING (.player-fullscreen-layout)
+   ========================================================================== */
+.player-fullscreen-layout {
+    width: 100%;
+    max-width: 1360px;
+    margin: 0 auto 60px;
+    padding: 14px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    position: relative;
+    z-index: 1;
+}
+
+.player-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.player-view-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 229, 255, 0.1);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    color: var(--primary);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+.player-cinema-box {
+    background: #000;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95);
+}
+
+.player-bar {
+    padding: 10px 16px;
+    background: rgba(14, 18, 26, 0.98);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.player-title-wrap {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.player-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00e676;
+    display: inline-block;
+    box-shadow: 0 0 8px #00e676;
+    flex-shrink: 0;
+}
+
+.player-controls-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.player-mini-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+    min-height: 28px;
+}
+
+.player-mini-btn:hover {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+}
+
+.player-mini-btn.active {
+    background: var(--primary);
+    color: #07090e;
+    border-color: var(--primary);
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.video-container {
+    position: relative;
+    background: #000;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.video-container video {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    background: #000;
+}
+
+/* Touch Double-Tap Seek Overlay */
+.touch-seek-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 56px;
+    display: flex;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.seek-touch-zone {
+    flex: 1;
+    height: 100%;
+    pointer-events: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.seek-ripple {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: rgba(0, 229, 255, 0.25);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    opacity: 0;
+    transform: scale(0.6);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    box-shadow: 0 0 24px rgba(0, 229, 255, 0.4);
+}
+
+.seek-ripple.active {
+    opacity: 1;
+    transform: scale(1);
+    animation: ripplePulse 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes ripplePulse {
+    0% { opacity: 0; transform: scale(0.6); }
+    30% { opacity: 1; transform: scale(1.1); }
+    100% { opacity: 0; transform: scale(1.3); }
+}
+
+/* Video Subtitles (::cue) Styling */
+video::cue {
+    background-color: rgba(0, 0, 0, 0.85) !important;
+    color: #ffffff !important;
+    font-family: var(--font-body), sans-serif !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9) !important;
+    line-height: 1.4 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+}
+
+.video-container.drag-over {
+    outline: 2px dashed var(--primary);
+    outline-offset: -4px;
+}
+
+/* Next Episode Countdown Overlay */
+.next-ep-countdown {
+    position: absolute;
+    bottom: 30px;
+    right: 20px;
+    z-index: 100;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.next-ep-box {
+    background: rgba(14, 18, 26, 0.95);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8), 0 0 20px var(--primary-glow);
+    max-width: 260px;
+}
+
+.next-ep-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    margin: 4px 0 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.next-ep-timer {
+    font-size: 11.5px;
+    color: var(--text-muted);
+}
+
+/* Player Info Toolbar */
+.player-info-toolbar {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+[data-theme="light"] .player-info-toolbar {
+    background: #ffffff;
+}
+
+.player-info-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.player-heading-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0;
+    word-break: break-word;
+}
+
+[data-theme="light"] .player-heading-title {
+    color: #0c121e;
+}
+
+.player-heading-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.player-quick-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.player-tv-playlist-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+[data-theme="light"] .player-tv-playlist-box {
+    background: #ffffff;
 }
 
 /* Modals */
@@ -2684,33 +2785,6 @@ kbd {
         min-height: 44px;
     }
 
-    .mb-player-wrapper {
-        margin: 0 12px;
-        border-radius: var(--radius-md);
-    }
-
-    .player-bar {
-        padding: 8px 10px;
-        gap: 6px;
-    }
-
-    .player-title-wrap {
-        font-size: 12px;
-    }
-
-    .player-controls-right {
-        overflow-x: auto;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        gap: 4px;
-    }
-
-    .player-mini-btn {
-        padding: 3px 6px;
-        font-size: 10px;
-        min-height: 26px;
-    }
-
     .mb-content-body {
         margin: 0 12px;
         gap: 16px;
@@ -2751,6 +2825,68 @@ kbd {
         gap: 8px;
     }
 
+    /* 📺 FOCUSED PLAYER VIEW ON MOBILE */
+    .player-fullscreen-layout {
+        padding: 8px 12px 40px;
+        gap: 12px;
+    }
+
+    .player-cinema-box {
+        border-radius: 12px;
+    }
+
+    .player-bar {
+        padding: 8px 10px;
+        gap: 6px;
+    }
+
+    .player-title-wrap {
+        font-size: 12px;
+    }
+
+    .player-controls-right {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        gap: 4px;
+    }
+
+    .player-mini-btn {
+        padding: 3px 6px;
+        font-size: 10px;
+        min-height: 26px;
+    }
+
+    .player-info-toolbar {
+        padding: 12px 14px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .player-heading-title {
+        font-size: 17px;
+    }
+
+    .player-quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        width: 100%;
+        gap: 8px;
+    }
+
+    .player-quick-actions .mb-btn-action {
+        width: 100%;
+        justify-content: center;
+        padding: 9px 12px;
+        font-size: 11.5px;
+        min-height: 40px;
+    }
+
+    .player-tv-playlist-box {
+        padding: 14px 12px;
+    }
+
     .pwa-banner {
         bottom: calc(var(--bottom-nav-height) + 12px);
         left: 12px;
@@ -2784,8 +2920,8 @@ kbd {
         font-size: 19px;
     }
 
-    .mb-player-wrapper,
-    .mb-content-body {
+    .mb-content-body,
+    .player-fullscreen-layout {
         margin: 0 10px;
     }
 }

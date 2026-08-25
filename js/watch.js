@@ -1,7 +1,7 @@
 /**
- * CineBox MovieBox-Style Details & Streaming Controller
- * Inspired by MovieBox (movie-box.co) with rich backdrop hero, ratings, genres,
- * synopsis toggle, in-browser player, CC subtitles, VLC/external launchers & TV season explorer.
+ * CineBox MovieBox-Style Details & Dedicated Online Player Controller
+ * By default: Displays MovieBox details page (No video player / No autoplay)
+ * When clicking "Watch Online" or an Episode: Seamlessly opens focused Player Mode
  */
 
 let currentItem = null;
@@ -16,6 +16,7 @@ let currentSeasonName = 'Season 1';
 let currentSelectedSeasonIdx = 0;
 let episodeFilterQuery = '';
 let isSynopsisExpanded = false;
+let isPlayerMode = false;
 
 // Player state
 const playbackSpeeds = [0.75, 1.0, 1.25, 1.5, 2.0];
@@ -44,8 +45,9 @@ async function initWatch() {
     const urlParams = new URLSearchParams(window.location.search);
     const targetTitle = urlParams.get('title');
     const dataParam = urlParams.get('data');
+    const shouldAutoPlay = urlParams.get('play') === '1' || urlParams.get('play') === 'true';
 
-    // 1. Instant match from query parameter or sessionStorage
+    // 1. Match from query parameter or sessionStorage
     if (dataParam) {
         try {
             currentItem = JSON.parse(decodeURIComponent(dataParam));
@@ -142,6 +144,11 @@ async function initWatch() {
     setupDoubleTapSeekControls();
     setupSubtitleDragAndDrop();
     setupSearchKeybindings();
+
+    // Auto-enter player mode only if explicitly requested in URL (e.g. ?play=1)
+    if (shouldAutoPlay && currentItem && currentItem.url) {
+        enterPlayerMode(currentItem.url, currentItem.title);
+    }
 }
 
 function renderWatchPage(item) {
@@ -178,7 +185,7 @@ function renderWatchPage(item) {
 
     updateWatchlistButtonState();
 
-    // MovieBox Action Buttons
+    // MovieBox Action Buttons (On Details View)
     document.getElementById('wActions').innerHTML = `
         ${isSeries ? `
             <button class="mb-btn-primary" onclick="scrollTvExplorer()">
@@ -186,7 +193,7 @@ function renderWatchPage(item) {
                 <span>Select Episode</span>
             </button>
         ` : `
-            <button class="mb-btn-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
+            <button class="mb-btn-primary" onclick="enterPlayerMode('${item.url}', '${escapeQuotes(item.title)}')">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
                 <span>▶ Watch Online</span>
             </button>
@@ -224,11 +231,90 @@ function renderWatchPage(item) {
     if (isSeries) {
         document.getElementById('tvExplorerWrap').style.display = 'flex';
         loadTvSeriesSeasons(item.url, item.title);
-    } else {
-        currentActiveStreamUrl = item.url;
-        currentActiveStreamTitle = item.title;
-        startStream(item.url, item.title);
     }
+}
+
+// ==========================================
+// 📺 Dedicated Online Player View Mode
+// ==========================================
+function enterPlayerMode(url, title) {
+    if (!url && currentItem) url = currentItem.url;
+    if (!title && currentItem) title = currentItem.title;
+    if (!url) return;
+
+    isPlayerMode = true;
+    currentActiveStreamUrl = url;
+    currentActiveStreamTitle = title || (currentItem ? currentItem.title : 'Playing Media');
+
+    // Switch Views
+    document.getElementById('detailView').style.display = 'none';
+    const pView = document.getElementById('playerView');
+    pView.style.display = 'block';
+
+    // Populate Player Heading Info
+    document.getElementById('playerHeadingTitle').textContent = currentActiveStreamTitle;
+    document.getElementById('playerQualityTag').textContent = (currentItem && currentItem.tag) ? currentItem.tag : '1080p HD';
+
+    const isSeries = currentItem && (currentItem.tag === 'TV Series' || currentItem.tag === 'K-Drama' || (currentItem.url && currentItem.url.endsWith('/')));
+
+    // Populate Quick Actions Toolbar
+    document.getElementById('playerQuickActions').innerHTML = `
+        <button class="mb-btn-action mb-btn-vlc" onclick="openCurrentInVLC()">
+            ${VLC_ICON_SVG}
+            <span>VLC Player</span>
+        </button>
+        ${!isSeries ? `
+            <a class="mb-btn-action" href="${url}" download>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Download</span>
+            </a>
+        ` : ''}
+        <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
+            <svg class="icon" id="wHeartIconPlayer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span id="wWatchlistPlayerText">${isInWatchlist(currentItem ? currentItem.title : '') ? 'Saved ❤️' : 'Save'}</span>
+        </button>
+        <button class="mb-btn-action" onclick="shareCurrentMedia()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Share</span>
+        </button>
+    `;
+
+    // Start video playback
+    startStream(url, currentActiveStreamTitle);
+
+    // If TV Series: display episode playlist in player view
+    if (isSeries && currentTvEntry) {
+        document.getElementById('playerTvPlaylistWrap').style.display = 'block';
+        renderPlayerEpisodeList(currentSeasonEpisodes);
+    } else {
+        document.getElementById('playerTvPlaylistWrap').style.display = 'none';
+    }
+
+    // Update URL query param to reflect playing state without reloading
+    const urlObj = new URL(window.location);
+    urlObj.searchParams.set('play', '1');
+    history.replaceState(null, '', urlObj.toString());
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function exitPlayerMode() {
+    isPlayerMode = false;
+    
+    // Pause playback
+    const player = document.getElementById('videoPlayer');
+    if (player) player.pause();
+
+    // Switch Views back
+    document.getElementById('playerView').style.display = 'none';
+    document.getElementById('detailView').style.display = 'flex';
+
+    // Remove play query param
+    const urlObj = new URL(window.location);
+    urlObj.searchParams.delete('play');
+    history.replaceState(null, '', urlObj.toString());
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function toggleSynopsis() {
@@ -261,22 +347,22 @@ function updateWatchlistButtonState() {
     if (!currentItem) return;
     const inList = isInWatchlist(currentItem.title);
     
-    // Top button
-    const btnText = document.getElementById('wWatchlistTopText');
-    const icon = document.getElementById('wHeartIcon');
-    if (btnText && icon) {
-        btnText.textContent = inList ? 'Saved ❤️' : 'Watchlist';
-        icon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
-        icon.style.fill = inList ? 'var(--accent)' : 'none';
-    }
-
-    // Action button
+    // Details Action button
     const actionText = document.getElementById('wWatchlistActionText');
     const actionIcon = document.getElementById('wHeartIconAction');
     if (actionText) actionText.textContent = inList ? 'Saved ❤️' : 'Watchlist';
     if (actionIcon) {
         actionIcon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
         actionIcon.style.fill = inList ? 'var(--accent)' : 'none';
+    }
+
+    // Player View Action button
+    const playerText = document.getElementById('wWatchlistPlayerText');
+    const playerIcon = document.getElementById('wHeartIconPlayer');
+    if (playerText) playerText.textContent = inList ? 'Saved ❤️' : 'Save';
+    if (playerIcon) {
+        playerIcon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
+        playerIcon.style.fill = inList ? 'var(--accent)' : 'none';
     }
 }
 
@@ -348,11 +434,9 @@ function setupPlayerListeners() {
 }
 
 function startStream(url, title) {
-    const pSection = document.getElementById('playerSection');
     const player = document.getElementById('videoPlayer');
-    if (!player || !pSection) return;
+    if (!player) return;
 
-    pSection.style.display = 'block';
     currentActiveStreamUrl = url;
     currentActiveStreamTitle = title || 'Playing Media';
     document.getElementById('playerCurrentTitle').textContent = currentActiveStreamTitle;
@@ -366,7 +450,6 @@ function startStream(url, title) {
     }
 
     player.play().catch(e => console.log(e));
-    pSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ==========================================
@@ -577,16 +660,16 @@ function cancelNextEpisode() {
 }
 
 // ==========================================
-// 📺 TV Explorer & MovieBox Playlist Explorer
+// 📺 TV Explorer & Episode Management
 // ==========================================
 async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
     const tabs = document.getElementById('seasonTabs');
     const epList = document.getElementById('episodeList');
     const countBadge = document.getElementById('seasonCountBadge');
 
-    tabs.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 4px;">Loading seasons...</div>';
-    epList.innerHTML = '';
-    countBadge.textContent = 'Loading...';
+    if (tabs) tabs.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 4px;">Loading seasons...</div>';
+    if (epList) epList.innerHTML = '';
+    if (countBadge) countBadge.textContent = 'Loading...';
     motherFolderSpecials = [];
 
     if (Object.keys(tvCatalog).length === 0) {
@@ -635,7 +718,9 @@ async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
 
 function renderIndexedTvData(tvData, seriesTitle) {
     const tabs = document.getElementById('seasonTabs');
+    const playerTabs = document.getElementById('playerSeasonTabs');
     const countBadge = document.getElementById('seasonCountBadge');
+    const pCountBadge = document.getElementById('playerSeasonCountBadge');
 
     const folderUrl = tvData[0] || '';
     const seasons = tvData[1] || [];
@@ -646,9 +731,11 @@ function renderIndexedTvData(tvData, seriesTitle) {
         url: folderUrl.endsWith('/') ? folderUrl + encodeURI(spName) : folderUrl + '/' + encodeURI(spName)
     }));
 
-    if (seasons.length > 0) {
-        countBadge.textContent = `${seasons.length} Seasons ${specials.length > 0 ? '+ Specials' : ''}`;
+    const badgeStr = `${seasons.length} Seasons ${specials.length > 0 ? '+ Specials' : ''}`;
+    if (countBadge) countBadge.textContent = badgeStr;
+    if (pCountBadge) pCountBadge.textContent = badgeStr;
 
+    if (seasons.length > 0) {
         let tabsHtml = seasons.map((s, idx) => {
             const sName = s[0];
             return `
@@ -666,13 +753,14 @@ function renderIndexedTvData(tvData, seriesTitle) {
             `;
         }
 
-        tabs.innerHTML = tabsHtml;
+        if (tabs) tabs.innerHTML = tabsHtml;
+        if (playerTabs) playerTabs.innerHTML = tabsHtml;
+
         currentTvEntry = tvData;
         currentSelectedSeasonIdx = 0;
         loadIndexedSeasonEpisodes(0, seasons[0][0]);
     } else if (specials.length > 0) {
-        countBadge.textContent = `${specials.length} Specials`;
-        tabs.innerHTML = '<span style="font-size: 12px; color: var(--primary); font-weight: 700;">Bonus Videos</span>';
+        if (countBadge) countBadge.textContent = `${specials.length} Specials`;
         currentSeasonEpisodes = motherFolderSpecials;
         currentPlayingEpisodeIdx = -1;
         renderEpisodeListHtml(motherFolderSpecials);
@@ -682,7 +770,7 @@ function renderIndexedTvData(tvData, seriesTitle) {
 }
 
 function selectIndexedSeason(btnEl, seasonIdx, seasonName) {
-    document.querySelectorAll('#seasonTabs .season-pill-btn').forEach(b => {
+    document.querySelectorAll('.season-pill-btn').forEach(b => {
         b.classList.remove('active');
     });
     btnEl.classList.add('active');
@@ -707,10 +795,11 @@ function loadIndexedSeasonEpisodes(seasonIdx, seasonName) {
     currentSeasonEpisodes = episodes;
     currentPlayingEpisodeIdx = -1;
     renderEpisodeListHtml(episodes);
+    renderPlayerEpisodeList(episodes);
 }
 
 function selectSpecialsTab(btnEl) {
-    document.querySelectorAll('#seasonTabs .season-pill-btn').forEach(b => {
+    document.querySelectorAll('.season-pill-btn').forEach(b => {
         b.classList.remove('active');
     });
     btnEl.classList.add('active');
@@ -719,15 +808,18 @@ function selectSpecialsTab(btnEl) {
     currentSeasonEpisodes = motherFolderSpecials;
     currentPlayingEpisodeIdx = -1;
     renderEpisodeListHtml(motherFolderSpecials);
+    renderPlayerEpisodeList(motherFolderSpecials);
 }
 
 function filterEpisodes(query) {
     episodeFilterQuery = (query || '').trim().toLowerCase();
     renderEpisodeListHtml(currentSeasonEpisodes);
+    renderPlayerEpisodeList(currentSeasonEpisodes);
 }
 
 function renderEpisodeListHtml(episodes) {
     const epList = document.getElementById('episodeList');
+    if (!epList) return;
     if (!episodes || episodes.length === 0) {
         epList.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 14px; text-align: center;">No episodes found.</div>';
         return;
@@ -781,6 +873,43 @@ function renderEpisodeListHtml(episodes) {
     epList.innerHTML = html;
 }
 
+function renderPlayerEpisodeList(episodes) {
+    const epList = document.getElementById('playerEpisodeList');
+    if (!epList) return;
+    if (!episodes || episodes.length === 0) {
+        epList.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 10px; text-align: center;">No episodes in this season.</div>';
+        return;
+    }
+
+    const filtered = episodeFilterQuery ? episodes.filter(e => e.name.toLowerCase().includes(episodeFilterQuery)) : episodes;
+
+    epList.innerHTML = filtered.map((ep, idx) => {
+        const originalIdx = episodes.indexOf(ep);
+        const isPlaying = originalIdx === currentPlayingEpisodeIdx;
+        const cleanName = ep.name.replace(/\.(mp4|mkv|avi|webm)$/i, '');
+
+        return `
+        <div class="ep-card ${isPlaying ? 'playing' : ''}" onclick="playSpecificEpisode(${originalIdx})">
+            <div class="ep-index-badge">
+                ${isPlaying ? '▶' : (originalIdx + 1)}
+            </div>
+            <div class="ep-info-wrap">
+                <div class="ep-title-text" title="${escapeQuotes(ep.name)}">
+                    ${cleanName}
+                </div>
+                <div class="ep-meta-sub">
+                    <span style="color: ${isPlaying ? 'var(--primary)' : 'var(--text-muted)'}; font-weight: 700;">${isPlaying ? 'PLAYING NOW' : currentSeasonName}</span>
+                </div>
+            </div>
+            <div class="ep-action-btns" onclick="event.stopPropagation();">
+                <button class="ep-icon-btn btn-vlc-sm" onclick="openInVLC('${ep.url}', '${escapeQuotes(ep.name)}')" title="VLC">
+                    ${VLC_ICON_SVG}
+                </button>
+            </div>
+        </div>
+    `;}).join('');
+}
+
 function playSpecificEpisode(idx) {
     if (!currentSeasonEpisodes[idx]) return;
     cancelNextEpisode();
@@ -791,11 +920,18 @@ function playSpecificEpisode(idx) {
     currentActiveStreamUrl = ep.url;
     currentActiveStreamTitle = fullTitle;
 
-    document.getElementById('playerCurrentTitle').textContent = fullTitle;
     document.getElementById('playerNavBtns').style.display = 'flex';
 
     renderEpisodeListHtml(currentSeasonEpisodes);
-    startStream(ep.url, fullTitle);
+    renderPlayerEpisodeList(currentSeasonEpisodes);
+
+    // If not already in player mode, enter player mode automatically!
+    if (!isPlayerMode) {
+        enterPlayerMode(ep.url, fullTitle);
+    } else {
+        document.getElementById('playerHeadingTitle').textContent = fullTitle;
+        startStream(ep.url, fullTitle);
+    }
 }
 
 function playNextEpisode() {
@@ -813,18 +949,25 @@ function playPrevEpisode() {
 }
 
 function fallbackTvView(seriesUrl, seriesTitle) {
-    document.getElementById('seasonCountBadge').textContent = 'Directory';
-    document.getElementById('seasonTabs').innerHTML = `
-        <a class="btn btn-primary" style="font-size: 12px; padding: 8px 14px; border-radius: 20px;" href="${seriesUrl}" target="_blank">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            <span>Browse All Seasons on Server</span>
-        </a>
-    `;
-    document.getElementById('episodeList').innerHTML = `
-        <div style="font-size: 12px; color: var(--text-muted); padding: 10px 4px; line-height: 1.5;">
-            Click above to browse all season folders and stream/download any episode directly via high-speed BDIX.
-        </div>
-    `;
+    const sBadge = document.getElementById('seasonCountBadge');
+    if (sBadge) sBadge.textContent = 'Directory';
+    const sTabs = document.getElementById('seasonTabs');
+    if (sTabs) {
+        sTabs.innerHTML = `
+            <a class="btn btn-primary" style="font-size: 12px; padding: 8px 14px; border-radius: 20px;" href="${seriesUrl}" target="_blank">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>Browse All Seasons on Server</span>
+            </a>
+        `;
+    }
+    const epList = document.getElementById('episodeList');
+    if (epList) {
+        epList.innerHTML = `
+            <div style="font-size: 12px; color: var(--text-muted); padding: 10px 4px; line-height: 1.5;">
+                Click above to browse all season folders and stream/download any episode directly via high-speed BDIX.
+            </div>
+        `;
+    }
 }
 
 // ==========================================
@@ -988,6 +1131,8 @@ function setupSearchKeybindings() {
             playPrevEpisode();
         } else if (e.key === 'c' || e.key === 'C') {
             toggleSubtitles();
+        } else if (e.key === 'Escape' && isPlayerMode) {
+            exitPlayerMode();
         }
     });
 }
@@ -997,7 +1142,8 @@ function setupSearchKeybindings() {
 // ==========================================
 async function loadRelatedMedia(tag, currentTitle) {
     const slider = document.getElementById('relatedSlider');
-    if (!slider) return;
+    const playerSlider = document.getElementById('playerRelatedSlider');
+    if (!slider && !playerSlider) return;
 
     let candidateList = [];
     const cachedHome = sessionStorage.getItem('cinebox_home_v2');
@@ -1029,7 +1175,7 @@ async function loadRelatedMedia(tag, currentTitle) {
     });
 
     if (filtered.length > 0) {
-        slider.innerHTML = filtered.slice(0, 16).map(item => {
+        const cardsHtml = filtered.slice(0, 16).map(item => {
             const obj = Array.isArray(item) ? {
                 title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
             } : item;
@@ -1069,9 +1215,9 @@ async function loadRelatedMedia(tag, currentTitle) {
                 </a>
             `;
         }).join('');
-        document.getElementById('relatedSection').style.display = 'block';
-    } else {
-        document.getElementById('relatedSection').style.display = 'none';
+
+        if (slider) slider.innerHTML = cardsHtml;
+        if (playerSlider) playerSlider.innerHTML = cardsHtml;
     }
 }
 

@@ -77,13 +77,15 @@
             </button>
             <a class="btn btn-ghost desktop-only-btn" href="index.html" style="padding: 7px 12px; font-size: 12px;">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back</span>
+                <span>Home</span>
             </a>
         </div>
     </header>
 
-    <!-- MovieBox-Style Details Wrapper -->
-    <main class="mb-detail-page">
+    <!-- ================================================================= -->
+    <!-- 📄 1. DEFAULT DETAILS VIEW (No Video Player & No Autoplay)       -->
+    <!-- ================================================================= -->
+    <main class="mb-detail-page" id="detailView">
 
         <!-- 1. Cinematic Hero Section (Backdrop Banner & Media Info) -->
         <section class="mb-hero-section">
@@ -127,84 +129,8 @@
             </div>
         </section>
 
-        <!-- 2. Modern In-Browser Video Player Section -->
-        <section class="mb-player-wrapper" id="playerSection" style="display: none;">
-            <div class="player-bar">
-                <div class="player-title-wrap">
-                    <span class="player-live-dot"></span>
-                    <span id="playerCurrentTitle">Playing Media</span>
-                </div>
-
-                <div class="player-controls-right">
-                    <!-- Subtitles (CC) Button & Hidden File Picker -->
-                    <input type="file" id="subFileInput" accept=".srt,.vtt,.sub" style="display: none;" onchange="handleSubtitleFileSelect(event)">
-                    <button class="player-mini-btn" id="subBtn" onclick="toggleSubtitles()" title="Subtitles (CC) / Load .srt file">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 10h3M6 14h2M14 10h4M14 14h3"/></svg>
-                        <span>CC</span>
-                    </button>
-
-                    <!-- Speed Selector -->
-                    <button class="player-mini-btn" id="speedBtn" onclick="cyclePlaybackSpeed()" title="Playback Speed">
-                        <span id="speedLabel">1.0x</span>
-                    </button>
-
-                    <!-- Aspect Ratio Selector -->
-                    <button class="player-mini-btn" id="aspectBtn" onclick="cycleAspectRatio()" title="Aspect Ratio">
-                        <span id="aspectLabel">Fit</span>
-                    </button>
-
-                    <!-- PiP Toggle -->
-                    <button class="player-mini-btn" onclick="togglePictureInPicture()" title="Picture-in-Picture">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
-                    </button>
-
-                    <!-- Prev/Next Episode buttons -->
-                    <div id="playerNavBtns" style="display: none; gap: 4px;">
-                        <button class="btn btn-ghost" style="padding: 3px 8px; font-size: 11px;" onclick="playPrevEpisode()" title="Previous Episode (P)">◀</button>
-                        <button class="btn btn-primary" style="padding: 3px 8px; font-size: 11px;" onclick="playNextEpisode()" title="Next Episode (N)">Next ▶</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Video Player Element with Double-Tap Seek Zones -->
-            <div class="video-container" id="videoContainer">
-                <video id="videoPlayer" controls playsinline preload="metadata" style="width: 100%; aspect-ratio: 16/9; max-height: 560px; outline: none; background: #000;"></video>
-                
-                <!-- Double-Tap Touch Seek Overlay -->
-                <div class="touch-seek-overlay" id="touchSeekOverlay">
-                    <div class="seek-touch-zone left" id="seekTouchLeft">
-                        <div class="seek-ripple" id="seekRippleLeft">
-                            <span style="font-size: 16px;">⏪</span>
-                            <span>-10s</span>
-                        </div>
-                    </div>
-                    <div class="seek-touch-zone right" id="seekTouchRight">
-                        <div class="seek-ripple" id="seekRippleRight">
-                            <span style="font-size: 16px;">⏩</span>
-                            <span>+10s</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Next Episode Countdown Overlay -->
-                <div class="next-ep-countdown" id="nextEpCountdown" style="display: none;">
-                    <div class="next-ep-box">
-                        <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Up Next</div>
-                        <div class="next-ep-title" id="nextEpTitle">Next Episode</div>
-                        <div class="next-ep-timer">Playing in <span id="countdownSecs">8</span>s</div>
-                        <div style="display: flex; gap: 8px; margin-top: 8px;">
-                            <button class="btn btn-primary" style="padding: 5px 12px; font-size: 11.5px;" onclick="confirmNextEpisode()">Play Now</button>
-                            <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="cancelNextEpisode()">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. MovieBox Content Tabs (Episodes / Details / External Players) -->
+        <!-- 2. TV Series Seasons & Episodes Explorer (For TV Series) -->
         <section class="mb-content-body">
-            
-            <!-- TV Series Seasons & Episodes Explorer (For TV Series) -->
             <div id="tvExplorerWrap" class="mb-episodes-section" style="display: none;">
                 <div class="mb-section-header">
                     <div class="mb-section-title">
@@ -293,8 +219,141 @@
                 </div>
                 <div class="row-slider" id="relatedSlider"></div>
             </div>
-
         </section>
+
+    </main>
+
+    <!-- ================================================================= -->
+    <!-- 📺 2. FOCUSED ONLINE PLAYER VIEW (Opened on "Watch Online" Click) -->
+    <!-- ================================================================= -->
+    <main class="player-fullscreen-layout" id="playerView" style="display: none;">
+        
+        <!-- Player Top Navigation Bar -->
+        <div class="player-top-bar">
+            <button class="btn btn-ghost" onclick="exitPlayerMode()" style="padding: 7px 14px; font-size: 12.5px; border-radius: 20px;">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Back to Details</span>
+            </button>
+
+            <div class="player-view-badge" id="playerMediaTypeBadge">
+                <span class="player-live-dot"></span>
+                <span id="playerMediaBadgeText">Now Playing</span>
+            </div>
+        </div>
+
+        <!-- Video Player Section -->
+        <div class="player-cinema-box">
+            <div class="player-bar">
+                <div class="player-title-wrap">
+                    <span class="player-live-dot"></span>
+                    <span id="playerCurrentTitle">Playing Media</span>
+                </div>
+
+                <div class="player-controls-right">
+                    <!-- Subtitles (CC) Button & Hidden File Picker -->
+                    <input type="file" id="subFileInput" accept=".srt,.vtt,.sub" style="display: none;" onchange="handleSubtitleFileSelect(event)">
+                    <button class="player-mini-btn" id="subBtn" onclick="toggleSubtitles()" title="Subtitles (CC) / Load .srt file">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 10h3M6 14h2M14 10h4M14 14h3"/></svg>
+                        <span>CC</span>
+                    </button>
+
+                    <!-- Speed Selector -->
+                    <button class="player-mini-btn" id="speedBtn" onclick="cyclePlaybackSpeed()" title="Playback Speed">
+                        <span id="speedLabel">1.0x</span>
+                    </button>
+
+                    <!-- Aspect Ratio Selector -->
+                    <button class="player-mini-btn" id="aspectBtn" onclick="cycleAspectRatio()" title="Aspect Ratio">
+                        <span id="aspectLabel">Fit</span>
+                    </button>
+
+                    <!-- PiP Toggle -->
+                    <button class="player-mini-btn" onclick="togglePictureInPicture()" title="Picture-in-Picture">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
+                    </button>
+
+                    <!-- Prev/Next Episode buttons -->
+                    <div id="playerNavBtns" style="display: none; gap: 4px;">
+                        <button class="btn btn-ghost" style="padding: 3px 8px; font-size: 11px;" onclick="playPrevEpisode()" title="Previous Episode (P)">◀</button>
+                        <button class="btn btn-primary" style="padding: 3px 8px; font-size: 11px;" onclick="playNextEpisode()" title="Next Episode (N)">Next ▶</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Video Player Element with Double-Tap Seek Zones -->
+            <div class="video-container" id="videoContainer">
+                <video id="videoPlayer" controls playsinline preload="metadata" style="width: 100%; aspect-ratio: 16/9; max-height: 580px; outline: none; background: #000;"></video>
+                
+                <!-- Double-Tap Touch Seek Overlay -->
+                <div class="touch-seek-overlay" id="touchSeekOverlay">
+                    <div class="seek-touch-zone left" id="seekTouchLeft">
+                        <div class="seek-ripple" id="seekRippleLeft">
+                            <span style="font-size: 16px;">⏪</span>
+                            <span>-10s</span>
+                        </div>
+                    </div>
+                    <div class="seek-touch-zone right" id="seekTouchRight">
+                        <div class="seek-ripple" id="seekRippleRight">
+                            <span style="font-size: 16px;">⏩</span>
+                            <span>+10s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Episode Countdown Overlay -->
+                <div class="next-ep-countdown" id="nextEpCountdown" style="display: none;">
+                    <div class="next-ep-box">
+                        <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Up Next</div>
+                        <div class="next-ep-title" id="nextEpTitle">Next Episode</div>
+                        <div class="next-ep-timer">Playing in <span id="countdownSecs">8</span>s</div>
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <button class="btn btn-primary" style="padding: 5px 12px; font-size: 11.5px;" onclick="confirmNextEpisode()">Play Now</button>
+                            <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="cancelNextEpisode()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Page Quick Action Toolbar -->
+        <div class="player-info-toolbar">
+            <div class="player-info-main">
+                <h2 class="player-heading-title" id="playerHeadingTitle">Media Title</h2>
+                <div class="player-heading-meta" id="playerHeadingMeta">
+                    <span style="color: #ffb800; font-weight: 800;">★ 8.9</span>
+                    <span>•</span>
+                    <span id="playerQualityTag">1080p HD</span>
+                    <span>•</span>
+                    <span style="color: var(--accent-green);">BDIX Ultra-Speed CDN</span>
+                </div>
+            </div>
+
+            <!-- Quick Action Pills Row -->
+            <div class="player-quick-actions" id="playerQuickActions"></div>
+        </div>
+
+        <!-- TV Series Episode Selector Playlist (If TV Series) -->
+        <div id="playerTvPlaylistWrap" class="player-tv-playlist-box" style="display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                    <span>Switch Episode</span>
+                </div>
+                <div id="playerSeasonCountBadge" class="badge-count-static">Loading...</div>
+            </div>
+            <!-- Season Tabs -->
+            <div id="playerSeasonTabs" class="mb-season-tabs"></div>
+            <!-- Episode List -->
+            <div id="playerEpisodeList" class="mb-episode-grid" style="max-height: 380px;"></div>
+        </div>
+
+        <!-- Player Recommendations / Up Next Row -->
+        <div class="mb-related-section" id="playerRelatedSection" style="margin-top: 14px;">
+            <div class="mb-section-header">
+                <h2 class="mb-section-title" style="font-size: 15px;">Up Next / Recommendations</h2>
+            </div>
+            <div class="row-slider" id="playerRelatedSlider"></div>
+        </div>
 
     </main>
 
