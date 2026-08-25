@@ -277,48 +277,61 @@ header {
     color: var(--primary);
 }
 
-/* Nav Links (MovieBox Style) */
+/* Special High-End Nav Bar */
 .nav-links {
     display: flex;
     align-items: center;
     gap: 4px;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 4px 6px;
+    border-radius: 30px;
+    border: 1px solid var(--border);
+    backdrop-filter: blur(10px);
+}
+
+[data-theme="light"] .nav-links {
+    background: #eef2f6;
+    border-color: rgba(0, 0, 0, 0.08);
 }
 
 .nav-link {
     background: transparent;
     border: none;
     color: var(--text-muted);
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
-    padding: 7px 14px;
+    padding: 7px 16px;
     border-radius: 20px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 7px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
 }
 
 .nav-link:hover {
     color: #fff;
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-1px);
 }
 
 [data-theme="light"] .nav-link:hover {
     color: #0c121e;
-    background: rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.06);
 }
 
 .nav-link.active {
-    color: var(--primary);
-    background: rgba(0, 229, 255, 0.12);
+    color: #07090e;
+    background: linear-gradient(135deg, #00e5ff 0%, #00b4d8 100%);
     font-weight: 700;
+    box-shadow: 0 4px 14px var(--primary-glow);
 }
 
 [data-theme="light"] .nav-link.active {
-    color: #0088cc;
-    background: rgba(0, 136, 204, 0.12);
+    color: #ffffff;
+    background: linear-gradient(135deg, #0088cc 0%, #005f9e 100%);
+    box-shadow: 0 4px 12px rgba(0, 136, 204, 0.35);
 }
 
 /* MovieBox Category Filter Bar */

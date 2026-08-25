@@ -449,6 +449,23 @@
             }
         }
 
+        let tvCatalogPromise = null;
+        function getTvCatalog() {
+            if (!tvCatalogPromise) {
+                tvCatalogPromise = fetch('./tv_index.json')
+                    .then(r => r.json())
+                    .then(data => {
+                        tvCatalog = data || {};
+                        return tvCatalog;
+                    })
+                    .catch(e => {
+                        console.warn('TV index fetch notice:', e);
+                        return {};
+                    });
+            }
+            return tvCatalogPromise;
+        }
+
         async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
             const tabs = document.getElementById('seasonTabs');
             const epList = document.getElementById('episodeList');
@@ -459,33 +476,57 @@
             countBadge.textContent = 'Loading...';
             motherFolderSpecials = [];
 
-            let matchedData = tvCatalog[seriesTitle];
-            if (!matchedData) {
+            // Ensure tvCatalog is fully loaded
+            if (Object.keys(tvCatalog).length === 0) {
+                await getTvCatalog();
+            }
+
+            let matchedData = null;
+
+            // 1. Match by exact title key
+            if (tvCatalog[seriesTitle]) {
+                matchedData = tvCatalog[seriesTitle];
+            }
+
+            // 2. Match by series folder URL
+            if (!matchedData && seriesUrl) {
+                const normTargetUrl = decodeURI(seriesUrl).replace(/\/+$/, '').toLowerCase();
+                for (const [k, v] of Object.entries(tvCatalog)) {
+                    if (v && v[0]) {
+                        const normEntryUrl = decodeURI(v[0]).replace(/\/+$/, '').toLowerCase();
+                        if (normEntryUrl === normTargetUrl) {
+                            matchedData = v;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 3. Match by normalized alphanumeric characters
+            if (!matchedData && seriesTitle) {
+                const normTarget = seriesTitle.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+                for (const [k, v] of Object.entries(tvCatalog)) {
+                    const normK = k.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+                    if (normK === normTarget || (normK.length > 5 && normTarget.includes(normK)) || (normTarget.length > 5 && normK.includes(normTarget))) {
+                        matchedData = v;
+                        break;
+                    }
+                }
+            }
+
+            // 4. Fuzzy title contains match
+            if (!matchedData && seriesTitle) {
                 const lowerTitle = seriesTitle.toLowerCase();
-                const key = Object.keys(tvCatalog).find(k => k.toLowerCase() === lowerTitle || lowerTitle.includes(k.toLowerCase()) || k.toLowerCase().includes(lowerTitle));
+                const key = Object.keys(tvCatalog).find(k => {
+                    const lk = k.toLowerCase();
+                    return lk === lowerTitle || lowerTitle.includes(lk) || lk.includes(lowerTitle);
+                });
                 if (key) matchedData = tvCatalog[key];
             }
 
             if (matchedData) {
                 renderIndexedTvData(matchedData, seriesTitle);
                 return;
-            }
-
-            if (Object.keys(tvCatalog).length === 0) {
-                try {
-                    const res = await fetch('./tv_index.json?v=' + Date.now());
-                    tvCatalog = await res.json();
-                    matchedData = tvCatalog[seriesTitle];
-                    if (!matchedData) {
-                        const lowerTitle = seriesTitle.toLowerCase();
-                        const key = Object.keys(tvCatalog).find(k => k.toLowerCase() === lowerTitle || lowerTitle.includes(k.toLowerCase()) || k.toLowerCase().includes(lowerTitle));
-                        if (key) matchedData = tvCatalog[key];
-                    }
-                    if (matchedData) {
-                        renderIndexedTvData(matchedData, seriesTitle);
-                        return;
-                    }
-                } catch (e) {}
             }
 
             fallbackTvView(seriesUrl, seriesTitle);

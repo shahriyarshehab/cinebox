@@ -335,14 +335,35 @@ function switchNavTab(tab) {
         showHomeView();
     } else if (tab === 'tv') {
         const b = document.getElementById('navTv'); if (b) b.classList.add('active');
-        openCategoryView('TV Series', 'TV & Web Series');
+        openSpecialSectionView('TV Shows & Web Series', m => m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.category && m.category.includes('Series')), 'TV Series');
     } else if (tab === 'movies') {
         const b = document.getElementById('navMovies'); if (b) b.classList.add('active');
-        openCategoryView('Hollywood 1080p', 'Movies Collection');
+        openSpecialSectionView('Movies Collection', m => m.tag !== 'TV Series' && m.tag !== 'K-Drama', 'All');
     } else if (tab === 'animation') {
         const b = document.getElementById('navAnimation'); if (b) b.classList.add('active');
-        openCategoryView('Animation', 'Animation & Anime');
+        openSpecialSectionView('Animation & Anime Collection', m => m.tag === 'Animation' || (m.category && m.category.includes('Animation')), 'Animation');
     }
+}
+
+async function openSpecialSectionView(title, filterFn, defaultTag) {
+    currentView = 'category';
+    currentCategoryTag = defaultTag || 'All';
+    currentCategoryName = title;
+
+    if (!isFullCatalogLoaded) {
+        document.getElementById('mainContent').innerHTML = `
+            <div style="text-align: center; padding: 60px 20px;">
+                <div style="font-size: 15px; font-weight: 600; color: var(--text-muted);">Loading ${title}...</div>
+            </div>
+        `;
+        await loadFullCatalogInBackground();
+    }
+
+    filteredMovies = allMovies.filter(filterFn);
+    applyCurrentSorting();
+    displayedCount = BATCH_SIZE;
+    renderView();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function renderCategoryFullGrid(container) {
