@@ -14,12 +14,18 @@ initTheme();
 
 let allMovies = [];
 let homeData = null;
-let currentView = 'home'; // 'home' | 'category' | 'search'
+let currentView = 'home'; // 'home' | 'category' | 'search' | 'watchlist'
 let currentCategoryTag = 'All';
 let currentCategoryName = 'All Movies';
 let filteredMovies = [];
 let displayedCount = 40;
 const BATCH_SIZE = 40;
+
+// Filter facets
+let filterYear = 'all';
+let filterQuality = 'all';
+let filterAudio = 'all';
+let currentSort = 'latest';
 
 let currentSlide = 0;
 let carouselMovies = [];
@@ -41,8 +47,41 @@ const CATEGORY_ROWS = [
     { name: 'English Classic Movies', tag: 'English Movies', limit: 14 }
 ];
 
+const ALL_CATEGORY_PILLS = [
+    { label: 'All Categories', tag: 'All' },
+    { label: 'IMDb Top 250', tag: 'Top Rated' },
+    { label: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
+    { label: 'Animation & Anime', tag: 'Animation' },
+    { label: 'Bollywood (Hindi)', tag: 'Bollywood' },
+    { label: 'South Action (Dubbed)', tag: 'South Action' },
+    { label: 'South Original', tag: 'South Original' },
+    { label: 'TV & Web Series', tag: 'TV Series' },
+    { label: 'Korean Drama', tag: 'K-Drama' },
+    { label: 'Bangla Movies', tag: 'Bangla' },
+    { label: 'Foreign Cinema', tag: 'Foreign Movies' },
+    { label: '3D Movies', tag: '3D Movies' },
+    { label: 'English Classic', tag: 'English Movies' }
+];
+
+const CATEGORY_JSON_MAP = {
+    'K-Drama': 'data/kdrama.json',
+    'TV Series': 'data/tv_series.json',
+    'Hollywood 1080p': 'data/hollywood.json',
+    'Bollywood': 'data/bollywood.json',
+    'South Action': 'data/south_action.json',
+    'South Original': 'data/south_original.json',
+    'Animation': 'data/animation.json',
+    'Bangla': 'data/bangla.json',
+    'Foreign Movies': 'data/foreign.json',
+    '3D Movies': 'data/3d.json',
+    'English Movies': 'data/english.json',
+    'Top Rated': 'data/top_rated.json'
+};
+
+const categoryCache = {};
+
 async function init() {
-    const main = document.getElementById('mainContent');
+    updateWatchlistNavBadge();
 
     // 1. Check client-side cached home data for 0ms instant render
     const cachedHome = sessionStorage.getItem('cinebox_home_v2');
@@ -53,7 +92,7 @@ async function init() {
         } catch (e) {}
     }
 
-    // 2. Fetch lightweight home_data.json (~90 KB, downloads in ~25ms)
+    // 2. Fetch lightweight home_data.json (~90 KB)
     try {
         const res = await fetch('./home_data.json?v=' + Date.now());
         if (res.ok) {
@@ -65,7 +104,7 @@ async function init() {
         console.warn('Fast home load notice:', e);
     }
 
-    // 3. Check for URL search parameters, tab parameters, or category parameters
+    // 3. Check URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const queryParam = urlParams.get('q');
     const tabParam = urlParams.get('tab');
@@ -79,17 +118,14 @@ async function init() {
     } else if (tabParam) {
         loadFullCatalogInBackground().then(() => switchNavTab(tabParam));
     } else {
-        // Asynchronously load the 36,000+ full catalog in background without blocking UI
         setTimeout(loadFullCatalogInBackground, 300);
     }
+
+    setupGlobalShortcuts();
 }
 
 function applyHomeData(data) {
     if (!data) return;
-    const badge = document.getElementById('totalCountBadge');
-    if (badge && data.total) {
-        badge.textContent = `${data.total.toLocaleString()} Movies`;
-    }
     if (data.carousel && data.carousel.length > 0) {
         setupCarousel(data.carousel);
     }
@@ -98,20 +134,7 @@ function applyHomeData(data) {
     }
 }
 
-const ALL_CATEGORY_FILES = [
-    'data/top_rated.json',
-    'data/animation.json',
-    'data/hollywood.json',
-    'data/bollywood.json',
-    'data/south_action.json',
-    'data/south_original.json',
-    'data/tv_series.json',
-    'data/kdrama.json',
-    'data/bangla.json',
-    'data/foreign.json',
-    'data/3d.json',
-    'data/english.json'
-];
+const ALL_CATEGORY_FILES = Object.values(CATEGORY_JSON_MAP);
 
 async function loadFullCatalogInBackground() {
     if (isFullCatalogLoaded && allMovies.length > 0) return;
@@ -143,10 +166,6 @@ async function loadFullCatalogInBackground() {
         });
 
         isFullCatalogLoaded = true;
-        const badge = document.getElementById('totalCountBadge');
-        if (badge) {
-            badge.textContent = `${allMovies.length.toLocaleString()} Movies`;
-        }
 
         if (currentView !== 'home') {
             renderView();
@@ -168,6 +187,8 @@ function setupCarousel(moviesList) {
     track.innerHTML = carouselMovies.map((m, idx) => {
         const itemData = encodeURIComponent(JSON.stringify(m));
         const linkUrl = `watch.html?title=${encodeURIComponent(m.title)}&data=${itemData}`;
+        const inWatchlist = isInWatchlist(m.title);
+
         return `
         <div class="carousel-slide ${idx === 0 ? 'active' : ''}" id="slide-${idx}">
             <div class="slide-bg" style="background-image: url('${m.poster}')"></div>
@@ -188,6 +209,10 @@ function setupCarousel(moviesList) {
                             <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
                             <span>Watch Now</span>
                         </a>
+                        <button class="btn btn-ghost" onclick="toggleWatchlistFromObj(${escapeQuotesJson(m)})">
+                            <svg class="icon" viewBox="0 0 24 24" fill="${inWatchlist ? 'var(--accent)' : 'none'}" stroke="${inWatchlist ? 'var(--accent)' : 'currentColor'}" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                            <span>${inWatchlist ? 'In Watchlist' : 'Add to List'}</span>
+                        </button>
                     </div>
                 </div>
 
@@ -240,8 +265,124 @@ function goToSlide(idx) {
     startCarouselAuto();
 }
 
-function navigateToWatch(title) {
-    window.location.href = `watch.html?title=${encodeURIComponent(title)}`;
+// Watch History & Continue Watching
+function getWatchHistory() {
+    try {
+        return JSON.parse(localStorage.getItem('cinebox_watch_history') || '[]');
+    } catch (e) { return []; }
+}
+
+function removeWatchHistory(url, event) {
+    if (event) event.stopPropagation();
+    let history = getWatchHistory();
+    history = history.filter(h => h.url !== url);
+    localStorage.setItem('cinebox_watch_history', JSON.stringify(history));
+    showToast('Removed from Continue Watching');
+    if (currentView === 'home') renderView();
+}
+
+function renderContinueWatchingHtml() {
+    const history = getWatchHistory();
+    if (!history || history.length === 0) return '';
+
+    return `
+        <div class="continue-watching-block">
+            <div class="row-header" style="border-bottom: none; margin-bottom: 12px;">
+                <div class="row-title-wrap">
+                    <h2 class="row-heading">
+                        <span style="color: var(--primary);">▶</span> Continue Watching
+                    </h2>
+                    <span class="row-badge">${history.length} in progress</span>
+                </div>
+                <div class="row-controls">
+                    <button class="row-nav-btn prev" onclick="slideRow('continueSlider', -1)" aria-label="Previous">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M15 18l-6-6 6-6"/></svg>
+                    </button>
+                    <button class="row-nav-btn next" onclick="slideRow('continueSlider', 1)" aria-label="Next">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M9 18l6-6-6-6"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="row-slider" id="continueSlider">
+                ${history.map(item => {
+                    const itemData = encodeURIComponent(JSON.stringify(item));
+                    const linkUrl = `watch.html?title=${encodeURIComponent(item.title)}&data=${itemData}`;
+                    const timeLeft = Math.max(1, Math.round((item.duration - item.time) / 60));
+
+                    return `
+                        <div class="continue-card">
+                            <button class="btn-remove-history" onclick="removeWatchHistory('${item.url}', event)" title="Remove">✕</button>
+                            <a href="${linkUrl}" style="text-decoration: none; color: inherit;">
+                                <div class="continue-thumb-wrap">
+                                    <img src="${item.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300'}" alt="${escapeQuotes(item.title)}" loading="lazy">
+                                    <div class="progress-bar-container">
+                                        <div class="progress-bar-fill" style="width: ${item.percent || 10}%;"></div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="card-title" title="${item.title}">${item.title}</div>
+                                    <div class="card-meta">
+                                        <span style="color: var(--primary); font-weight: 700;">${item.percent}% watched</span>
+                                        <span>${timeLeft}m left</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Watchlist Store
+function getWatchlist() {
+    try {
+        return JSON.parse(localStorage.getItem('cinebox_watchlist') || '[]');
+    } catch (e) { return []; }
+}
+
+function isInWatchlist(title) {
+    const list = getWatchlist();
+    return list.some(m => (m.title || '').toLowerCase().trim() === (title || '').toLowerCase().trim());
+}
+
+function toggleWatchlistFromObj(movieObj, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    const list = getWatchlist();
+    const cleanTitle = (movieObj.title || '').toLowerCase().trim();
+    const idx = list.findIndex(m => (m.title || '').toLowerCase().trim() === cleanTitle);
+
+    if (idx >= 0) {
+        list.splice(idx, 1);
+        localStorage.setItem('cinebox_watchlist', JSON.stringify(list));
+        showToast('Removed from Watchlist');
+    } else {
+        list.unshift(movieObj);
+        localStorage.setItem('cinebox_watchlist', JSON.stringify(list));
+        showToast('Added to Watchlist ❤️');
+    }
+    updateWatchlistNavBadge();
+    if (currentView === 'watchlist') {
+        renderWatchlistView();
+    }
+}
+
+function updateWatchlistNavBadge() {
+    const list = getWatchlist();
+    const badge = document.getElementById('watchlistNavCount');
+    if (badge) {
+        if (list.length > 0) {
+            badge.textContent = list.length;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
 }
 
 function renderView() {
@@ -254,6 +395,9 @@ function renderView() {
         } else {
             renderHomeRows(main);
         }
+    } else if (currentView === 'watchlist') {
+        document.getElementById('heroCarousel').style.display = 'none';
+        renderWatchlistView();
     } else {
         document.getElementById('heroCarousel').style.display = 'none';
         renderCategoryFullGrid(main);
@@ -272,7 +416,9 @@ function renderHomeRowsFromPayload(categoriesMap) {
     const container = document.getElementById('mainContent');
     if (!categoriesMap) return;
 
-    let html = `
+    let html = renderContinueWatchingHtml();
+
+    html += `
         <!-- MovieBox Quick-Category Filter Bar -->
         <div class="home-category-pills-bar">
             <div class="filter-pills-row">
@@ -327,7 +473,9 @@ function renderHomeRowsFromPayload(categoriesMap) {
 }
 
 function renderHomeRows(container) {
-    let html = `
+    let html = renderContinueWatchingHtml();
+
+    html += `
         <!-- MovieBox Quick-Category Filter Bar -->
         <div class="home-category-pills-bar">
             <div class="filter-pills-row">
@@ -379,39 +527,6 @@ function renderHomeRows(container) {
     container.innerHTML = html;
 }
 
-const ALL_CATEGORY_PILLS = [
-    { label: 'All Categories', tag: 'All' },
-    { label: 'IMDb Top 250', tag: 'Top Rated' },
-    { label: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
-    { label: 'Animation & Anime', tag: 'Animation' },
-    { label: 'Bollywood (Hindi)', tag: 'Bollywood' },
-    { label: 'South Action (Dubbed)', tag: 'South Action' },
-    { label: 'South Original', tag: 'South Original' },
-    { label: 'TV & Web Series', tag: 'TV Series' },
-    { label: 'Korean Drama', tag: 'K-Drama' },
-    { label: 'Bangla Movies', tag: 'Bangla' },
-    { label: 'Foreign Cinema', tag: 'Foreign Movies' },
-    { label: '3D Movies', tag: '3D Movies' },
-    { label: 'English Classic', tag: 'English Movies' }
-];
-
-const CATEGORY_JSON_MAP = {
-    'K-Drama': 'data/kdrama.json',
-    'TV Series': 'data/tv_series.json',
-    'Hollywood 1080p': 'data/hollywood.json',
-    'Bollywood': 'data/bollywood.json',
-    'South Action': 'data/south_action.json',
-    'South Original': 'data/south_original.json',
-    'Animation': 'data/animation.json',
-    'Bangla': 'data/bangla.json',
-    'Foreign Movies': 'data/foreign.json',
-    '3D Movies': 'data/3d.json',
-    'English Movies': 'data/english.json',
-    'Top Rated': 'data/top_rated.json'
-};
-
-const categoryCache = {};
-
 async function fetchCategoryData(tag) {
     if (categoryCache[tag]) return categoryCache[tag];
     const file = CATEGORY_JSON_MAP[tag];
@@ -434,7 +549,6 @@ async function fetchCategoryData(tag) {
 }
 
 let activeNavTab = 'home';
-let currentSort = 'latest';
 
 async function switchNavTab(tab) {
     activeNavTab = tab;
@@ -449,9 +563,8 @@ async function switchNavTab(tab) {
         currentCategoryTag = 'TV Series';
         currentCategoryName = 'TV Shows & Korean Dramas';
         const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
-        filteredMovies = [...tv, ...kdrama];
-        applyCurrentSorting();
-        displayedCount = BATCH_SIZE;
+        rawCategoryPool = [...tv, ...kdrama];
+        applyAllFilters();
         renderView();
         window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (tab === 'movies') {
@@ -460,20 +573,62 @@ async function switchNavTab(tab) {
     } else if (tab === 'animation') {
         const b = document.getElementById('navAnimation'); if (b) b.classList.add('active');
         openCategoryView('Animation', 'Animation & Anime Collection');
+    } else if (tab === 'watchlist') {
+        const b = document.getElementById('navWatchlist'); if (b) b.classList.add('active');
+        currentView = 'watchlist';
+        renderView();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+}
+
+let rawCategoryPool = [];
+
+function renderWatchlistView() {
+    const container = document.getElementById('mainContent');
+    const list = getWatchlist();
+
+    container.innerHTML = `
+        <div class="filter-bar-wrap">
+            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 12px;" onclick="showHomeView()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        <span>Home</span>
+                    </button>
+                    <h1 class="row-heading" style="font-size: 20px;">❤️ My Watchlist</h1>
+                </div>
+                <span style="font-size: 12px; color: var(--text-muted);">${list.length} saved titles</span>
+            </div>
+        </div>
+
+        ${list.length > 0 ? `
+            <div class="poster-grid" id="movieGrid">
+                ${list.map(item => renderMovieCardHtml(item)).join('')}
+            </div>
+        ` : `
+            <div style="text-align: center; padding: 80px 20px;">
+                <div style="font-size: 48px; margin-bottom: 12px;">💖</div>
+                <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Your Watchlist is Empty</h2>
+                <p style="font-size: 13.5px; color: var(--text-muted); max-width: 420px; margin: 0 auto 20px;">
+                    Click the bookmark icon on any movie or series to save it here for later streaming!
+                </p>
+                <button class="btn btn-primary" onclick="showHomeView()">Browse 36,000+ Movies</button>
+            </div>
+        `}
+    `;
 }
 
 function renderCategoryFullGrid(container) {
     const toShow = filteredMovies.slice(0, displayedCount);
 
     container.innerHTML = `
-        <!-- MovieBox Filter Bar with Horizontal Pills -->
+        <!-- MovieBox Filter Bar with Horizontal Pills & Facets -->
         <div class="filter-bar-wrap">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 12px;" onclick="showHomeView()">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                        <span>Home Rows</span>
+                        <span>Home</span>
                     </button>
                     <h1 class="row-heading" style="font-size: 20px;">${currentCategoryName}</h1>
                 </div>
@@ -496,6 +651,32 @@ function renderCategoryFullGrid(container) {
                     </button>
                 `).join('')}
             </div>
+
+            <!-- Multi-Facet Filters (Release Era, Quality, Audio) -->
+            <div class="filter-facets-container">
+                <div class="facet-group">
+                    <span class="facet-label">Era:</span>
+                    <button class="filter-pill-mini ${filterYear === 'all' ? 'active' : ''}" onclick="setFacetYear('all')">All</button>
+                    <button class="filter-pill-mini ${filterYear === '2024+' ? 'active' : ''}" onclick="setFacetYear('2024+')">2024–2026</button>
+                    <button class="filter-pill-mini ${filterYear === '2020-2023' ? 'active' : ''}" onclick="setFacetYear('2020-2023')">2020–2023</button>
+                    <button class="filter-pill-mini ${filterYear === '2010s' ? 'active' : ''}" onclick="setFacetYear('2010s')">2010s</button>
+                    <button class="filter-pill-mini ${filterYear === 'classic' ? 'active' : ''}" onclick="setFacetYear('classic')">Classic</button>
+                </div>
+
+                <div class="facet-group">
+                    <span class="facet-label">Audio:</span>
+                    <button class="filter-pill-mini ${filterAudio === 'all' ? 'active' : ''}" onclick="setFacetAudio('all')">All</button>
+                    <button class="filter-pill-mini ${filterAudio === 'dual' ? 'active' : ''}" onclick="setFacetAudio('dual')">Dual Audio</button>
+                    <button class="filter-pill-mini ${filterAudio === 'multi' ? 'active' : ''}" onclick="setFacetAudio('multi')">Multi Audio</button>
+                </div>
+
+                <div class="facet-group">
+                    <span class="facet-label">Quality:</span>
+                    <button class="filter-pill-mini ${filterQuality === 'all' ? 'active' : ''}" onclick="setFacetQuality('all')">All</button>
+                    <button class="filter-pill-mini ${filterQuality === '1080p' ? 'active' : ''}" onclick="setFacetQuality('1080p')">1080p Full HD</button>
+                    <button class="filter-pill-mini ${filterQuality === '720p' ? 'active' : ''}" onclick="setFacetQuality('720p')">720p</button>
+                </div>
+            </div>
         </div>
 
         <div class="poster-grid" id="movieGrid">
@@ -506,6 +687,57 @@ function renderCategoryFullGrid(container) {
             <button class="btn btn-ghost" id="loadMoreBtn" style="${displayedCount < filteredMovies.length ? 'display:block' : 'display:none'}" onclick="loadMore()">Load More Movies</button>
         </div>
     `;
+}
+
+function setFacetYear(val) {
+    filterYear = val;
+    applyAllFilters();
+    renderView();
+}
+
+function setFacetAudio(val) {
+    filterAudio = val;
+    applyAllFilters();
+    renderView();
+}
+
+function setFacetQuality(val) {
+    filterQuality = val;
+    applyAllFilters();
+    renderView();
+}
+
+function applyAllFilters() {
+    let dataset = rawCategoryPool;
+
+    // Apply Year
+    if (filterYear === '2024+') {
+        dataset = dataset.filter(m => (m.title && (m.title.includes('2024') || m.title.includes('2025') || m.title.includes('2026'))) || (m.date && (m.date.startsWith('2024') || m.date.startsWith('2025') || m.date.startsWith('2026'))));
+    } else if (filterYear === '2020-2023') {
+        dataset = dataset.filter(m => m.title && (m.title.includes('2020') || m.title.includes('2021') || m.title.includes('2022') || m.title.includes('2023')));
+    } else if (filterYear === '2010s') {
+        dataset = dataset.filter(m => m.title && /201[0-9]/.test(m.title));
+    } else if (filterYear === 'classic') {
+        dataset = dataset.filter(m => m.title && /(19[0-9]{2}|200[0-9])/.test(m.title));
+    }
+
+    // Apply Audio
+    if (filterAudio === 'dual') {
+        dataset = dataset.filter(m => m.title && m.title.toLowerCase().includes('dual audio'));
+    } else if (filterAudio === 'multi') {
+        dataset = dataset.filter(m => m.title && m.title.toLowerCase().includes('multi audio'));
+    }
+
+    // Apply Quality
+    if (filterQuality === '1080p') {
+        dataset = dataset.filter(m => m.title && m.title.includes('1080p'));
+    } else if (filterQuality === '720p') {
+        dataset = dataset.filter(m => m.title && m.title.includes('720p'));
+    }
+
+    filteredMovies = [...dataset];
+    applyCurrentSorting();
+    displayedCount = BATCH_SIZE;
 }
 
 function matchesCategory(m, tag) {
@@ -527,13 +759,12 @@ async function selectFilterPill(tag, label) {
         if (!isFullCatalogLoaded && allMovies.length === 0) {
             await loadFullCatalogInBackground();
         }
-        filteredMovies = [...allMovies];
+        rawCategoryPool = [...allMovies];
     } else {
-        filteredMovies = await fetchCategoryData(tag);
+        rawCategoryPool = await fetchCategoryData(tag);
     }
 
-    applyCurrentSorting();
-    displayedCount = BATCH_SIZE;
+    applyAllFilters();
     renderView();
 }
 
@@ -548,7 +779,6 @@ function applyCurrentSorting() {
     if (currentSort === 'title') {
         filteredMovies.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
     } else if (currentSort === 'rating') {
-        // High score top
         filteredMovies.sort((a, b) => (b.title.includes('2026') ? 1 : 0) - (a.title.includes('2026') ? 1 : 0));
     }
 }
@@ -577,17 +807,17 @@ async function openCategoryView(tag, name) {
             `;
             await loadFullCatalogInBackground();
         }
-        filteredMovies = [...allMovies];
+        rawCategoryPool = [...allMovies];
     } else {
-        filteredMovies = await fetchCategoryData(tag);
+        rawCategoryPool = await fetchCategoryData(tag);
     }
 
-    applyCurrentSorting();
-    displayedCount = BATCH_SIZE;
+    applyAllFilters();
     renderView();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Live Autocomplete Search
 let liveSearchTimer = null;
 
 function handleLiveSearch(val) {
@@ -674,12 +904,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        hideSearchDropdown();
-    }
-});
-
 async function handleSearch() {
     hideSearchDropdown();
     const q = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -694,12 +918,12 @@ async function handleSearch() {
 
     currentView = 'search';
     currentCategoryName = `Search: "${q}"`;
-    filteredMovies = allMovies.filter(m => 
+    rawCategoryPool = allMovies.filter(m => 
         (m.title && m.title.toLowerCase().includes(q)) || 
         (m.category && m.category.toLowerCase().includes(q)) || 
         (m.tag && m.tag.toLowerCase().includes(q))
     );
-    displayedCount = BATCH_SIZE;
+    applyAllFilters();
     renderView();
 }
 
@@ -733,6 +957,109 @@ window.addEventListener('scroll', () => {
         }
     }, 100);
 });
+
+// Surprise Me (Random Pick) Modal
+async function openSurpriseModal() {
+    const modal = document.getElementById('surpriseModal');
+    const body = document.getElementById('surpriseModalBody');
+    modal.style.display = 'flex';
+
+    body.innerHTML = `
+        <div class="surprise-loader">
+            <div class="surprise-spinner">🎲</div>
+            <div style="font-size: 14px; font-weight: 600; color: var(--primary);">Rolling the cinema dice...</div>
+        </div>
+    `;
+
+    if (allMovies.length === 0) {
+        await loadFullCatalogInBackground();
+    }
+
+    setTimeout(() => {
+        let pool = allMovies;
+        if (pool.length === 0 && homeData && homeData.carousel) {
+            pool = homeData.carousel.map(item => Array.isArray(item) ? {
+                title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
+            } : item);
+        }
+
+        if (pool.length === 0) {
+            body.innerHTML = '<div style="text-align:center; padding: 20px;">Could not load pool. Try again.</div>';
+            return;
+        }
+
+        const randomPick = pool[Math.floor(Math.random() * pool.length)];
+        const itemData = encodeURIComponent(JSON.stringify(randomPick));
+        const linkUrl = `watch.html?title=${encodeURIComponent(randomPick.title)}&data=${itemData}`;
+        const isSeries = randomPick.tag === 'TV Series' || randomPick.tag === 'K-Drama' || (randomPick.url && randomPick.url.endsWith('/'));
+
+        body.innerHTML = `
+            <div class="surprise-result-grid">
+                <img class="surprise-thumb" src="${randomPick.poster}" alt="${escapeQuotes(randomPick.title)}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300';">
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                    <div class="slide-tag">${randomPick.tag || 'HD Cinema'}</div>
+                    <h3 style="font-size: 18px; font-weight: 800; color: #fff; line-height: 1.3;">${randomPick.title}</h3>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted);">
+                        <span>📁 ${randomPick.category || 'Cinema'}</span>
+                        <span>•</span>
+                        <span style="color: var(--accent-gold); font-weight: 700;">★ 9.0 / 10</span>
+                        <span>•</span>
+                        <span>${randomPick.size || 'HD'}</span>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+                        <a class="btn btn-primary" href="${linkUrl}">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+                            <span>${isSeries ? 'View Series' : 'Watch Now'}</span>
+                        </a>
+                        <button class="btn btn-ghost" onclick="openSurpriseModal()">
+                            <span>🎲 Roll Again</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }, 450);
+}
+
+function closeSurpriseModal() {
+    const modal = document.getElementById('surpriseModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Shortcuts modal
+function toggleShortcutsModal() {
+    const modal = document.getElementById('shortcutsModal');
+    if (modal) {
+        modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    }
+}
+
+function setupGlobalShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            const input = document.getElementById('searchInput');
+            if (input) { input.focus(); input.select(); }
+        } else if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+            e.preventDefault();
+            const input = document.getElementById('searchInput');
+            if (input) { input.focus(); input.select(); }
+        } else if (e.key === 'Escape') {
+            hideSearchDropdown();
+            closeSurpriseModal();
+            const scModal = document.getElementById('shortcutsModal');
+            if (scModal) scModal.style.display = 'none';
+        }
+    });
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 2800);
+}
 
 function renderMovieCardHtml(item) {
     const rawTitle = item.title || '';
@@ -774,6 +1101,10 @@ function renderMovieCardHtml(item) {
 
 function escapeQuotes(str) {
     return (str || '').replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
+}
+
+function escapeQuotesJson(obj) {
+    return JSON.stringify(obj).replace(/"/g, '&quot;');
 }
 
 window.onload = init;
