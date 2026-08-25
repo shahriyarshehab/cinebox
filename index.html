@@ -700,7 +700,11 @@
         async function init() {
             try {
                 const res = await fetch('./movies.json');
-                allMovies = await res.json();
+                const rawMovies = await res.json();
+                allMovies = rawMovies.filter(m => {
+                    const t = (m.title || '').trim().toLowerCase();
+                    return t && !t.includes('parent directory') && t !== '..' && t !== '.';
+                });
                 document.getElementById('totalCountBadge').textContent = `${allMovies.length.toLocaleString()} Movies`;
                 filteredMovies = [...allMovies];
                 renderGrid();
