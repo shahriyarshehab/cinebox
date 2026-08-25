@@ -1,7 +1,7 @@
 /**
- * CineBox YouTube-Style Watch & Streaming Controller
- * Full YouTube layout with in-browser player, CC subtitles, double-tap 10s seek,
- * horizontal action pills, playlist season explorer, and sidebar recommendations.
+ * CineBox MovieBox-Style Details & Streaming Controller
+ * Inspired by MovieBox (movie-box.co) with rich backdrop hero, ratings, genres,
+ * synopsis toggle, in-browser player, CC subtitles, VLC/external launchers & TV season explorer.
  */
 
 let currentItem = null;
@@ -15,6 +15,7 @@ let currentPlayingEpisodeIdx = -1;
 let currentSeasonName = 'Season 1';
 let currentSelectedSeasonIdx = 0;
 let episodeFilterQuery = '';
+let isSynopsisExpanded = false;
 
 // Player state
 const playbackSpeeds = [0.75, 1.0, 1.25, 1.5, 2.0];
@@ -145,66 +146,77 @@ async function initWatch() {
 
 function renderWatchPage(item) {
     document.title = `${item.title} — CineBox`;
+    
+    // Backdrop & Poster
     document.getElementById('wTitle').textContent = item.title;
     document.getElementById('wPoster').src = item.poster;
-    document.getElementById('wTag').textContent = item.category || item.tag || 'HD Cinema';
-
-    const player = document.getElementById('videoPlayer');
-    if (player) player.poster = item.poster;
-
+    document.getElementById('mbBackdrop').style.backgroundImage = `url('${item.poster}')`;
+    
     const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
 
-    // YouTube-Style Video Meta Chips
-    document.getElementById('wChips').innerHTML = `
-        <span class="yt-meta-badge yt-badge-gold">★ 8.9 / 10</span>
-        <span class="yt-meta-badge yt-badge-quality">${item.tag || '1080p HD'}</span>
-        <a class="yt-meta-badge yt-badge-link" href="index.html?cat=${encodeURIComponent(item.tag || item.category)}">📁 ${item.category || item.tag}</a>
-        <a class="yt-meta-badge yt-badge-link" href="index.html?tab=${isSeries ? 'tv' : 'movies'}">📺 ${isSeries ? 'TV Series' : 'Movie'}</a>
-        <span class="yt-meta-badge">Size: ${item.size || 'HD'}</span>
-        <span class="yt-meta-badge">${item.date || '2024'}</span>
+    // Quality Badge
+    document.getElementById('wQualityBadge').textContent = item.tag || '1080p HD';
+    
+    // Meta Specs
+    document.getElementById('wYear').textContent = item.date || '2024';
+    document.getElementById('wType').textContent = isSeries ? 'TV Series' : 'Movie';
+    document.getElementById('wDuration').textContent = isSeries ? 'Multiple Seasons' : 'Full HD';
+    document.getElementById('wSize').textContent = item.size || 'HD Cinema';
+
+    // Technical info card
+    document.getElementById('wQualityVal').textContent = `${item.tag || '1080p Full HD'} (Web-DL)`;
+    document.getElementById('wFileSizeVal').textContent = item.size || '1080p HD';
+    document.getElementById('wAudioVal').textContent = item.category || 'Dual Audio / Original';
+
+    // Genres Row
+    const catName = item.category || item.tag || 'Cinema';
+    document.getElementById('wGenres').innerHTML = `
+        <a class="mb-genre-pill" href="index.html?cat=${encodeURIComponent(catName)}"># ${catName}</a>
+        <a class="mb-genre-pill" href="index.html?tab=${isSeries ? 'tv' : 'movies'}"># ${isSeries ? 'TV Series' : 'Movies'}</a>
+        <span class="mb-genre-pill" style="border-color: rgba(255, 184, 0, 0.4); color: #ffb800;"># Top Rated</span>
     `;
 
     updateWatchlistButtonState();
 
-    // YouTube-Style Action Pills Bar
+    // MovieBox Action Buttons
     document.getElementById('wActions').innerHTML = `
         ${isSeries ? `
-            <button class="yt-action-pill yt-pill-primary" onclick="scrollTvExplorer()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            <button class="mb-btn-primary" onclick="scrollTvExplorer()">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
                 <span>Select Episode</span>
             </button>
         ` : `
-            <button class="yt-action-pill yt-pill-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M8 5v14l11-7z"/></svg>
-                <span>Play Now</span>
+            <button class="mb-btn-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
+                <span>▶ Watch Online</span>
             </button>
         `}
-        <button class="yt-action-pill yt-pill-vlc" onclick="openCurrentInVLC()">
+        <button class="mb-btn-action mb-btn-vlc" onclick="openCurrentInVLC()">
             ${VLC_ICON_SVG}
             <span>Play in VLC</span>
         </button>
         ${!isSeries ? `
-            <a class="yt-action-pill yt-pill-download" href="${item.url}" download>
+            <a class="mb-btn-action" href="${item.url}" download>
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Download</span>
             </a>
         ` : ''}
-        <button class="yt-action-pill" onclick="toggleCurrentWatchlist()">
-            <svg class="icon" id="wHeartIconPill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            <span id="wWatchlistPillText">${isInWatchlist(item.title) ? 'Saved ❤️' : 'Save'}</span>
+        <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
+            <svg class="icon" id="wHeartIconAction" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span id="wWatchlistActionText">${isInWatchlist(item.title) ? 'Saved ❤️' : 'Watchlist'}</span>
         </button>
-        <button class="yt-action-pill" onclick="shareCurrentMedia()">
+        <button class="mb-btn-action" onclick="shareCurrentMedia()">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
             <span>Share</span>
         </button>
-        <a class="yt-action-pill" href="${item.url}" target="_blank">
+        <a class="mb-btn-action" href="${item.url}" target="_blank">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
             <span>Server Folder</span>
         </a>
     `;
 
     const relatedTag = item.tag || 'Top Rated';
-    document.getElementById('relatedHeading').textContent = `Up Next in ${item.category || item.tag}`;
+    document.getElementById('relatedHeading').textContent = `More in ${catName}`;
     document.getElementById('relatedSeeAllBtn').href = `index.html?cat=${encodeURIComponent(relatedTag)}`;
 
     loadRelatedMedia(relatedTag, item.title);
@@ -216,6 +228,21 @@ function renderWatchPage(item) {
         currentActiveStreamUrl = item.url;
         currentActiveStreamTitle = item.title;
         startStream(item.url, item.title);
+    }
+}
+
+function toggleSynopsis() {
+    isSynopsisExpanded = !isSynopsisExpanded;
+    const textEl = document.getElementById('wSynopsis');
+    const btnEl = document.getElementById('mbMoreBtn');
+    if (textEl && btnEl) {
+        if (isSynopsisExpanded) {
+            textEl.classList.add('expanded');
+            btnEl.textContent = 'Less';
+        } else {
+            textEl.classList.remove('expanded');
+            btnEl.textContent = 'More';
+        }
     }
 }
 
@@ -243,13 +270,13 @@ function updateWatchlistButtonState() {
         icon.style.fill = inList ? 'var(--accent)' : 'none';
     }
 
-    // Pill button
-    const pillText = document.getElementById('wWatchlistPillText');
-    const pillIcon = document.getElementById('wHeartIconPill');
-    if (pillText) pillText.textContent = inList ? 'Saved ❤️' : 'Save';
-    if (pillIcon) {
-        pillIcon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
-        pillIcon.style.fill = inList ? 'var(--accent)' : 'none';
+    // Action button
+    const actionText = document.getElementById('wWatchlistActionText');
+    const actionIcon = document.getElementById('wHeartIconAction');
+    if (actionText) actionText.textContent = inList ? 'Saved ❤️' : 'Watchlist';
+    if (actionIcon) {
+        actionIcon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
+        actionIcon.style.fill = inList ? 'var(--accent)' : 'none';
     }
 }
 
@@ -321,9 +348,11 @@ function setupPlayerListeners() {
 }
 
 function startStream(url, title) {
+    const pSection = document.getElementById('playerSection');
     const player = document.getElementById('videoPlayer');
-    if (!player) return;
+    if (!player || !pSection) return;
 
+    pSection.style.display = 'block';
     currentActiveStreamUrl = url;
     currentActiveStreamTitle = title || 'Playing Media';
     document.getElementById('playerCurrentTitle').textContent = currentActiveStreamTitle;
@@ -337,6 +366,7 @@ function startStream(url, title) {
     }
 
     player.play().catch(e => console.log(e));
+    pSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ==========================================
@@ -547,7 +577,7 @@ function cancelNextEpisode() {
 }
 
 // ==========================================
-// 📺 TV Explorer & Playlist Management
+// 📺 TV Explorer & MovieBox Playlist Explorer
 // ==========================================
 async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
     const tabs = document.getElementById('seasonTabs');
@@ -766,8 +796,6 @@ function playSpecificEpisode(idx) {
 
     renderEpisodeListHtml(currentSeasonEpisodes);
     startStream(ep.url, fullTitle);
-
-    document.getElementById('playerSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function playNextEpisode() {
@@ -965,12 +993,11 @@ function setupSearchKeybindings() {
 }
 
 // ==========================================
-// 🎬 Related Media Slider & Sidebar List
+// 🎬 Related Media Slider
 // ==========================================
 async function loadRelatedMedia(tag, currentTitle) {
     const slider = document.getElementById('relatedSlider');
-    const mobileRelated = document.getElementById('mobileRelatedSection');
-    if (!slider && !mobileRelated) return;
+    if (!slider) return;
 
     let candidateList = [];
     const cachedHome = sessionStorage.getItem('cinebox_home_v2');
@@ -1002,87 +1029,49 @@ async function loadRelatedMedia(tag, currentTitle) {
     });
 
     if (filtered.length > 0) {
-        // Desktop YouTube Sidebar List
-        if (slider) {
-            slider.innerHTML = filtered.slice(0, 16).map(item => {
-                const obj = Array.isArray(item) ? {
-                    title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
-                } : item;
-                const rawTitle = obj.title || '';
-                const safeTitle = escapeQuotes(rawTitle);
-                const itemData = encodeURIComponent(JSON.stringify(obj));
-                const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
+        slider.innerHTML = filtered.slice(0, 16).map(item => {
+            const obj = Array.isArray(item) ? {
+                title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
+            } : item;
+            const rawTitle = obj.title || '';
+            const safeTitle = escapeQuotes(rawTitle);
+            const itemData = encodeURIComponent(JSON.stringify(obj));
+            const isSeries = obj.tag === 'TV Series' || obj.tag === 'K-Drama' || (obj.url && obj.url.endsWith('/'));
+            const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
 
-                return `
-                    <a class="yt-sidebar-card" href="${linkUrl}">
-                        <div class="yt-sidebar-thumb">
-                            <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
-                                 onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=160';">
-                            <span class="yt-thumb-badge">${obj.tag || 'HD'}</span>
+            return `
+                <a class="movie-card" href="${linkUrl}">
+                    <div class="card-cover">
+                        <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="cover-fallback" style="display: none;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                            <div style="font-size: 11px; font-weight: 600;">${obj.title}</div>
                         </div>
-                        <div class="yt-sidebar-info">
-                            <div class="yt-sidebar-title" title="${safeTitle}">${obj.title}</div>
-                            <div class="yt-sidebar-meta">
-                                <span>${obj.category || obj.tag || 'Cinema'}</span>
-                                <span>•</span>
-                                <span>${obj.size || 'HD'}</span>
+                        <div class="tag-badge">${obj.tag || 'HD'}</div>
+                        <div class="cover-overlay">
+                            <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
+                                ${isSeries ? 
+                                    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="18" height="18"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
+                                    '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>'
+                                }
                             </div>
-                            <div class="yt-sidebar-sub">★ 8.9 • High-Speed BDIX</div>
+                            <span style="font-size: 10.5px; font-weight: 700; color: #fff;">${isSeries ? 'View Series' : 'Watch Now'}</span>
                         </div>
-                    </a>
-                `;
-            }).join('');
-        }
-
-        // Mobile Related Row Section
-        if (mobileRelated) {
-            mobileRelated.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
-                    <h2 class="row-heading" style="font-size: 16px; margin: 0;">More Like This</h2>
-                    <a class="btn-see-all" href="index.html?cat=${encodeURIComponent(tag)}" style="font-size: 11px;">
-                        <span>Explore</span>
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </a>
-                </div>
-                <div class="row-slider" style="gap: 10px;">
-                    ${filtered.slice(0, 12).map(item => {
-                        const obj = Array.isArray(item) ? {
-                            title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
-                        } : item;
-                        const rawTitle = obj.title || '';
-                        const safeTitle = escapeQuotes(rawTitle);
-                        const itemData = encodeURIComponent(JSON.stringify(obj));
-                        const isSeries = obj.tag === 'TV Series' || obj.tag === 'K-Drama' || (obj.url && obj.url.endsWith('/'));
-                        const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
-
-                        return `
-                            <a class="movie-card" style="flex: 0 0 120px; width: 120px;" href="${linkUrl}">
-                                <div class="card-cover">
-                                    <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
-                                         onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=160';">
-                                    <div class="tag-badge">${obj.tag || 'HD'}</div>
-                                    <div class="cover-overlay">
-                                        <div class="play-button-symbol">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="card-title" title="${obj.title}">${obj.title}</div>
-                                    <div class="card-meta">
-                                        <span>${obj.size || 'HD'}</span>
-                                        <span>${obj.date || ''}</span>
-                                    </div>
-                                </div>
-                            </a>
-                        `;
-                    }).join('')}
-                </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title" title="${obj.title}">${obj.title}</div>
+                        <div class="card-meta">
+                            <span>${obj.size || 'HD'}</span>
+                            <span>${obj.date || ''}</span>
+                        </div>
+                    </div>
+                </a>
             `;
-        }
-
-        const relSec = document.getElementById('relatedSection');
-        if (relSec) relSec.style.display = 'flex';
+        }).join('');
+        document.getElementById('relatedSection').style.display = 'block';
+    } else {
+        document.getElementById('relatedSection').style.display = 'none';
     }
 }
 
