@@ -6,6 +6,8 @@
     <title>Watch Media — CineBox</title>
     <meta name="description" content="Stream and download high-quality HD cinema, TV shows, and anime with in-browser player, subtitles (CC), double-tap seek, and VLC integration.">
     <meta name="theme-color" content="#07090e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,10 +16,10 @@
 </head>
 <body>
 
-    <!-- Ambient Glow Effect Layer -->
-    <div class="ambient-glow" id="watchAmbientGlow"></div>
+    <!-- Ambient Glow Layer -->
+    <div class="ambient-glow" id="globalAmbientGlow"></div>
 
-    <!-- Header -->
+    <!-- Header (Identical to Index Page Branding) -->
     <header>
         <a class="brand" href="index.html">
             <div class="brand-mark">
@@ -59,6 +61,7 @@
         </div>
 
         <div class="header-actions">
+            <!-- Theme Toggle -->
             <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle Light / Dark Theme">
                 <div class="theme-toggle-track">
                     <div class="theme-toggle-thumb">
@@ -72,197 +75,192 @@
                     </div>
                 </div>
             </button>
-            <a class="btn btn-ghost" href="index.html">
+            <a class="btn btn-ghost desktop-only-btn" href="index.html" style="padding: 7px 12px; font-size: 12px;">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Catalog</span>
+                <span>Back to Home</span>
             </a>
         </div>
     </header>
 
-    <div class="watch-container">
-        <!-- Back Navigation & Top Bar -->
-        <div class="back-nav">
-            <a class="btn btn-ghost" href="index.html" style="padding: 6px 12px; font-size: 12px;">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back</span>
-            </a>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <button class="btn btn-ghost" id="wWatchlistTopBtn" onclick="toggleCurrentWatchlist()" style="padding: 6px 12px; font-size: 12px;">
-                    <svg class="icon" id="wHeartIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                    <span id="wWatchlistTopText">Watchlist</span>
-                </button>
-                <div id="mediaTypeBadge" class="live-status">
-                    <span class="live-status-dot"></span>
-                    <span>Ready</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Video Player Frame -->
-        <div class="player-section" id="playerSection" style="display: none;">
-            <div class="player-bar">
-                <div class="player-title-wrap">
-                    <span class="player-live-dot"></span>
-                    <span id="playerCurrentTitle">Playing Media</span>
-                </div>
-
-                <div class="player-controls-right">
-                    <!-- Subtitles (CC) Button & Hidden File Picker -->
-                    <input type="file" id="subFileInput" accept=".srt,.vtt,.sub" style="display: none;" onchange="handleSubtitleFileSelect(event)">
-                    <button class="player-mini-btn" id="subBtn" onclick="toggleSubtitles()" title="Subtitles (CC) / Load .srt file">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 10h3M6 14h2M14 10h4M14 14h3"/></svg>
-                        <span>CC</span>
-                    </button>
-
-                    <!-- Speed Selector -->
-                    <button class="player-mini-btn" id="speedBtn" onclick="cyclePlaybackSpeed()" title="Playback Speed">
-                        <span id="speedLabel">1.0x</span>
-                    </button>
-
-                    <!-- Aspect Ratio Selector -->
-                    <button class="player-mini-btn" id="aspectBtn" onclick="cycleAspectRatio()" title="Aspect Ratio">
-                        <span id="aspectLabel">Fit</span>
-                    </button>
-
-                    <!-- PiP Toggle -->
-                    <button class="player-mini-btn" onclick="togglePictureInPicture()" title="Picture-in-Picture">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
-                    </button>
-
-                    <!-- Prev/Next Episode buttons -->
-                    <div id="playerNavBtns" style="display: none; gap: 4px;">
-                        <button class="btn btn-ghost" style="padding: 3px 8px; font-size: 11px;" onclick="playPrevEpisode()" title="Previous Episode (P)">◀</button>
-                        <button class="btn btn-primary" style="padding: 3px 8px; font-size: 11px;" onclick="playNextEpisode()" title="Next Episode (N)">Next ▶</button>
+    <!-- YouTube-Style Watch Layout Container -->
+    <main class="yt-watch-layout">
+        <!-- Main Column (Player, Media Title, Actions, Details, Playlist) -->
+        <section class="yt-main-column">
+            
+            <!-- Video Player Frame -->
+            <div class="player-section" id="playerSection">
+                <div class="player-bar">
+                    <div class="player-title-wrap">
+                        <span class="player-live-dot"></span>
+                        <span id="playerCurrentTitle">Playing Media</span>
                     </div>
-                </div>
-            </div>
 
-            <!-- Video Player Element with Double-Tap Seek Zones -->
-            <div class="video-container" id="videoContainer">
-                <video id="videoPlayer" controls playsinline preload="metadata" style="width: 100%; max-height: 580px; outline: none; background: #000;"></video>
-                
-                <!-- Double-Tap Touch Seek Overlay (YouTube / Netflix Style) -->
-                <div class="touch-seek-overlay" id="touchSeekOverlay">
-                    <div class="seek-touch-zone left" id="seekTouchLeft">
-                        <div class="seek-ripple" id="seekRippleLeft">
-                            <span style="font-size: 16px;">⏪</span>
-                            <span>-10s</span>
-                        </div>
-                    </div>
-                    <div class="seek-touch-zone right" id="seekTouchRight">
-                        <div class="seek-ripple" id="seekRippleRight">
-                            <span style="font-size: 16px;">⏩</span>
-                            <span>+10s</span>
+                    <div class="player-controls-right">
+                        <!-- Subtitles (CC) Button & Hidden File Picker -->
+                        <input type="file" id="subFileInput" accept=".srt,.vtt,.sub" style="display: none;" onchange="handleSubtitleFileSelect(event)">
+                        <button class="player-mini-btn" id="subBtn" onclick="toggleSubtitles()" title="Subtitles (CC) / Load .srt file">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 10h3M6 14h2M14 10h4M14 14h3"/></svg>
+                            <span>CC</span>
+                        </button>
+
+                        <!-- Speed Selector -->
+                        <button class="player-mini-btn" id="speedBtn" onclick="cyclePlaybackSpeed()" title="Playback Speed">
+                            <span id="speedLabel">1.0x</span>
+                        </button>
+
+                        <!-- Aspect Ratio Selector -->
+                        <button class="player-mini-btn" id="aspectBtn" onclick="cycleAspectRatio()" title="Aspect Ratio">
+                            <span id="aspectLabel">Fit</span>
+                        </button>
+
+                        <!-- PiP Toggle -->
+                        <button class="player-mini-btn" onclick="togglePictureInPicture()" title="Picture-in-Picture">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
+                        </button>
+
+                        <!-- Prev/Next Episode buttons -->
+                        <div id="playerNavBtns" style="display: none; gap: 4px;">
+                            <button class="btn btn-ghost" style="padding: 3px 8px; font-size: 11px;" onclick="playPrevEpisode()" title="Previous Episode (P)">◀</button>
+                            <button class="btn btn-primary" style="padding: 3px 8px; font-size: 11px;" onclick="playNextEpisode()" title="Next Episode (N)">Next ▶</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Next Episode Countdown Overlay -->
-                <div class="next-ep-countdown" id="nextEpCountdown" style="display: none;">
-                    <div class="next-ep-box">
-                        <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Up Next</div>
-                        <div class="next-ep-title" id="nextEpTitle">Next Episode</div>
-                        <div class="next-ep-timer">Playing in <span id="countdownSecs">8</span>s</div>
-                        <div style="display: flex; gap: 8px; margin-top: 8px;">
-                            <button class="btn btn-primary" style="padding: 5px 12px; font-size: 11.5px;" onclick="confirmNextEpisode()">Play Now</button>
-                            <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="cancelNextEpisode()">Cancel</button>
+                <!-- Video Player Element with Double-Tap Seek Zones -->
+                <div class="video-container" id="videoContainer">
+                    <video id="videoPlayer" controls playsinline preload="metadata" poster="" style="width: 100%; aspect-ratio: 16/9; max-height: 560px; outline: none; background: #000;"></video>
+                    
+                    <!-- Double-Tap Touch Seek Overlay (YouTube Style) -->
+                    <div class="touch-seek-overlay" id="touchSeekOverlay">
+                        <div class="seek-touch-zone left" id="seekTouchLeft">
+                            <div class="seek-ripple" id="seekRippleLeft">
+                                <span style="font-size: 16px;">⏪</span>
+                                <span>-10s</span>
+                            </div>
+                        </div>
+                        <div class="seek-touch-zone right" id="seekTouchRight">
+                            <div class="seek-ripple" id="seekRippleRight">
+                                <span style="font-size: 16px;">⏩</span>
+                                <span>+10s</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Next Episode Countdown Overlay -->
+                    <div class="next-ep-countdown" id="nextEpCountdown" style="display: none;">
+                        <div class="next-ep-box">
+                            <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Up Next</div>
+                            <div class="next-ep-title" id="nextEpTitle">Next Episode</div>
+                            <div class="next-ep-timer">Playing in <span id="countdownSecs">8</span>s</div>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                <button class="btn btn-primary" style="padding: 5px 12px; font-size: 11.5px;" onclick="confirmNextEpisode()">Play Now</button>
+                                <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="cancelNextEpisode()">Cancel</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Media Hero Card -->
-        <div class="watch-hero-card">
-            <div class="watch-backdrop" id="watchBackdrop"></div>
-            <div class="watch-content-inner">
-                <img id="wPoster" class="watch-poster-big" src="" alt="Poster">
-                <div class="watch-details">
-                    <div class="slide-tag" id="wTag">Quality • HD</div>
-                    <h1 class="watch-title" id="wTitle">Loading Title...</h1>
-                    <div class="modal-chips" id="wChips"></div>
-                    <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
-                        High-speed streaming & 1-click download enabled. Supports in-browser player with subtitles (CC), VLC, MX Player, and PotPlayer.
+            <!-- YouTube-Style Video Title & Header Info -->
+            <div class="yt-video-info-block">
+                <h1 class="yt-video-title" id="wTitle">Loading Title...</h1>
+                <div class="yt-video-meta-row" id="wChips"></div>
+            </div>
+
+            <!-- YouTube-Style Action Buttons Bar (Horizontal Scrollable Pills) -->
+            <div class="yt-actions-scroll-bar" id="wActions"></div>
+
+            <!-- YouTube-Style Media Channel / Description Box -->
+            <div class="yt-description-box" id="mediaDescriptionBox">
+                <div class="yt-desc-header">
+                    <img id="wPoster" class="yt-channel-poster" src="" alt="Poster">
+                    <div class="yt-channel-details">
+                        <div class="yt-channel-title" id="wTag">Quality • HD Cinema</div>
+                        <div class="yt-channel-sub">Direct BDIX High-Speed Streaming & Download</div>
+                    </div>
+                    <button class="btn btn-ghost" id="wWatchlistTopBtn" onclick="toggleCurrentWatchlist()" style="margin-left: auto; padding: 6px 14px; font-size: 12px; border-radius: 20px;">
+                        <svg class="icon" id="wHeartIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <span id="wWatchlistTopText">Watchlist</span>
+                    </button>
+                </div>
+                <div class="yt-desc-body">
+                    <p id="wSummaryText" style="margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.55;">
+                        Full 1080p high-definition stream with zero buffering on high-speed networks. Supports in-browser playback, local subtitles (CC), VLC, MX Player, and PotPlayer.
                     </p>
-                    <div class="modal-btn-row" id="wActions"></div>
                 </div>
             </div>
-        </div>
 
-        <!-- TV Series Seasons & Episodes Explorer (For Series) -->
-        <div id="tvExplorerWrap" style="display: none; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 22px 24px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
-                <div style="font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                    <span>Seasons & Episodes</span>
+            <!-- TV Series Seasons & Episodes Explorer (YouTube Playlist Style) -->
+            <div id="tvExplorerWrap" class="yt-playlist-card" style="display: none;">
+                <div class="yt-playlist-header">
+                    <div style="font-size: 15px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                        <span>Seasons & Episodes</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-ghost" id="btnDownloadSeasonM3u" style="padding: 4px 10px; font-size: 11px; border-color: rgba(0, 229, 255, 0.3); color: var(--primary);" onclick="downloadSeasonM3u()" title="Download whole season as .m3u playlist">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Season Playlist (.m3u)</span>
+                        </button>
+                        <div id="seasonCountBadge" class="badge-count-static">Loading...</div>
+                    </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-ghost" id="btnDownloadSeasonM3u" style="padding: 4px 10px; font-size: 11px; border-color: rgba(0, 229, 255, 0.3); color: var(--primary);" onclick="downloadSeasonM3u()" title="Download whole season as .m3u playlist">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <span>Season Playlist (.m3u)</span>
+
+                <!-- Season Tabs -->
+                <div id="seasonTabs" class="yt-season-tabs-bar"></div>
+
+                <!-- Episode List -->
+                <div id="episodeList" class="yt-episode-list-wrap"></div>
+            </div>
+
+            <!-- External Player Hub -->
+            <div class="player-hub-card" id="externalPlayerHub">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 6px;">
+                    <div style="font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        <span>External App Players</span>
+                    </div>
+                    <span style="font-size: 11px; color: var(--text-muted);">Stream directly in external player</span>
+                </div>
+                <div class="player-hub-grid">
+                    <button class="btn btn-vlc" onclick="openCurrentInVLC()">
+                        <span>🍦</span>
+                        <span>VLC Player</span>
                     </button>
-                    <div id="seasonCountBadge" class="badge-count-static">Loading...</div>
-                </div>
-            </div>
-
-            <!-- Season Tabs -->
-            <div id="seasonTabs" style="display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; scrollbar-width: none;"></div>
-
-            <!-- Episode List -->
-            <div id="episodeList" style="display: flex; flex-direction: column; gap: 7px; max-height: 480px; overflow-y: auto; padding-right: 4px;"></div>
-        </div>
-
-        <!-- External Player Hub Modal / Options -->
-        <div class="player-hub-card" id="externalPlayerHub">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 6px;">
-                <div style="font-size: 14.5px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    <span>External App Players</span>
-                </div>
-                <span style="font-size: 11px; color: var(--text-muted);">Launch in external media player</span>
-            </div>
-            <div class="player-hub-grid">
-                <button class="btn btn-vlc" onclick="openCurrentInVLC()">
-                    <span>🍦</span>
-                    <span>VLC Player</span>
-                </button>
-                <button class="btn btn-ghost" onclick="openInMXPlayer()" style="border-color: rgba(0, 180, 216, 0.4); color: #00b4d8;">
-                    <span>📱</span>
-                    <span>MX Player</span>
-                </button>
-                <button class="btn btn-ghost" onclick="openInPotPlayer()" style="border-color: rgba(255, 184, 0, 0.4); color: var(--accent-gold);">
-                    <span>💻</span>
-                    <span>PotPlayer</span>
-                </button>
-                <button class="btn btn-ghost" onclick="copyCurrentStreamUrl()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    <span>Copy URL</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Related / More Like This Interlink Row -->
-        <div id="relatedSection" style="margin-top: 8px;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
-                <h2 class="row-heading" style="font-size: 17px;" id="relatedHeading">More Like This</h2>
-                <div class="row-controls">
-                    <button class="row-nav-btn prev" onclick="slideRow('relatedSlider', -1)" aria-label="Previous">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M15 18l-6-6 6-6"/></svg>
+                    <button class="btn btn-ghost" onclick="openInMXPlayer()" style="border-color: rgba(0, 180, 216, 0.4); color: #00b4d8;">
+                        <span>📱</span>
+                        <span>MX Player</span>
                     </button>
-                    <button class="row-nav-btn next" onclick="slideRow('relatedSlider', 1)" aria-label="Next">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
+                    <button class="btn btn-ghost" onclick="openInPotPlayer()" style="border-color: rgba(255, 184, 0, 0.4); color: var(--accent-gold);">
+                        <span>💻</span>
+                        <span>PotPlayer</span>
                     </button>
-                    <a class="btn-see-all" id="relatedSeeAllBtn" href="index.html">
-                        <span>Explore</span>
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </a>
+                    <button class="btn btn-ghost" onclick="copyCurrentStreamUrl()">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <span>Copy URL</span>
+                    </button>
                 </div>
             </div>
-            <div class="row-slider" id="relatedSlider"></div>
-        </div>
-    </div>
 
-    <!-- Mobile Bottom Navigation Bar -->
+            <!-- Mobile Related Media (Appears below on mobile) -->
+            <div class="yt-mobile-related" id="mobileRelatedSection"></div>
+
+        </section>
+
+        <!-- Sidebar Column (Desktop YouTube "Up Next" / "Related Media") -->
+        <aside class="yt-sidebar-column" id="relatedSection">
+            <div class="yt-sidebar-header">
+                <h2 class="row-heading" style="font-size: 16px; margin: 0;" id="relatedHeading">Up Next</h2>
+                <a class="btn-see-all" id="relatedSeeAllBtn" href="index.html" style="font-size: 11px;">
+                    <span>Explore</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+            <div class="yt-sidebar-list" id="relatedSlider"></div>
+        </aside>
+    </main>
+
+    <!-- Mobile Bottom Navigation Bar (Identical to Index Page) -->
     <nav class="mobile-bottom-nav">
         <a class="mobile-nav-btn" href="index.html">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>

@@ -1,6 +1,7 @@
 /**
- * CineBox Watch Page Controller
- * Optimized for Mobile Touch, Subtitles, Double-Tap Seek, TV Explorer & External Players
+ * CineBox YouTube-Style Watch & Streaming Controller
+ * Full YouTube layout with in-browser player, CC subtitles, double-tap 10s seek,
+ * horizontal action pills, playlist season explorer, and sidebar recommendations.
  */
 
 let currentItem = null;
@@ -146,84 +147,74 @@ function renderWatchPage(item) {
     document.title = `${item.title} — CineBox`;
     document.getElementById('wTitle').textContent = item.title;
     document.getElementById('wPoster').src = item.poster;
-    document.getElementById('watchBackdrop').style.backgroundImage = `url('${item.poster}')`;
-    document.getElementById('wTag').textContent = item.tag || 'HD Cinema';
+    document.getElementById('wTag').textContent = item.category || item.tag || 'HD Cinema';
+
+    const player = document.getElementById('videoPlayer');
+    if (player) player.poster = item.poster;
 
     const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
 
+    // YouTube-Style Video Meta Chips
     document.getElementById('wChips').innerHTML = `
-        <a class="modal-chip" href="index.html?cat=${encodeURIComponent(item.tag || item.category)}" style="text-decoration: none; color: var(--primary); font-weight: 700;">📁 ${item.category || item.tag}</a>
-        <a class="modal-chip" href="index.html?tab=${isSeries ? 'tv' : 'movies'}" style="text-decoration: none; color: var(--text-muted);">📺 ${isSeries ? 'TV Series' : 'Movie'}</a>
-        <span class="modal-chip">Quality: ${item.tag || 'HD'}</span>
-        <span class="modal-chip">Size: ${item.size || 'HD'}</span>
-        <span class="modal-chip" style="color: var(--accent-gold); font-weight: 700;">★ 8.9 / 10</span>
+        <span class="yt-meta-badge yt-badge-gold">★ 8.9 / 10</span>
+        <span class="yt-meta-badge yt-badge-quality">${item.tag || '1080p HD'}</span>
+        <a class="yt-meta-badge yt-badge-link" href="index.html?cat=${encodeURIComponent(item.tag || item.category)}">📁 ${item.category || item.tag}</a>
+        <a class="yt-meta-badge yt-badge-link" href="index.html?tab=${isSeries ? 'tv' : 'movies'}">📺 ${isSeries ? 'TV Series' : 'Movie'}</a>
+        <span class="yt-meta-badge">Size: ${item.size || 'HD'}</span>
+        <span class="yt-meta-badge">${item.date || '2024'}</span>
     `;
 
     updateWatchlistButtonState();
 
+    // YouTube-Style Action Pills Bar
+    document.getElementById('wActions').innerHTML = `
+        ${isSeries ? `
+            <button class="yt-action-pill yt-pill-primary" onclick="scrollTvExplorer()">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                <span>Select Episode</span>
+            </button>
+        ` : `
+            <button class="yt-action-pill yt-pill-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><path d="M8 5v14l11-7z"/></svg>
+                <span>Play Now</span>
+            </button>
+        `}
+        <button class="yt-action-pill yt-pill-vlc" onclick="openCurrentInVLC()">
+            ${VLC_ICON_SVG}
+            <span>Play in VLC</span>
+        </button>
+        ${!isSeries ? `
+            <a class="yt-action-pill yt-pill-download" href="${item.url}" download>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Download</span>
+            </a>
+        ` : ''}
+        <button class="yt-action-pill" onclick="toggleCurrentWatchlist()">
+            <svg class="icon" id="wHeartIconPill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <span id="wWatchlistPillText">${isInWatchlist(item.title) ? 'Saved ❤️' : 'Save'}</span>
+        </button>
+        <button class="yt-action-pill" onclick="shareCurrentMedia()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <span>Share</span>
+        </button>
+        <a class="yt-action-pill" href="${item.url}" target="_blank">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            <span>Server Folder</span>
+        </a>
+    `;
+
     const relatedTag = item.tag || 'Top Rated';
-    document.getElementById('relatedHeading').textContent = `More in ${item.category || item.tag}`;
+    document.getElementById('relatedHeading').textContent = `Up Next in ${item.category || item.tag}`;
     document.getElementById('relatedSeeAllBtn').href = `index.html?cat=${encodeURIComponent(relatedTag)}`;
 
     loadRelatedMedia(relatedTag, item.title);
 
     if (isSeries) {
-        document.getElementById('wActions').innerHTML = `
-            <div class="hero-actions-container">
-                <button class="btn btn-primary hero-btn-primary" onclick="scrollTvExplorer()">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                    <span>Select Episode</span>
-                </button>
-                <div class="hero-sub-actions-grid">
-                    <button class="btn btn-ghost" onclick="toggleCurrentWatchlist()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                        <span>Bookmark</span>
-                    </button>
-                    <button class="btn btn-ghost" onclick="shareCurrentMedia()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                        <span>Share</span>
-                    </button>
-                    <a class="btn btn-ghost" href="${item.url}" target="_blank">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-                        <span>Server Folder</span>
-                    </a>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('tvExplorerWrap').style.display = 'block';
+        document.getElementById('tvExplorerWrap').style.display = 'flex';
         loadTvSeriesSeasons(item.url, item.title);
     } else {
         currentActiveStreamUrl = item.url;
         currentActiveStreamTitle = item.title;
-
-        document.getElementById('wActions').innerHTML = `
-            <div class="hero-actions-container">
-                <button class="btn btn-primary hero-btn-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
-                    <span>Play Now (In Browser)</span>
-                </button>
-                <div class="hero-sub-actions-grid">
-                    <button class="btn btn-vlc" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
-                        ${VLC_ICON_SVG}
-                        <span>Play VLC</span>
-                    </button>
-                    <a class="btn btn-accent" href="${item.url}" download>
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <span>Download</span>
-                    </a>
-                    <button class="btn btn-ghost" onclick="toggleCurrentWatchlist()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                        <span>Bookmark</span>
-                    </button>
-                    <button class="btn btn-ghost" onclick="shareCurrentMedia()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                        <span>Share</span>
-                    </button>
-                </div>
-            </div>
-        `;
-
         startStream(item.url, item.title);
     }
 }
@@ -242,18 +233,23 @@ function toggleCurrentWatchlist() {
 function updateWatchlistButtonState() {
     if (!currentItem) return;
     const inList = isInWatchlist(currentItem.title);
+    
+    // Top button
     const btnText = document.getElementById('wWatchlistTopText');
     const icon = document.getElementById('wHeartIcon');
     if (btnText && icon) {
-        if (inList) {
-            btnText.textContent = 'Saved ❤️';
-            icon.style.stroke = 'var(--accent)';
-            icon.style.fill = 'var(--accent)';
-        } else {
-            btnText.textContent = 'Watchlist';
-            icon.style.stroke = 'currentColor';
-            icon.style.fill = 'none';
-        }
+        btnText.textContent = inList ? 'Saved ❤️' : 'Watchlist';
+        icon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
+        icon.style.fill = inList ? 'var(--accent)' : 'none';
+    }
+
+    // Pill button
+    const pillText = document.getElementById('wWatchlistPillText');
+    const pillIcon = document.getElementById('wHeartIconPill');
+    if (pillText) pillText.textContent = inList ? 'Saved ❤️' : 'Save';
+    if (pillIcon) {
+        pillIcon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
+        pillIcon.style.fill = inList ? 'var(--accent)' : 'none';
     }
 }
 
@@ -325,9 +321,9 @@ function setupPlayerListeners() {
 }
 
 function startStream(url, title) {
-    const pSection = document.getElementById('playerSection');
     const player = document.getElementById('videoPlayer');
-    pSection.style.display = 'block';
+    if (!player) return;
+
     currentActiveStreamUrl = url;
     currentActiveStreamTitle = title || 'Playing Media';
     document.getElementById('playerCurrentTitle').textContent = currentActiveStreamTitle;
@@ -551,7 +547,7 @@ function cancelNextEpisode() {
 }
 
 // ==========================================
-// 📺 TV Explorer & Touch Episode Management
+// 📺 TV Explorer & Playlist Management
 // ==========================================
 async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
     const tabs = document.getElementById('seasonTabs');
@@ -711,11 +707,11 @@ function renderEpisodeListHtml(episodes) {
 
     let html = '';
     
-    // Add search bar if more than 8 episodes
-    if (episodes.length > 8) {
+    // Add search bar if more than 6 episodes
+    if (episodes.length > 6) {
         html += `
-            <div style="position: relative; margin-bottom: 8px;">
-                <input type="text" class="ep-filter-input" placeholder="Search ${episodes.length} episodes..." value="${escapeQuotes(episodeFilterQuery)}" oninput="filterEpisodes(this.value)">
+            <div style="position: relative; margin-bottom: 6px;">
+                <input type="text" class="ep-filter-input" placeholder="Filter ${episodes.length} episodes..." value="${escapeQuotes(episodeFilterQuery)}" oninput="filterEpisodes(this.value)">
                 ${episodeFilterQuery ? `<button onclick="filterEpisodes('');" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">✕</button>` : ''}
             </div>
         `;
@@ -969,11 +965,12 @@ function setupSearchKeybindings() {
 }
 
 // ==========================================
-// 🎬 Related Media Slider
+// 🎬 Related Media Slider & Sidebar List
 // ==========================================
 async function loadRelatedMedia(tag, currentTitle) {
     const slider = document.getElementById('relatedSlider');
-    if (!slider) return;
+    const mobileRelated = document.getElementById('mobileRelatedSection');
+    if (!slider && !mobileRelated) return;
 
     let candidateList = [];
     const cachedHome = sessionStorage.getItem('cinebox_home_v2');
@@ -1005,49 +1002,87 @@ async function loadRelatedMedia(tag, currentTitle) {
     });
 
     if (filtered.length > 0) {
-        slider.innerHTML = filtered.slice(0, 14).map(item => {
-            const obj = Array.isArray(item) ? {
-                title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
-            } : item;
-            const rawTitle = obj.title || '';
-            const safeTitle = escapeQuotes(rawTitle);
-            const itemData = encodeURIComponent(JSON.stringify(obj));
-            const isSeries = obj.tag === 'TV Series' || obj.tag === 'K-Drama' || (obj.url && obj.url.endsWith('/'));
-            const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
+        // Desktop YouTube Sidebar List
+        if (slider) {
+            slider.innerHTML = filtered.slice(0, 16).map(item => {
+                const obj = Array.isArray(item) ? {
+                    title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
+                } : item;
+                const rawTitle = obj.title || '';
+                const safeTitle = escapeQuotes(rawTitle);
+                const itemData = encodeURIComponent(JSON.stringify(obj));
+                const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
 
-            return `
-                <a class="movie-card" href="${linkUrl}">
-                    <div class="card-cover">
-                        <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="cover-fallback" style="display: none;">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-                            <div style="font-size: 11px; font-weight: 600;">${obj.title}</div>
+                return `
+                    <a class="yt-sidebar-card" href="${linkUrl}">
+                        <div class="yt-sidebar-thumb">
+                            <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
+                                 onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=160';">
+                            <span class="yt-thumb-badge">${obj.tag || 'HD'}</span>
                         </div>
-                        <div class="tag-badge">${obj.tag || 'HD'}</div>
-                        <div class="cover-overlay">
-                            <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
-                                ${isSeries ? 
-                                    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="18" height="18"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
-                                    '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>'
-                                }
+                        <div class="yt-sidebar-info">
+                            <div class="yt-sidebar-title" title="${safeTitle}">${obj.title}</div>
+                            <div class="yt-sidebar-meta">
+                                <span>${obj.category || obj.tag || 'Cinema'}</span>
+                                <span>•</span>
+                                <span>${obj.size || 'HD'}</span>
                             </div>
-                            <span style="font-size: 10.5px; font-weight: 700; color: #fff;">${isSeries ? 'View Series' : 'Watch Now'}</span>
+                            <div class="yt-sidebar-sub">★ 8.9 • High-Speed BDIX</div>
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="card-title" title="${obj.title}">${obj.title}</div>
-                        <div class="card-meta">
-                            <span>${obj.size || 'HD'}</span>
-                            <span>${obj.date || ''}</span>
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                `;
+            }).join('');
+        }
+
+        // Mobile Related Row Section
+        if (mobileRelated) {
+            mobileRelated.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                    <h2 class="row-heading" style="font-size: 16px; margin: 0;">More Like This</h2>
+                    <a class="btn-see-all" href="index.html?cat=${encodeURIComponent(tag)}" style="font-size: 11px;">
+                        <span>Explore</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+                <div class="row-slider" style="gap: 10px;">
+                    ${filtered.slice(0, 12).map(item => {
+                        const obj = Array.isArray(item) ? {
+                            title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
+                        } : item;
+                        const rawTitle = obj.title || '';
+                        const safeTitle = escapeQuotes(rawTitle);
+                        const itemData = encodeURIComponent(JSON.stringify(obj));
+                        const isSeries = obj.tag === 'TV Series' || obj.tag === 'K-Drama' || (obj.url && obj.url.endsWith('/'));
+                        const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
+
+                        return `
+                            <a class="movie-card" style="flex: 0 0 120px; width: 120px;" href="${linkUrl}">
+                                <div class="card-cover">
+                                    <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
+                                         onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=160';">
+                                    <div class="tag-badge">${obj.tag || 'HD'}</div>
+                                    <div class="cover-overlay">
+                                        <div class="play-button-symbol">
+                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="card-title" title="${obj.title}">${obj.title}</div>
+                                    <div class="card-meta">
+                                        <span>${obj.size || 'HD'}</span>
+                                        <span>${obj.date || ''}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }).join('')}
+                </div>
             `;
-        }).join('');
-        document.getElementById('relatedSection').style.display = 'block';
-    } else {
-        document.getElementById('relatedSection').style.display = 'none';
+        }
+
+        const relSec = document.getElementById('relatedSection');
+        if (relSec) relSec.style.display = 'flex';
     }
 }
 

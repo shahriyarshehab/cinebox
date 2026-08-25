@@ -1234,48 +1234,136 @@ header {
 }
 
 /* ==========================================================================
-   🎬 WATCH & DETAILS PAGE STYLING (Spacious & Responsive)
+   🎬 YOUTUBE-STYLE MEDIA PLAYING PAGE ARCHITECTURE
    ========================================================================== */
 
-/* Main Watch Container */
-.watch-container {
+/* Main Layout Grid */
+.yt-watch-layout {
     width: 100%;
-    max-width: 1360px;
-    margin: 24px auto 70px;
-    padding: 0 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    max-width: 1440px;
+    margin: 0 auto 60px;
+    padding: 16px 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 28px;
+    align-items: flex-start;
     position: relative;
     z-index: 1;
 }
 
-.back-nav {
+.yt-main-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+.yt-sidebar-column {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: sticky;
+    top: 70px;
+}
+
+.yt-sidebar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
 }
 
-.live-status {
-    background: rgba(0, 230, 118, 0.1);
-    color: var(--accent-green);
-    border: 1px solid rgba(0, 230, 118, 0.25);
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 20px;
+.yt-sidebar-list {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Sidebar Video Card (YouTube Style) */
+.yt-sidebar-card {
+    display: flex;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid transparent;
+    border-radius: 12px;
+    padding: 6px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.yt-sidebar-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--border);
+    transform: translateX(2px);
+}
+
+.yt-sidebar-thumb {
+    width: 115px;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    background: #111;
+}
+
+.yt-sidebar-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.yt-thumb-badge {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.85);
+    color: var(--primary);
+    font-size: 9px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.yt-sidebar-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+}
+
+.yt-sidebar-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+[data-theme="light"] .yt-sidebar-title {
+    color: #0c121e;
+}
+
+.yt-sidebar-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
     gap: 6px;
 }
 
-.live-status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--accent-green);
-    box-shadow: 0 0 8px var(--accent-green);
+.yt-sidebar-sub {
+    font-size: 10.5px;
+    color: var(--accent-gold);
+    font-weight: 600;
 }
 
 /* Modern Video Player Wrapper */
@@ -1288,7 +1376,7 @@ header {
 }
 
 .player-bar {
-    padding: 12px 18px;
+    padding: 10px 16px;
     background: rgba(14, 18, 26, 0.98);
     border-bottom: 1px solid var(--border);
     display: flex;
@@ -1330,17 +1418,17 @@ header {
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid var(--border);
     color: #fff;
-    padding: 5px 10px;
+    padding: 4px 10px;
     border-radius: 6px;
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     transition: all 0.15s ease;
     white-space: nowrap;
-    min-height: 30px;
+    min-height: 28px;
 }
 
 .player-mini-btn:hover {
@@ -1360,11 +1448,15 @@ header {
     position: relative;
     background: #000;
     width: 100%;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .video-container video {
     width: 100%;
-    max-height: 620px;
+    height: 100%;
     outline: none;
     background: #000;
 }
@@ -1484,139 +1576,225 @@ video::cue {
     color: var(--text-muted);
 }
 
-/* Media Hero Card (Spacious & Rich) */
-.watch-hero-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    overflow: hidden;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
-    position: relative;
-}
-
-[data-theme="light"] .watch-hero-card {
-    background: #ffffff;
-    box-shadow: 0 16px 36px rgba(0,0,0,0.12);
-}
-
-.watch-backdrop {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-size: cover;
-    background-position: center;
-    filter: blur(24px) brightness(0.25);
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-.watch-content-inner {
-    position: relative;
-    z-index: 2;
-    padding: 32px 38px;
+/* Video Info Block */
+.yt-video-info-block {
     display: flex;
-    gap: 34px;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 4px;
 }
 
-.watch-poster-big {
-    width: 205px;
-    height: 308px;
-    border-radius: 16px;
-    object-fit: cover;
-    border: 2px solid var(--border-hover);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.8);
+.yt-video-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.3;
+    margin: 0;
+    word-break: break-word;
+}
+
+[data-theme="light"] .yt-video-title {
+    color: #0c121e;
+}
+
+.yt-video-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.yt-meta-badge {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.yt-meta-badge.yt-badge-gold {
+    background: rgba(255, 184, 0, 0.1);
+    border-color: rgba(255, 184, 0, 0.3);
+    color: #ffb800;
+    font-weight: 800;
+}
+
+.yt-meta-badge.yt-badge-quality {
+    background: rgba(0, 229, 255, 0.1);
+    border-color: rgba(0, 229, 255, 0.3);
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.yt-meta-badge.yt-badge-link:hover {
+    background: var(--primary);
+    color: #07090e;
+}
+
+/* YouTube Action Pills Bar */
+.yt-actions-scroll-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px 0;
+}
+
+.yt-action-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 24px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 38px;
     flex-shrink: 0;
 }
 
-.watch-details {
+.yt-action-pill:hover, .yt-action-pill:active {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+}
+
+.yt-action-pill.yt-pill-primary {
+    background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
+    color: #07090e;
+    border: none;
+    box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+.yt-action-pill.yt-pill-vlc {
+    background: rgba(255, 119, 0, 0.15);
+    border-color: rgba(255, 119, 0, 0.4);
+    color: #ff8800;
+}
+
+.yt-action-pill.yt-pill-vlc:hover {
+    background: #ff8800;
+    color: #fff;
+}
+
+.yt-action-pill.yt-pill-download {
+    background: rgba(0, 229, 255, 0.1);
+    border-color: rgba(0, 229, 255, 0.3);
+    color: var(--primary);
+}
+
+/* Description / Channel Card */
+.yt-description-box {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+[data-theme="light"] .yt-description-box {
+    background: #f8fafc;
+}
+
+.yt-desc-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.yt-channel-poster {
+    width: 48px;
+    height: 72px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.yt-channel-details {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     flex: 1;
     min-width: 0;
+}
+
+.yt-channel-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+}
+
+[data-theme="light"] .yt-channel-title {
+    color: #0c121e;
+}
+
+.yt-channel-sub {
+    font-size: 11.5px;
+    color: var(--text-muted);
+}
+
+/* YouTube Playlist Card (TV Seasons & Episodes) */
+.yt-playlist-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
 
-.watch-title {
-    font-family: var(--font-display);
-    font-size: 30px;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.25;
-    word-break: break-word;
+[data-theme="light"] .yt-playlist-card {
+    background: #ffffff;
 }
 
-[data-theme="light"] .watch-title {
-    color: #0c121e;
+.yt-playlist-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
 }
 
-.modal-chips {
+.yt-season-tabs-bar {
     display: flex;
     gap: 8px;
-    flex-wrap: wrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
 }
 
-.modal-chip {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    padding: 5px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-/* Hero Action Buttons */
-.hero-actions-container {
+.yt-episode-list-wrap {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 8px;
-    width: 100%;
-}
-
-.hero-btn-primary {
-    padding: 12px 24px;
-    font-size: 14px;
-    font-weight: 800;
-    border-radius: var(--radius-md);
-    background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);
-    color: #07090e;
-    box-shadow: 0 6px 20px var(--primary-glow);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
     gap: 8px;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s ease;
-    min-height: 44px;
+    max-height: 480px;
+    overflow-y: auto;
+    padding-right: 4px;
 }
 
-.hero-btn-primary:active {
-    transform: scale(0.98);
-}
-
-.hero-sub-actions-grid {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.hero-sub-actions-grid .btn {
-    padding: 10px 18px;
-    font-size: 13px;
-    border-radius: 10px;
-    justify-content: center;
-    min-height: 44px;
-}
-
-/* Season Pill Selector */
+/* Season Pills */
 .season-pill-btn {
-    font-size: 13px;
-    padding: 8px 18px;
+    font-size: 12.5px;
+    padding: 7px 16px;
     border-radius: 24px;
     white-space: nowrap;
     border: 1px solid var(--border);
@@ -1654,15 +1832,15 @@ video::cue {
     box-shadow: 0 4px 14px rgba(255, 184, 0, 0.4);
 }
 
-/* Episode Search Filter */
+/* Episode Filter Input */
 .ep-filter-input {
     width: 100%;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border);
     border-radius: 20px;
-    padding: 9px 18px;
+    padding: 8px 16px;
     color: #fff;
-    font-size: 13px;
+    font-size: 12px;
     outline: none;
     transition: all 0.2s ease;
 }
@@ -1678,13 +1856,13 @@ video::cue {
     box-shadow: 0 0 12px var(--primary-glow);
 }
 
-/* Episode Cards (Touch Ergonomic & Spacious) */
+/* Episode Cards */
 .ep-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    padding: 12px 18px;
+    gap: 12px;
+    padding: 10px 14px;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
@@ -1692,7 +1870,7 @@ video::cue {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
     -webkit-tap-highlight-color: transparent;
-    min-height: 56px;
+    min-height: 52px;
 }
 
 .ep-card:hover {
@@ -1712,14 +1890,14 @@ video::cue {
 }
 
 .ep-index-badge {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     background: rgba(255, 255, 255, 0.06);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 800;
     color: var(--text-muted);
     flex-shrink: 0;
@@ -1737,11 +1915,11 @@ video::cue {
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
 }
 
 .ep-title-text {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: #fff;
     line-height: 1.35;
@@ -1762,7 +1940,7 @@ video::cue {
 }
 
 .ep-meta-sub {
-    font-size: 11px;
+    font-size: 10.5px;
     color: var(--text-muted);
     display: flex;
     align-items: center;
@@ -1772,14 +1950,14 @@ video::cue {
 .ep-action-btns {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-shrink: 0;
 }
 
 .ep-icon-btn {
-    width: 34px;
-    height: 34px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1813,20 +1991,20 @@ video::cue {
 .player-hub-card {
     background: var(--bg-surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 22px 28px;
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
 }
 
 .player-hub-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
 }
 
 .player-hub-grid .btn {
-    padding: 11px 16px;
-    font-size: 13px;
-    min-height: 46px;
+    padding: 10px 14px;
+    font-size: 12.5px;
+    min-height: 42px;
 }
 
 /* Modals */
@@ -2178,25 +2356,31 @@ kbd {
    📱 RESPONSIVE MEDIA QUERIES (Computers, Tablets & Mobile Devices)
    ========================================================================== */
 
-/* Tablets & Medium Screens (768px - 1024px) */
-@media (max-width: 1024px) {
-    .watch-container {
-        padding: 0 20px;
-        gap: 20px;
+/* Tablets & Medium Screens (768px - 1023px) */
+@media (max-width: 1023px) {
+    .yt-watch-layout {
+        grid-template-columns: 1fr;
+        padding: 10px 14px 40px;
+        gap: 16px;
     }
 
-    .watch-content-inner {
-        padding: 28px 28px;
-        gap: 24px;
+    .yt-sidebar-column {
+        display: none;
     }
 
-    .watch-poster-big {
-        width: 180px;
-        height: 270px;
+    .yt-mobile-related {
+        display: block;
+        margin-top: 10px;
     }
 
-    .watch-title {
-        font-size: 26px;
+    .desktop-only-btn {
+        display: none !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .yt-mobile-related {
+        display: none;
     }
 }
 
@@ -2431,20 +2615,23 @@ kbd {
         padding: 4px 10px;
     }
 
-    /* 🎬 WATCH & DETAILS PAGE ON MOBILE (Uncompacted & Spacious) */
-    .watch-container {
-        margin: 12px auto 50px;
-        padding: 0 16px;
-        gap: 20px;
+    /* YouTube Watch Layout on Mobile */
+    .yt-watch-layout {
+        padding: 8px 12px 40px;
+        gap: 14px;
+    }
+
+    .player-section {
+        border-radius: 12px;
     }
 
     .player-bar {
-        padding: 10px 14px;
-        gap: 8px;
+        padding: 8px 10px;
+        gap: 6px;
     }
 
     .player-title-wrap {
-        font-size: 12.5px;
+        font-size: 12px;
     }
 
     .player-controls-right {
@@ -2455,126 +2642,32 @@ kbd {
     }
 
     .player-mini-btn {
-        padding: 4px 8px;
-        font-size: 10.5px;
-        min-height: 28px;
+        padding: 3px 6px;
+        font-size: 10px;
+        min-height: 26px;
     }
 
-    .next-ep-countdown {
-        bottom: 14px;
-        right: 12px;
-        left: 12px;
+    .yt-video-title {
+        font-size: 18px;
     }
 
-    .next-ep-box {
-        max-width: none;
-        padding: 12px 16px;
-    }
-
-    .watch-hero-card {
-        border-radius: 18px;
-    }
-
-    .watch-content-inner {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 26px 20px;
-        gap: 20px;
-    }
-
-    /* Generous, rich poster on mobile - NOT compact */
-    .watch-poster-big {
-        width: 170px;
-        height: 255px;
-        border-radius: 16px;
-        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
-    }
-
-    .watch-details {
-        align-items: center;
-        gap: 12px;
-        width: 100%;
-    }
-
-    .watch-title {
-        font-size: 23px;
-        font-weight: 800;
-        line-height: 1.3;
-        margin: 2px 0;
-    }
-
-    .modal-chips {
-        justify-content: center;
-        gap: 8px;
-    }
-
-    .modal-chip {
-        padding: 6px 12px;
+    .yt-action-pill {
+        padding: 7px 14px;
         font-size: 11.5px;
-        border-radius: 8px;
+        min-height: 36px;
     }
 
-    .hero-actions-container {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        width: 100%;
-        margin-top: 6px;
+    .yt-description-box {
+        padding: 12px 14px;
     }
 
-    .hero-btn-primary {
-        width: 100%;
-        padding: 13px 20px;
-        font-size: 14.5px;
-        font-weight: 800;
-        min-height: 48px;
-    }
-
-    .hero-sub-actions-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-        width: 100%;
-    }
-
-    .hero-sub-actions-grid .btn {
-        padding: 11px 12px;
-        font-size: 12.5px;
-        min-height: 44px;
-        width: 100%;
-    }
-
-    #tvExplorerWrap {
-        padding: 20px 16px !important;
-        border-radius: 18px !important;
+    .yt-playlist-card {
+        padding: 14px 12px;
     }
 
     .ep-card {
-        padding: 11px 13px;
-        gap: 10px;
-        min-height: 52px;
-    }
-
-    .ep-title-text {
-        font-size: 13px;
-        line-height: 1.35;
-    }
-
-    .ep-index-badge {
-        width: 32px;
-        height: 32px;
-        font-size: 12px;
-    }
-
-    .ep-icon-btn {
-        width: 34px;
-        height: 34px;
-    }
-
-    .player-hub-card {
-        padding: 20px 16px;
-        border-radius: 18px;
+        padding: 9px 10px;
+        gap: 8px;
     }
 
     .player-hub-grid {
@@ -2583,9 +2676,8 @@ kbd {
     }
 
     .player-hub-grid .btn {
-        font-size: 12px;
-        padding: 11px 10px;
-        min-height: 44px;
+        padding: 9px 10px;
+        font-size: 11.5px;
     }
 
     .pwa-banner {
@@ -2608,33 +2700,21 @@ kbd {
         width: 120px;
     }
 
-    .watch-container {
-        padding: 0 12px;
-        margin: 10px auto 40px;
-        gap: 16px;
+    .yt-watch-layout {
+        padding: 6px 10px 40px;
+        gap: 12px;
     }
 
-    .watch-content-inner {
-        padding: 22px 16px;
-        gap: 16px;
+    .yt-video-title {
+        font-size: 17px;
     }
 
-    .watch-poster-big {
-        width: 155px;
-        height: 232px;
-        border-radius: 14px;
+    .yt-actions-scroll-bar {
+        gap: 6px;
     }
 
-    .watch-title {
-        font-size: 21px;
-    }
-
-    #tvExplorerWrap {
-        padding: 18px 12px !important;
-    }
-
-    .ep-card {
-        padding: 10px 10px;
-        gap: 8px;
+    .yt-action-pill {
+        padding: 6px 12px;
+        font-size: 11px;
     }
 }
