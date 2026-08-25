@@ -88,8 +88,9 @@ async function init() {
 
 function applyHomeData(data) {
     if (!data) return;
-    if (data.total) {
-        document.getElementById('totalCountBadge').textContent = `${data.total.toLocaleString()} Movies`;
+    const badge = document.getElementById('totalCountBadge');
+    if (badge && data.total) {
+        badge.textContent = `${data.total.toLocaleString()} Movies`;
     }
     if (data.carousel && data.carousel.length > 0) {
         setupCarousel(data.carousel);
@@ -126,7 +127,10 @@ async function loadFullCatalogInBackground() {
         });
 
         isFullCatalogLoaded = true;
-        document.getElementById('totalCountBadge').textContent = `${allMovies.length.toLocaleString()} Movies`;
+        const badge = document.getElementById('totalCountBadge');
+        if (badge) {
+            badge.textContent = `${allMovies.length.toLocaleString()} Movies`;
+        }
 
         if (currentView !== 'home') {
             renderView();
