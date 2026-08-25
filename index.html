@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineBox • Stream & Download Unlimited Movies</title>
+    <title>CineBox • Stream & Download 36,000+ Movies</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -254,10 +254,8 @@
             align-items: center;
             gap: 10px;
             overflow-x: auto;
-            scrollbar-width: none;
+            scrollbar-width: thin;
         }
-
-        .category-nav::-webkit-scrollbar { display: none; }
 
         .cat-chip {
             background: rgba(255, 255, 255, 0.04);
@@ -286,6 +284,13 @@
             color: #0a0c14;
             border-color: #00e5ff;
             box-shadow: 0 4px 16px var(--primary-glow);
+        }
+
+        .cat-count {
+            background: rgba(0, 0, 0, 0.3);
+            font-size: 11px;
+            padding: 2px 7px;
+            border-radius: 12px;
         }
 
         /* Main Grid */
@@ -606,16 +611,16 @@
             <div>
                 <div class="brand-text">Cine<span>Box</span></div>
             </div>
-            <div class="badge-live" id="totalCountBadge">7,900+ Movies</div>
+            <div class="badge-live" id="totalCountBadge">36,000+ Movies</div>
         </div>
 
         <div class="search-container">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Search across all movies, Hollywood, Bollywood, South..." oninput="handleSearch()">
+            <input type="text" id="searchInput" placeholder="Search across all movies, Hollywood, Bollywood, South, Anime..." oninput="handleSearch()">
         </div>
 
         <div>
-            <a class="btn btn-cyan" href="#categories">🎬 Browse Catalog</a>
+            <a class="btn btn-cyan" href="#categories">🎬 Categories</a>
         </div>
     </header>
 
@@ -627,7 +632,7 @@
             <div class="hero-tag">🔥 CineBox Spotlight</div>
             <h1 class="hero-title" id="heroTitle">CineBox Cinema Portal</h1>
             <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.6;">
-                Stream and download Hollywood, Bollywood, South Indian and Bangla movies directly with high speed and zero buffering.
+                Stream and download Hollywood, Bollywood, South Indian, Animation and Bangla movies directly with high speed and zero buffering.
             </p>
             <div style="display: flex; gap: 12px; margin-top: 6px;">
                 <button class="btn btn-cyan" onclick="playRandom()">▶ Watch Random</button>
@@ -635,27 +640,14 @@
         </div>
     </div>
 
-    <!-- Category Nav -->
-    <div class="category-nav" id="categories">
-        <div class="cat-chip active" onclick="filterCategory('All')">🌟 All (36,000+)</div>
-        <div class="cat-chip" onclick="filterCategory('Top Rated')">🏆 IMDb Top 250</div>
-        <div class="cat-chip" onclick="filterCategory('Animation')">🎨 Animation Movies</div>
-        <div class="cat-chip" onclick="filterCategory('Hollywood 1080p')">🎬 Hollywood 1080p</div>
-        <div class="cat-chip" onclick="filterCategory('Bollywood')">🍿 Bollywood</div>
-        <div class="cat-chip" onclick="filterCategory('South Action')">💥 South Hindi Dubbed</div>
-        <div class="cat-chip" onclick="filterCategory('South Original')">🌟 South Original</div>
-        <div class="cat-chip" onclick="filterCategory('TV Series')">📺 TV & Web Series</div>
-        <div class="cat-chip" onclick="filterCategory('K-Drama')">🇰🇷 Korean Drama</div>
-        <div class="cat-chip" onclick="filterCategory('Bangla')">🎭 Bangla Movies</div>
-        <div class="cat-chip" onclick="filterCategory('Foreign Movies')">🌐 Foreign Movies</div>
-        <div class="cat-chip" onclick="filterCategory('3D Movies')">👓 3D Movies</div>
-    </div>
+    <!-- Category Nav (Dynamically Populated) -->
+    <div class="category-nav" id="categories"></div>
 
     <!-- Movie Grid -->
     <div class="content-wrap">
         <div class="section-header">
             <div class="section-title" id="sectionTitle">All Movies & Releases</div>
-            <div style="font-size: 13px; color: var(--text-secondary);" id="matchCounter">Loading movies...</div>
+            <div style="font-size: 13px; color: var(--text-secondary);" id="matchCounter">Loading 36,000+ movies...</div>
         </div>
 
         <div class="movie-grid" id="movieGrid"></div>
@@ -700,6 +692,24 @@
         let displayedCount = 40;
         const BATCH_SIZE = 40;
 
+        const CATEGORY_DEFS = [
+            { key: 'All', name: '🌟 All Movies', tag: 'All' },
+            { key: 'Top Rated', name: '🏆 IMDb Top 250', tag: 'Top Rated' },
+            { key: 'Animation', name: '🎨 Animation & Anime', tag: 'Animation' },
+            { key: 'Hollywood 1080p', name: '🎬 Hollywood 1080p', tag: 'Hollywood 1080p' },
+            { key: 'English Movies', name: '🎥 English Movies', tag: 'English Movies' },
+            { key: 'Bollywood', name: '🍿 Bollywood (Hindi)', tag: 'Bollywood' },
+            { key: 'South Action', name: '💥 South Hindi Dubbed', tag: 'South Action' },
+            { key: 'South Original', name: '🌟 South Original', tag: 'South Original' },
+            { key: 'TV Series', name: '📺 TV & Web Series', tag: 'TV Series' },
+            { key: 'K-Drama', name: '🇰🇷 Korean Drama', tag: 'K-Drama' },
+            { key: 'Bangla', name: '🎭 Bangla Movies', tag: 'Bangla' },
+            { key: 'Foreign Movies', name: '🌐 Foreign Movies', tag: 'Foreign Movies' },
+            { key: '3D Movies', name: '👓 3D Movies', tag: '3D Movies' }
+        ];
+
+        let currentActiveTag = 'All';
+
         async function init() {
             try {
                 const res = await fetch('./movies.json');
@@ -708,8 +718,11 @@
                     const t = (m.title || '').trim().toLowerCase();
                     return t && !t.includes('parent directory') && t !== '..' && t !== '.';
                 });
+
                 document.getElementById('totalCountBadge').textContent = `${allMovies.length.toLocaleString()} Movies`;
                 filteredMovies = [...allMovies];
+                
+                renderCategoryChips();
                 renderGrid();
                 setupHero();
             } catch (err) {
@@ -717,38 +730,70 @@
             }
         }
 
+        function renderCategoryChips() {
+            const counts = {};
+            counts['All'] = allMovies.length;
+            
+            allMovies.forEach(m => {
+                const t = m.tag || 'Other';
+                counts[t] = (counts[t] || 0) + 1;
+            });
+
+            const nav = document.getElementById('categories');
+            nav.innerHTML = CATEGORY_DEFS.map(def => {
+                const cnt = counts[def.tag] || 0;
+                return `
+                    <div class="cat-chip ${def.tag === currentActiveTag ? 'active' : ''}" onclick="filterCategory('${def.tag}')">
+                        <span>${def.name}</span>
+                        <span class="cat-count">${cnt.toLocaleString()}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function setupHero() {
             if (allMovies.length > 0) {
-                const rand = allMovies[Math.floor(Math.random() * Math.min(20, allMovies.length))];
+                const rand = allMovies[Math.floor(Math.random() * Math.min(25, allMovies.length))];
                 document.getElementById('heroTitle').textContent = rand.title;
                 document.getElementById('heroBg').style.backgroundImage = `url('${rand.poster}')`;
             }
         }
 
         function filterCategory(tag) {
-            document.querySelectorAll('.cat-chip').forEach(el => {
-                el.classList.toggle('active', el.textContent.includes(tag) || (tag === 'All' && el.textContent.includes('All')));
-            });
+            currentActiveTag = tag;
+            renderCategoryChips();
 
             document.getElementById('searchInput').value = '';
-            document.getElementById('sectionTitle').textContent = tag === 'All' ? 'All Movies & Releases' : tag;
+            const activeDef = CATEGORY_DEFS.find(d => d.tag === tag);
+            document.getElementById('sectionTitle').textContent = activeDef ? activeDef.name : tag;
 
             if (tag === 'All') {
                 filteredMovies = [...allMovies];
             } else {
-                filteredMovies = allMovies.filter(m => m.tag === tag || m.category.includes(tag));
+                filteredMovies = allMovies.filter(m => m.tag === tag || (m.category && m.category.includes(tag)));
             }
+
             displayedCount = BATCH_SIZE;
             renderGrid();
+
+            // Smooth scroll to top of content
+            document.querySelector('.content-wrap').scrollIntoView({ behavior: 'smooth' });
         }
 
         function handleSearch() {
             const q = document.getElementById('searchInput').value.toLowerCase().trim();
             if (!q) {
-                filteredMovies = [...allMovies];
-            } else {
-                filteredMovies = allMovies.filter(m => m.title.toLowerCase().includes(q) || m.category.toLowerCase().includes(q) || m.tag.toLowerCase().includes(q));
+                filterCategory(currentActiveTag);
+                return;
             }
+
+            filteredMovies = allMovies.filter(m => 
+                (m.title && m.title.toLowerCase().includes(q)) || 
+                (m.category && m.category.toLowerCase().includes(q)) || 
+                (m.tag && m.tag.toLowerCase().includes(q))
+            );
+
+            document.getElementById('sectionTitle').textContent = `Search Results for "${q}"`;
             displayedCount = BATCH_SIZE;
             renderGrid();
         }
@@ -760,7 +805,7 @@
             document.getElementById('matchCounter').textContent = `Showing ${toShow.length} of ${filteredMovies.length.toLocaleString()} movies`;
 
             if (toShow.length === 0) {
-                grid.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1/-1; text-align: center; padding: 48px;">No matching movies found.</p>';
+                grid.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1/-1; text-align: center; padding: 48px;">No matching movies found in this category.</p>';
                 document.getElementById('loadMoreBtn').style.display = 'none';
                 return;
             }
@@ -811,7 +856,8 @@
             document.getElementById('mPoster').style.display = 'block';
 
             document.getElementById('mTags').innerHTML = `
-                <span class="modal-tag">Category: ${item.category}</span>
+                <span class="modal-tag">Category: ${item.category || item.tag}</span>
+                <span class="modal-tag">Tag: ${item.tag || 'Cinema'}</span>
                 <span class="modal-tag">Size: ${item.size || 'HD'}</span>
                 <span class="modal-tag">⭐ 8.8/10</span>
                 <span class="modal-tag">🚀 CineBox Direct</span>
