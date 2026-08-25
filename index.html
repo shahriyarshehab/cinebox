@@ -1363,14 +1363,17 @@
             document.getElementById('movieModal').style.display = 'flex';
         }
 
+        let motherFolderSpecials = [];
+
         async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
             const tabs = document.getElementById('seasonTabs');
             const epList = document.getElementById('episodeList');
             const countBadge = document.getElementById('seasonCountBadge');
 
-            tabs.innerHTML = '<div style="font-size: 12px; color: var(--text-muted);">Loading seasons...</div>';
+            tabs.innerHTML = '<div style="font-size: 12px; color: var(--text-muted);">Loading seasons & episodes...</div>';
             epList.innerHTML = '';
             countBadge.textContent = 'Scanning...';
+            motherFolderSpecials = [];
 
             try {
                 const res = await fetch(seriesUrl);
@@ -1383,42 +1386,74 @@
                 const links = Array.from(doc.querySelectorAll('a'));
 
                 const seasonDirs = [];
-                const directEpisodes = [];
+                const directVideos = [];
 
                 links.forEach(a => {
                     const href = a.getAttribute('href');
                     const text = (a.textContent || '').trim();
-                    if (!href || text.toLowerCase().includes('parent directory') || text === '..' || text === '.') return;
-                    if (href.endsWith('.jpg') || href.endsWith('.png') || href.endsWith('.nfo')) return;
+                    if (!href || text.toLowerCase().includes('parent directory') || text === '..' || text === '.' || href.includes('browsehappy')) return;
+                    if (href.endsWith('.jpg') || href.endsWith('.png') || href.endsWith('.nfo') || href.endsWith('.txt')) return;
 
                     const absoluteUrl = new URL(href, seriesUrl).href;
                     if (href.endsWith('/') || text.toLowerCase().includes('season') || text.toLowerCase().includes('s0')) {
                         seasonDirs.push({ name: text, url: absoluteUrl });
                     } else if (href.match(/\.(mp4|mkv|avi|webm)$/i)) {
-                        directEpisodes.push({ name: text, url: absoluteUrl });
+                        directVideos.push({ name: text, url: absoluteUrl });
                     }
                 });
 
+                motherFolderSpecials = directVideos;
+
                 if (seasonDirs.length > 0) {
-                    countBadge.textContent = `${seasonDirs.length} Seasons Found`;
-                    tabs.innerHTML = seasonDirs.map((s, idx) => `
+                    const totalSeasons = seasonDirs.length + (directVideos.length > 0 ? 1 : 0);
+                    countBadge.textContent = `${seasonDirs.length} Seasons ${directVideos.length > 0 ? '+ Specials' : ''}`;
+
+                    let tabsHtml = seasonDirs.map((s, idx) => `
                         <button class="btn btn-ghost ${idx === 0 ? 'active' : ''}" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; ${idx === 0 ? 'background: var(--primary); color: #07090e; font-weight: 700;' : ''}" onclick="selectSeason(this, '${s.url}', '${escapeQuotes(s.name)}')">
                             ${s.name}
                         </button>
                     `).join('');
 
-                    // Load first season episodes
+                    if (directVideos.length > 0) {
+                        tabsHtml += `
+                            <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; border-color: rgba(255, 184, 0, 0.4); color: #ffb800;" onclick="selectSpecialsTab(this)">
+                                ★ Specials / Bonus (${directVideos.length})
+                            </button>
+                        `;
+                    }
+
+                    tabs.innerHTML = tabsHtml;
+
+                    // Load first season episodes by default
                     loadSeasonEpisodes(seasonDirs[0].url, seasonDirs[0].name);
-                } else if (directEpisodes.length > 0) {
-                    countBadge.textContent = `${directEpisodes.length} Episodes`;
-                    tabs.innerHTML = '<span style="font-size: 12px; color: var(--primary); font-weight: 700;">Direct Episodes</span>';
-                    renderEpisodeListHtml(directEpisodes);
+                } else if (directVideos.length > 0) {
+                    countBadge.textContent = `${directVideos.length} Episodes`;
+                    tabs.innerHTML = '<span style="font-size: 12px; color: var(--primary); font-weight: 700;">Episodes</span>';
+                    currentSeasonEpisodes = directVideos;
+                    currentPlayingEpisodeIdx = -1;
+                    renderEpisodeListHtml(directVideos);
                 } else {
                     fallbackTvView(seriesUrl, seriesTitle);
                 }
             } catch (err) {
                 fallbackTvView(seriesUrl, seriesTitle);
             }
+        }
+
+        function selectSpecialsTab(btnEl) {
+            document.querySelectorAll('#seasonTabs button').forEach(b => {
+                b.style.background = 'rgba(255, 255, 255, 0.05)';
+                b.style.color = '#fff';
+                b.style.fontWeight = '600';
+            });
+            btnEl.style.background = 'var(--accent-gold)';
+            btnEl.style.color = '#07090e';
+            btnEl.style.fontWeight = '700';
+
+            currentSeasonName = 'Specials / Bonus';
+            currentSeasonEpisodes = motherFolderSpecials;
+            currentPlayingEpisodeIdx = -1;
+            renderEpisodeListHtml(motherFolderSpecials);
         }
 
         async function selectSeason(btnEl, seasonUrl, seasonName) {
