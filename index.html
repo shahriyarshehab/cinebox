@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DhakaFlix MovieBox • All Movies & Series</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0a0c14;
+            --bg-surface: #121624;
+            --bg-card: #171c2e;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 229, 255, 0.35);
+            
+            --primary: #00e5ff;
+            --primary-glow: rgba(0, 229, 255, 0.4);
+            --accent-pink: #ff2a5f;
+            --accent-gold: #ffb800;
+            --accent-green: #00e676;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #94a3b8;
+            --font-title: 'Outfit', sans-serif;
+            --font-body: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 12, 20, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 14px 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .brand-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00e5ff 0%, #ff2a5f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 16px rgba(0, 229, 255, 0.4);
+        }
+
+        .brand-text {
+            font-family: var(--font-title);
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #ffffff 40%, #00e5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge-live {
+            background: rgba(0, 230, 118, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(0, 230, 118, 0.35);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .badge-live::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 520px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            border-radius: 30px;
+            padding: 12px 20px 12px 46px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .search-container input:focus {
+            background: rgba(255, 255, 255, 0.09);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 9px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-cyan {
+            background: linear-gradient(135deg, #00e5ff 0%, #00b4d8 100%);
+            color: #0a0c14;
+            font-weight: 800;
+            box-shadow: 0 4px 16px var(--primary-glow);
+        }
+
+        .btn-cyan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(0, 229, 255, 0.6);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff2a5f 0%, #ff527b 100%);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(255, 42, 95, 0.4);
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Hero Spotlight */
+        .hero-banner {
+            margin: 24px 36px 0;
+            border-radius: 24px;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, #151a28 0%, #0d101a 100%);
+            border: 1px solid var(--border-subtle);
+            min-height: 270px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(28px) opacity(0.35);
+            transform: scale(1.1);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(90deg, #0e121d 0%, rgba(14, 18, 29, 0.85) 50%, rgba(14, 18, 29, 0.3) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 36px 44px;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .hero-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 42, 95, 0.15);
+            border: 1px solid rgba(255, 42, 95, 0.4);
+            color: #ff527b;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            width: fit-content;
+        }
+
+        .hero-title {
+            font-family: var(--font-title);
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: #fff;
+        }
+
+        /* Categories Bar */
+        .category-nav {
+            padding: 20px 36px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .category-nav::-webkit-scrollbar { display: none; }
+
+        .cat-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .cat-chip:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .cat-chip.active {
+            background: linear-gradient(135deg, #00e5ff 0%, #00b4d8 100%);
+            color: #0a0c14;
+            border-color: #00e5ff;
+            box-shadow: 0 4px 16px var(--primary-glow);
+        }
+
+        /* Main Grid */
+        .content-wrap {
+            padding: 24px 36px 60px;
+            flex: 1;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .section-title {
+            font-family: var(--font-title);
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 24px 18px;
+        }
+
+        .movie-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-glow);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 229, 255, 0.2);
+        }
+
+        .poster-box {
+            position: relative;
+            width: 100%;
+            padding-top: 148%;
+            background: linear-gradient(135deg, #182033 0%, #0d121e 100%);
+            overflow: hidden;
+        }
+
+        .poster-img {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .movie-card:hover .poster-img {
+            transform: scale(1.08);
+        }
+
+        .poster-fallback {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .poster-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            padding: 16px;
+            z-index: 3;
+        }
+
+        .movie-card:hover .poster-overlay {
+            opacity: 1;
+        }
+
+        .play-icon-circle {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00e5ff 0%, #ff2a5f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0, 229, 255, 0.6);
+        }
+
+        .badge-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            z-index: 2;
+        }
+
+        .badge-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 184, 0, 0.4);
+            color: var(--accent-gold);
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            z-index: 2;
+        }
+
+        .card-info {
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: var(--bg-card);
+        }
+
+        .card-title {
+            font-family: var(--font-title);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+            color: #fff;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            word-break: break-word;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: var(--text-secondary);
+        }
+
+        /* Load More Button */
+        .load-more-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 36px;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(14px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            padding: 24px;
+        }
+
+        .modal-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-glow);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 960px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-head {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .modal-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .modal-hero {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .modal-poster {
+            width: 170px;
+            height: 250px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 1px solid var(--border-subtle);
+            flex-shrink: 0;
+        }
+
+        .modal-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-title {
+            font-family: var(--font-title);
+            font-size: 26px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .modal-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .modal-tag {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border-subtle);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .video-player-wrap {
+            background: #000;
+            border-radius: 14px;
+            overflow: hidden;
+            display: none;
+        }
+
+        video {
+            width: 100%;
+            max-height: 500px;
+            outline: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: #0a0c14;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 13.5px;
+            font-weight: 800;
+            display: none;
+            z-index: 600;
+            box-shadow: 0 8px 24px rgba(0, 230, 118, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            header { padding: 12px 18px; }
+            .hero-banner { margin: 16px 18px 0; }
+            .category-nav { padding: 16px 18px 0; }
+            .content-wrap { padding: 18px 18px 40px; }
+            .movie-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px 12px; }
+            .modal-hero { flex-direction: column; align-items: center; text-align: center; }
+            .modal-tags { justify-content: center; }
+            .modal-actions { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand" onclick="filterCategory('All')">
+            <div class="brand-logo">▶</div>
+            <div>
+                <div class="brand-text">Dhaka<span>Flix</span></div>
+            </div>
+            <div class="badge-live" id="totalCountBadge">7,900+ Movies</div>
+        </div>
+
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Search across all movies, Hindi, Hollywood, South..." oninput="handleSearch()">
+        </div>
+
+        <div>
+            <a class="btn btn-cyan" href="#categories">🎬 Browse Catalog</a>
+        </div>
+    </header>
+
+    <!-- Spotlight Banner -->
+    <div class="hero-banner">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-tag">🔥 Featured Cinema</div>
+            <h1 class="hero-title" id="heroTitle">DhakaFlix MovieBox Portal</h1>
+            <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.6;">
+                Stream and download Hollywood, Bollywood, South Indian and Bangla movies directly via high-speed BDIX connection.
+            </p>
+            <div style="display: flex; gap: 12px; margin-top: 6px;">
+                <button class="btn btn-cyan" onclick="playRandom()">▶ Watch Random</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Nav -->
+    <div class="category-nav" id="categories">
+        <div class="cat-chip active" onclick="filterCategory('All')">🌟 All Movies</div>
+        <div class="cat-chip" onclick="filterCategory('Hollywood 1080p')">🎬 Hollywood 1080p</div>
+        <div class="cat-chip" onclick="filterCategory('Bollywood')">🍿 Bollywood</div>
+        <div class="cat-chip" onclick="filterCategory('South Action')">💥 South Action</div>
+        <div class="cat-chip" onclick="filterCategory('South Original')">🌟 South Original</div>
+        <div class="cat-chip" onclick="filterCategory('Top Rated')">🏆 IMDb Top Rated</div>
+        <div class="cat-chip" onclick="filterCategory('Animation')">🎨 Animation</div>
+        <div class="cat-chip" onclick="filterCategory('K-Drama')">🇰🇷 K-Drama</div>
+        <div class="cat-chip" onclick="filterCategory('Bangla')">🎭 Bangla Movies</div>
+    </div>
+
+    <!-- Movie Grid -->
+    <div class="content-wrap">
+        <div class="section-header">
+            <div class="section-title" id="sectionTitle">All Movies & Releases</div>
+            <div style="font-size: 13px; color: var(--text-secondary);" id="matchCounter">Loading movies...</div>
+        </div>
+
+        <div class="movie-grid" id="movieGrid"></div>
+
+        <div class="load-more-wrap">
+            <button class="btn btn-glass" id="loadMoreBtn" onclick="loadMore()">⬇️ Load More Movies</button>
+        </div>
+    </div>
+
+    <!-- Movie Modal -->
+    <div class="modal" id="movieModal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">MovieBox Player & Download</span>
+                <button class="btn btn-glass" style="padding: 4px 10px;" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-hero">
+                    <img id="mPoster" class="modal-poster" src="" alt="Poster">
+                    <div class="modal-details">
+                        <div class="modal-title" id="mTitle">Movie Title</div>
+                        <div class="modal-tags" id="mTags"></div>
+                        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                            Direct BDIX stream and download enabled. Supports browser HTML5 playback and IDM high-speed downloading.
+                        </p>
+                        <div class="modal-actions" id="mActions"></div>
+                    </div>
+                </div>
+
+                <div class="video-player-wrap" id="videoWrap">
+                    <video id="videoPlayer" controls autoplay></video>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Link copied to clipboard!</div>
+
+    <script>
+        let allMovies = [];
+        let filteredMovies = [];
+        let displayedCount = 40;
+        const BATCH_SIZE = 40;
+
+        async function init() {
+            try {
+                const res = await fetch('./movies.json');
+                allMovies = await res.json();
+                document.getElementById('totalCountBadge').textContent = `${allMovies.length.toLocaleString()} Movies`;
+                filteredMovies = [...allMovies];
+                renderGrid();
+                setupHero();
+            } catch (err) {
+                document.getElementById('movieGrid').innerHTML = `<p style="color: #ff2a5f; grid-column: 1/-1; text-align: center; padding: 40px;">Failed to load movies.json: ${err.message}</p>`;
+            }
+        }
+
+        function setupHero() {
+            if (allMovies.length > 0) {
+                const rand = allMovies[Math.floor(Math.random() * Math.min(20, allMovies.length))];
+                document.getElementById('heroTitle').textContent = rand.title;
+                document.getElementById('heroBg').style.backgroundImage = `url('${rand.poster}')`;
+            }
+        }
+
+        function filterCategory(tag) {
+            document.querySelectorAll('.cat-chip').forEach(el => {
+                el.classList.toggle('active', el.textContent.includes(tag) || (tag === 'All' && el.textContent.includes('All')));
+            });
+
+            document.getElementById('searchInput').value = '';
+            document.getElementById('sectionTitle').textContent = tag === 'All' ? 'All Movies & Releases' : tag;
+
+            if (tag === 'All') {
+                filteredMovies = [...allMovies];
+            } else {
+                filteredMovies = allMovies.filter(m => m.tag === tag || m.category.includes(tag));
+            }
+            displayedCount = BATCH_SIZE;
+            renderGrid();
+        }
+
+        function handleSearch() {
+            const q = document.getElementById('searchInput').value.toLowerCase().trim();
+            if (!q) {
+                filteredMovies = [...allMovies];
+            } else {
+                filteredMovies = allMovies.filter(m => m.title.toLowerCase().includes(q) || m.category.toLowerCase().includes(q) || m.tag.toLowerCase().includes(q));
+            }
+            displayedCount = BATCH_SIZE;
+            renderGrid();
+        }
+
+        function renderGrid() {
+            const grid = document.getElementById('movieGrid');
+            const toShow = filteredMovies.slice(0, displayedCount);
+
+            document.getElementById('matchCounter').textContent = `Showing ${toShow.length} of ${filteredMovies.length.toLocaleString()} movies`;
+
+            if (toShow.length === 0) {
+                grid.innerHTML = '<p style="color: var(--text-secondary); grid-column: 1/-1; text-align: center; padding: 48px;">No matching movies found.</p>';
+                document.getElementById('loadMoreBtn').style.display = 'none';
+                return;
+            }
+
+            grid.innerHTML = toShow.map((item, idx) => `
+                <div class="movie-card" onclick="openModal(${idx})">
+                    <div class="poster-box">
+                        <img class="poster-img" src="${item.poster}" alt="${escapeQuotes(item.title)}" loading="lazy"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="poster-fallback" style="display: none;">
+                            <div style="font-size: 38px;">🎬</div>
+                            <div style="font-size: 12px; font-weight: 700;">${item.title}</div>
+                        </div>
+
+                        <div class="badge-tag">${item.tag || 'HD'}</div>
+                        <div class="badge-rating">★ 8.8</div>
+
+                        <div class="poster-overlay">
+                            <div class="play-icon-circle">▶</div>
+                            <span style="font-size: 12px; font-weight: 800; color: #fff;">Watch / Download</span>
+                        </div>
+                    </div>
+
+                    <div class="card-info">
+                        <div class="card-title" title="${item.title}">${item.title}</div>
+                        <div class="card-meta">
+                            <span>${item.size || 'HD'}</span>
+                            <span>${item.date || ''}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('loadMoreBtn').style.display = displayedCount < filteredMovies.length ? 'block' : 'none';
+        }
+
+        function loadMore() {
+            displayedCount += BATCH_SIZE;
+            renderGrid();
+        }
+
+        function openModal(idx) {
+            const item = filteredMovies[idx];
+            if (!item) return;
+
+            document.getElementById('mTitle').textContent = item.title;
+            document.getElementById('mPoster').src = item.poster;
+            document.getElementById('mPoster').style.display = 'block';
+
+            document.getElementById('mTags').innerHTML = `
+                <span class="modal-tag">Category: ${item.category}</span>
+                <span class="modal-tag">Size: ${item.size || 'HD'}</span>
+                <span class="modal-tag">⭐ 8.8/10</span>
+                <span class="modal-tag">🚀 DhakaFlix Direct</span>
+            `;
+
+            document.getElementById('mActions').innerHTML = `
+                <button class="btn btn-cyan" onclick="startStream('${item.url}')">▶ Stream Video</button>
+                <a class="btn btn-primary" href="${item.url}" download>⬇ Download File</a>
+                <button class="btn btn-glass" onclick="copyLink('${item.url}')">🔗 Copy Link</button>
+            `;
+
+            const vWrap = document.getElementById('videoWrap');
+            vWrap.style.display = 'none';
+            document.getElementById('videoPlayer').pause();
+            document.getElementById('videoPlayer').src = '';
+
+            document.getElementById('movieModal').style.display = 'flex';
+        }
+
+        function startStream(url) {
+            const vWrap = document.getElementById('videoWrap');
+            const player = document.getElementById('videoPlayer');
+            vWrap.style.display = 'block';
+            player.src = url;
+            player.play();
+        }
+
+        function closeModal() {
+            const player = document.getElementById('videoPlayer');
+            player.pause();
+            player.src = '';
+            document.getElementById('movieModal').style.display = 'none';
+        }
+
+        function playRandom() {
+            if (filteredMovies.length > 0) {
+                const rIdx = Math.floor(Math.random() * filteredMovies.length);
+                openModal(rIdx);
+            }
+        }
+
+        function copyLink(url) {
+            navigator.clipboard.writeText(url);
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function escapeQuotes(str) {
+            return str.replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
