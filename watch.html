@@ -152,7 +152,8 @@
             <span class="search-icon">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             </span>
-            <input type="text" id="searchInput" placeholder="Search across 36,000+ movies..." onkeydown="if(event.key==='Enter') searchToHome(this.value)">
+            <input type="text" id="searchInput" placeholder="Search across 37,000+ movies..." oninput="handleLiveSearch(this.value)" onkeydown="if(event.key==='Enter') { hideSearchDropdown(); searchToHome(this.value); }" autocomplete="off">
+            <div class="search-dropdown" id="searchDropdown"></div>
         </div>
 
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -827,7 +828,112 @@
             }
         }
 
+        let watchLiveSearchTimer = null;
+        let watchAllMovies = [];
+
+        function handleLiveSearch(val) {
+            clearTimeout(watchLiveSearchTimer);
+            const query = (val || '').trim().toLowerCase();
+            const dropdown = document.getElementById('searchDropdown');
+            if (!dropdown) return;
+
+            if (!query) {
+                dropdown.style.display = 'none';
+                return;
+            }
+
+            watchLiveSearchTimer = setTimeout(async () => {
+                if (watchAllMovies.length === 0) {
+                    try {
+                        const res = await fetch('./movies.json');
+                        if (res.ok) {
+                            watchAllMovies = await res.json();
+                        }
+                    } catch (e) {}
+                }
+
+                let dataset = watchAllMovies;
+                if (dataset.length === 0) {
+                    const cachedHome = sessionStorage.getItem('cinebox_home_v1');
+                    if (cachedHome) {
+                        try {
+                            const hData = JSON.parse(cachedHome);
+                            dataset = (hData.carousel || []).concat(Object.values(hData.categories || {}).flat());
+                        } catch (e) {}
+                    }
+                }
+
+                const matches = [];
+                for (const item of dataset) {
+                    const obj = Array.isArray(item) ? {
+                        title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
+                    } : item;
+
+                    const t = (obj.title || '').toLowerCase();
+                    const c = (obj.category || '').toLowerCase();
+                    const g = (obj.tag || '').toLowerCase();
+
+                    if (t.includes(query) || c.includes(query) || g.includes(query)) {
+                        matches.push(obj);
+                        if (matches.length >= 8) break;
+                    }
+                }
+
+                if (matches.length > 0) {
+                    dropdown.innerHTML = matches.map(m => {
+                        const itemData = encodeURIComponent(JSON.stringify(m));
+                        const linkUrl = `watch.html?title=${encodeURIComponent(m.title)}&data=${itemData}`;
+                        const isSeries = m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.url && m.url.endsWith('/'));
+
+                        return `
+                            <a class="search-dropdown-item" href="${linkUrl}">
+                                <img class="search-item-thumb" src="${m.poster}" alt="${escapeQuotes(m.title)}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100';">
+                                <div class="search-item-info">
+                                    <div class="search-item-title">${m.title}</div>
+                                    <div class="search-item-meta">
+                                        <span class="search-item-badge">${m.tag || (isSeries ? 'Series' : 'HD')}</span>
+                                        <span>${m.category || ''}</span>
+                                        <span>${m.size || ''}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }).join('') + `
+                        <div class="search-dropdown-footer" onclick="hideSearchDropdown(); searchToHome('${escapeQuotes(val)}');">
+                            View all results for "${val}" →
+                        </div>
+                    `;
+                    dropdown.style.display = 'block';
+                } else {
+                    dropdown.innerHTML = `
+                        <div style="padding: 16px 12px; text-align: center; font-size: 12.5px; color: var(--text-muted);">
+                            No exact title found for "${val}". Press Enter for full search.
+                        </div>
+                    `;
+                    dropdown.style.display = 'block';
+                }
+            }, 150);
+        }
+
+        function hideSearchDropdown() {
+            const dropdown = document.getElementById('searchDropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-wrap')) {
+                hideSearchDropdown();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideSearchDropdown();
+            }
+        });
+
         function searchToHome(q) {
+            hideSearchDropdown();
             const clean = (q || '').trim();
             if (clean) {
                 window.location.href = `index.html?q=${encodeURIComponent(clean)}`;

@@ -482,7 +482,100 @@ async function openCategoryView(tag, name) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+let liveSearchTimer = null;
+
+function handleLiveSearch(val) {
+    clearTimeout(liveSearchTimer);
+    const query = (val || '').trim().toLowerCase();
+    const dropdown = document.getElementById('searchDropdown');
+    if (!dropdown) return;
+
+    if (!query) {
+        dropdown.style.display = 'none';
+        return;
+    }
+
+    liveSearchTimer = setTimeout(async () => {
+        if (!isFullCatalogLoaded && allMovies.length === 0) {
+            await loadFullCatalogInBackground();
+        }
+
+        let dataset = allMovies;
+        if (dataset.length === 0 && homeData) {
+            dataset = (homeData.carousel || []).concat(Object.values(homeData.categories || {}).flat());
+        }
+
+        const matches = [];
+        for (const item of dataset) {
+            const obj = Array.isArray(item) ? {
+                title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
+            } : item;
+
+            const t = (obj.title || '').toLowerCase();
+            const c = (obj.category || '').toLowerCase();
+            const g = (obj.tag || '').toLowerCase();
+
+            if (t.includes(query) || c.includes(query) || g.includes(query)) {
+                matches.push(obj);
+                if (matches.length >= 8) break;
+            }
+        }
+
+        if (matches.length > 0) {
+            dropdown.innerHTML = matches.map(m => {
+                const itemData = encodeURIComponent(JSON.stringify(m));
+                const linkUrl = `watch.html?title=${encodeURIComponent(m.title)}&data=${itemData}`;
+                const isSeries = m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.url && m.url.endsWith('/'));
+
+                return `
+                    <a class="search-dropdown-item" href="${linkUrl}">
+                        <img class="search-item-thumb" src="${m.poster}" alt="${escapeQuotes(m.title)}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=100';">
+                        <div class="search-item-info">
+                            <div class="search-item-title">${m.title}</div>
+                            <div class="search-item-meta">
+                                <span class="search-item-badge">${m.tag || (isSeries ? 'Series' : 'HD')}</span>
+                                <span>${m.category || ''}</span>
+                                <span>${m.size || ''}</span>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            }).join('') + `
+                <div class="search-dropdown-footer" onclick="hideSearchDropdown(); handleSearch();">
+                    View all results for "${val}" →
+                </div>
+            `;
+            dropdown.style.display = 'block';
+        } else {
+            dropdown.innerHTML = `
+                <div style="padding: 16px 12px; text-align: center; font-size: 12.5px; color: var(--text-muted);">
+                    No exact title found for "${val}". Press Enter for full search.
+                </div>
+            `;
+            dropdown.style.display = 'block';
+        }
+    }, 150);
+}
+
+function hideSearchDropdown() {
+    const dropdown = document.getElementById('searchDropdown');
+    if (dropdown) dropdown.style.display = 'none';
+}
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-wrap')) {
+        hideSearchDropdown();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        hideSearchDropdown();
+    }
+});
+
 async function handleSearch() {
+    hideSearchDropdown();
     const q = document.getElementById('searchInput').value.toLowerCase().trim();
     if (!q) {
         showHomeView();
