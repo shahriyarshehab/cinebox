@@ -1,0 +1,56 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.shahriyarshehab.cinebox'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.shahriyarshehab.cinebox"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Digital Asset Links Statement for Fullscreen TWA Verification
+        resValue "string", "asset_statements", """
+            [{
+                "relation": ["delegate_permission/common.handle_all_urls"],
+                "target": {
+                    "namespace": "web",
+                    "site": "https://shahriyarshehab.github.io"
+                }
+            }]
+        """
+
+        resValue "string", "web_app_url", "https://shahriyarshehab.github.io/cinebox/"
+        resValue "string", "web_app_host", "shahriyarshehab.github.io"
+        resValue "string", "web_app_path", "/cinebox/"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+    implementation 'androidx.browser:browser:1.8.0'
+    implementation 'androidx.core:core:1.13.1'
+}

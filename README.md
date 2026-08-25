@@ -9,6 +9,14 @@ CineBox is an ultra-fast, modern cinema & streaming web portal featuring **36,00
 
 ---
 
+## 📱 Android App (Trusted Web Activity):
+- 📁 Source code located in the [`android/`](android/) directory.
+- ⚡ **Native Android Shell** powered by Google's `AndroidBrowserHelper` and Chrome Custom Tabs.
+- 🎬 Seamless external player intent support for **VLC for Android** and **MX Player**.
+- 🚀 **1-Click Build**: Open `android/` in **Android Studio** or build with **GitHub Actions**.
+
+---
+
 ## ✨ Key Features:
 - **36,000+ Movies & TV Shows**: Hollywood 1080p, Bollywood, South Action (Dubbed & Original), K-Drama, TV Series, Animation & Bangla.
 - **⏱️ Continue Watching**: Automatically tracks and saves playback progress with a 1-click resume row.
@@ -19,6 +27,6 @@ CineBox is an ultra-fast, modern cinema & streaming web portal featuring **36,00
 - **🍦 External Player Hub**: Instant launchers for VLC Media Player, MX Player (Android), and PotPlayer (PC).
 - **🎛️ Multi-Faceted Filters**: Instant filtering by Release Era, Audio Track (Dual/Multi Audio), and Quality.
 - **⌨️ Keyboard Navigation**: Global search (`Ctrl + K` / `/`), Play/Pause (`Space`), Seek (`←/→`), Fullscreen (`F`), and Next Episode (`N`).
-- **📲 PWA Support**: Installable as a native standalone app on Android, iOS, Windows, and Mac.
+- **📲 PWA & Android TWA Support**: Installable as a native standalone app on Android (APK), iOS, Windows, and Mac.
 - **🎨 Glassmorphism & Ambient Glow**: Modern theme with light and dark mode toggle.
 - **100% Static & Fast**: Hosted on GitHub Pages with 0ms client-side cache rendering.

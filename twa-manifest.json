@@ -1,0 +1,64 @@
+{
+  "packageId": "com.shahriyarshehab.cinebox",
+  "host": "shahriyarshehab.github.io",
+  "name": "CineBox — Stream & Download Movies",
+  "launcherName": "CineBox",
+  "display": "standalone",
+  "themeColor": "#07090E",
+  "themeColorDark": "#07090E",
+  "navigationColor": "#07090E",
+  "navigationColorDark": "#07090E",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#07090E",
+  "enableNotifications": true,
+  "startUrl": "/cinebox/index.html",
+  "iconUrl": "https://shahriyarshehab.github.io/cinebox/icons/icon-512.png",
+  "maskableIconUrl": "https://shahriyarshehab.github.io/cinebox/icons/icon-maskable-512.png",
+  "monochromeIconUrl": "https://shahriyarshehab.github.io/cinebox/icons/ic_notification.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./cinebox-keystore.jks",
+    "alias": "cinebox"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "TV Shows",
+      "shortName": "TV Shows",
+      "url": "https://shahriyarshehab.github.io/cinebox/index.html#tv",
+      "icon": "icons/icon-192.png"
+    },
+    {
+      "name": "Movies",
+      "shortName": "Movies",
+      "url": "https://shahriyarshehab.github.io/cinebox/index.html#movies",
+      "icon": "icons/icon-192.png"
+    },
+    {
+      "name": "Watchlist",
+      "shortName": "Watchlist",
+      "url": "https://shahriyarshehab.github.io/cinebox/index.html#watchlist",
+      "icon": "icons/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://shahriyarshehab.github.io/cinebox/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "orientation": "default",
+  "fullScopeUrl": "https://shahriyarshehab.github.io/cinebox/"
+}

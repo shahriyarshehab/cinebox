@@ -1,17 +1,81 @@
 {
+  "id": "/cinebox/",
   "name": "CineBox — Stream & Download Movies",
   "short_name": "CineBox",
   "description": "Ultra-fast cinema & streaming web portal featuring 36,000+ movies, TV series, posters, and direct links.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#07090e",
-  "theme_color": "#00e5ff",
+  "theme_color": "#07090e",
+  "categories": [
+    "entertainment",
+    "movies",
+    "video"
+  ],
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2307090e'/><circle cx='50' cy='50' r='38' fill='none' stroke='%2300e5ff' stroke-width='4'/><polygon points='42,32 68,50 42,68' fill='%2300e5ff'/></svg>",
-      "sizes": "192x192 512x512",
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "TV Shows",
+      "short_name": "TV Shows",
+      "description": "Browse popular and trending TV series",
+      "url": "./index.html#tv",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Movies",
+      "short_name": "Movies",
+      "description": "Browse 36,000+ Hollywood & regional movies",
+      "url": "./index.html#movies",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "My Watchlist",
+      "short_name": "Watchlist",
+      "description": "View saved bookmarked movies and series",
+      "url": "./index.html#watchlist",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">CineBox</string>
+    <string name="launcher_name">CineBox</string>
+    <string name="host_name">shahriyarshehab.github.io</string>
+    <string name="default_url">https://shahriyarshehab.github.io/cinebox/</string>
+    <string name="shortcut_tv_name">TV Shows</string>
+    <string name="shortcut_movies_name">Movies</string>
+    <string name="shortcut_watchlist_name">Watchlist</string>
+</resources>
