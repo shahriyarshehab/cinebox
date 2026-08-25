@@ -736,10 +736,14 @@
                         <div class="modal-title" id="mTitle">Movie Title</div>
                         <div class="modal-chips" id="mTags"></div>
                         <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-                            Direct high-speed media stream and download enabled. Opens full theater video player in a new browser tab.
+                            Direct high-speed media stream and download enabled. Compatible with browser video player and IDM.
                         </p>
                         <div class="modal-btn-row" id="mActions"></div>
                     </div>
+                </div>
+
+                <div class="player-frame" id="videoWrap" style="display: none; margin-top: 16px; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border);">
+                    <video id="videoPlayer" controls style="width: 100%; max-height: 480px; outline: none; background: #000;"></video>
                 </div>
             </div>
         </div>
@@ -926,13 +930,11 @@
                 <span class="modal-chip">Score: 8.8/10</span>
             `;
 
-            const playerUrl = `player.html?v=${encodeURIComponent(item.url)}&t=${encodeURIComponent(item.title)}&p=${encodeURIComponent(item.poster)}`;
-
             document.getElementById('mActions').innerHTML = `
-                <a class="btn btn-primary" href="${playerUrl}" target="_blank">
+                <button class="btn btn-primary" onclick="startStream('${item.url}')">
                     <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
-                    <span>Stream in New Tab</span>
-                </a>
+                    <span>Play / Stream Video</span>
+                </button>
                 <a class="btn btn-accent" href="${item.url}" download>
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     <span>Download File</span>
@@ -943,19 +945,36 @@
                 </button>
             `;
 
+            const vWrap = document.getElementById('videoWrap');
+            vWrap.style.display = 'none';
+            const player = document.getElementById('videoPlayer');
+            player.pause();
+            player.src = '';
+
             document.getElementById('movieModal').style.display = 'flex';
         }
 
+        function startStream(url) {
+            const vWrap = document.getElementById('videoWrap');
+            const player = document.getElementById('videoPlayer');
+            vWrap.style.display = 'block';
+            player.src = url;
+            player.play().catch(e => {
+                console.log('Playback notice:', e);
+            });
+        }
+
         function closeModal() {
+            const player = document.getElementById('videoPlayer');
+            player.pause();
+            player.src = '';
             document.getElementById('movieModal').style.display = 'none';
         }
 
         function playRandom() {
             if (filteredMovies.length > 0) {
                 const rIdx = Math.floor(Math.random() * filteredMovies.length);
-                const item = filteredMovies[rIdx];
-                const playerUrl = `player.html?v=${encodeURIComponent(item.url)}&t=${encodeURIComponent(item.title)}&p=${encodeURIComponent(item.poster)}`;
-                window.open(playerUrl, '_blank');
+                openModal(rIdx);
             }
         }
 
