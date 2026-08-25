@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Media — CineBox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .watch-container {
+            max-width: 1200px;
+            margin: 30px auto 60px;
+            padding: 0 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .back-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .watch-hero-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+
+        .watch-backdrop {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(24px) brightness(0.25);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .watch-content-inner {
+            position: relative;
+            z-index: 2;
+            padding: 36px 40px;
+            display: flex;
+            gap: 36px;
+            align-items: flex-start;
+        }
+
+        .watch-poster-big {
+            width: 220px;
+            height: 330px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 2px solid var(--border-hover);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+            flex-shrink: 0;
+        }
+
+        .watch-details {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .watch-title {
+            font-family: var(--font-display);
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.25;
+        }
+
+        .player-section {
+            background: #000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+        }
+
+        .player-bar {
+            padding: 12px 20px;
+            background: rgba(14, 18, 26, 0.98);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .watch-content-inner {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding: 24px 20px;
+            }
+            .watch-poster-big {
+                width: 170px;
+                height: 255px;
+            }
+            .watch-details {
+                align-items: center;
+            }
+            .modal-chips {
+                justify-content: center;
+            }
+            .modal-btn-row {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <a class="brand" href="index.html">
+            <div class="brand-mark">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div class="brand-name">Cine<span>Box</span></div>
+        </a>
+
+        <div class="search-wrap">
+            <span class="search-icon">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="text" id="searchInput" placeholder="Search across 36,000+ movies..." onkeydown="if(event.key==='Enter') searchToHome(this.value)">
+        </div>
+
+        <div>
+            <a class="btn btn-ghost" href="index.html">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Back to Catalog</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="watch-container">
+        <!-- Back Navigation -->
+        <div class="back-nav">
+            <a class="btn btn-ghost" href="index.html">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Back to Home</span>
+            </a>
+            <div id="mediaTypeBadge" class="live-status">
+                <span class="live-status-dot"></span>
+                <span>Ready to Stream</span>
+            </div>
+        </div>
+
+        <!-- Video Player Frame -->
+        <div class="player-section" id="playerSection" style="display: none;">
+            <div class="player-bar">
+                <div style="font-size: 13.5px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #00e676; display: inline-block; box-shadow: 0 0 8px #00e676;"></span>
+                    <span id="playerCurrentTitle">Playing Media</span>
+                </div>
+                <div id="playerNavBtns" style="display: none; gap: 8px; flex-shrink: 0;">
+                    <button class="btn btn-ghost" style="padding: 5px 12px; font-size: 12px;" onclick="playPrevEpisode()">◀ Prev Episode</button>
+                    <button class="btn btn-primary" style="padding: 5px 12px; font-size: 12px;" onclick="playNextEpisode()">Next Episode ▶</button>
+                </div>
+            </div>
+            <video id="videoPlayer" controls style="width: 100%; max-height: 580px; outline: none; background: #000;"></video>
+        </div>
+
+        <!-- Media Hero Card -->
+        <div class="watch-hero-card">
+            <div class="watch-backdrop" id="watchBackdrop"></div>
+            <div class="watch-content-inner">
+                <img id="wPoster" class="watch-poster-big" src="" alt="Poster">
+                <div class="watch-details">
+                    <div class="slide-tag" id="wTag">Quality • HD</div>
+                    <h1 class="watch-title" id="wTitle">Loading Title...</h1>
+                    <div class="modal-chips" id="wChips"></div>
+                    <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.6;">
+                        High-speed direct streaming and download enabled. Compatible with browser HTML5 player and external VLC Media Player.
+                    </p>
+                    <div class="modal-btn-row" id="wActions"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TV Series Seasons & Episodes Explorer (For Series) -->
+        <div id="tvExplorerWrap" style="display: none; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px 32px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                <div style="font-size: 17px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                    <span>Select Season & Episode</span>
+                </div>
+                <div id="seasonCountBadge" style="font-size: 12px; background: rgba(0, 229, 255, 0.12); color: var(--primary); font-weight: 700; padding: 4px 12px; border-radius: 14px;">Loading seasons...</div>
+            </div>
+
+            <!-- Season Tabs -->
+            <div id="seasonTabs" style="display: flex; gap: 10px; overflow-x: auto; margin-bottom: 18px; padding-bottom: 6px;"></div>
+
+            <!-- Episode List -->
+            <div id="episodeList" style="display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto; padding-right: 6px;"></div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Link copied to clipboard</div>
+
+    <script>
+        let currentItem = null;
+        let tvCatalog = {};
+        let currentTvEntry = null;
+        let motherFolderSpecials = [];
+        let currentSeasonEpisodes = [];
+        let currentPlayingEpisodeIdx = -1;
+        let currentSeasonName = 'Season 1';
+
+        // Official VLC Cone SVG
+        const VLC_ICON_SVG = `
+            <svg class="icon" viewBox="0 0 512 512" width="16" height="16" aria-label="VLC" style="vertical-align: middle;">
+                <g fill="#f7901e">
+                    <path d="M437 400l-36-94c-3-10-13-16-23-16H134c-10 0-20 6-23 16l-36 94c-2 3-2 7-2 11 0 16 13 29 29 29h308a29 29 0 0 0 27-40z"/>
+                    <path d="M299 109l-15-51c-3-11-13-18-24-18h-8c-11 0-21 7-24 18l-15 51a307 307 0 0 0 86 0zM256 183c-24 0-46-2-64-6l-19 65c20 8 49 13 83 13s63-5 83-13l-20-65c-17 4-39 6-63 6z"/>
+                </g>
+                <g fill="#ffffff">
+                    <path d="M319 177l-20-68a307 307 0 0 1-86 0l-21 68c18 4 40 6 64 6s46-2 63-6z"/>
+                    <path d="M173 242l-18 62c19 14 55 23 101 23s82-9 101-23l-18-62c-20 8-49 13-83 13s-63-5-83-13z"/>
+                </g>
+            </svg>
+        `;
+
+        async function initWatch() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTitle = urlParams.get('title');
+            const dataParam = urlParams.get('data');
+
+            // 1. Fetch TV Catalog index in background
+            fetch('./tv_index.json?v=' + Date.now())
+                .then(r => r.json())
+                .then(data => { tvCatalog = data || {}; })
+                .catch(e => console.warn(e));
+
+            // 2. Fetch movies catalog to find item
+            try {
+                if (dataParam) {
+                    try {
+                        currentItem = JSON.parse(decodeURIComponent(dataParam));
+                    } catch (e) {}
+                }
+
+                if (!currentItem && targetTitle) {
+                    const res = await fetch('./movies.json?v=' + Date.now());
+                    const rawMovies = await res.json();
+                    const cleanTitle = targetTitle.toLowerCase().trim();
+
+                    for (const m of rawMovies) {
+                        const mTitle = Array.isArray(m) ? m[0] : m.title;
+                        if (mTitle && mTitle.toLowerCase().trim() === cleanTitle) {
+                            currentItem = Array.isArray(m) ? {
+                                title: m[0], poster: m[1], url: m[2], tag: m[3], category: m[4], size: m[5], date: m[6]
+                            } : m;
+                            break;
+                        }
+                    }
+
+                    if (!currentItem) {
+                        for (const m of rawMovies) {
+                            const mTitle = Array.isArray(m) ? m[0] : m.title;
+                            if (mTitle && (mTitle.toLowerCase().includes(cleanTitle) || cleanTitle.includes(mTitle.toLowerCase()))) {
+                                currentItem = Array.isArray(m) ? {
+                                    title: m[0], poster: m[1], url: m[2], tag: m[3], category: m[4], size: m[5], date: m[6]
+                                } : m;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (currentItem) {
+                    renderWatchPage(currentItem);
+                } else {
+                    document.getElementById('wTitle').textContent = 'Title Not Found';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderWatchPage(item) {
+            document.title = `${item.title} — CineBox`;
+            document.getElementById('wTitle').textContent = item.title;
+            document.getElementById('wPoster').src = item.poster;
+            document.getElementById('watchBackdrop').style.backgroundImage = `url('${item.poster}')`;
+            document.getElementById('wTag').textContent = item.tag || 'HD Cinema';
+
+            const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || item.url.endsWith('/');
+
+            document.getElementById('wChips').innerHTML = `
+                <span class="modal-chip">Category: ${item.category || item.tag}</span>
+                <span class="modal-chip">Type: ${isSeries ? 'TV Series' : 'Movie'}</span>
+                <span class="modal-chip">Quality: ${item.tag || 'HD'}</span>
+                <span class="modal-chip">Size: ${item.size || 'HD'}</span>
+                <span class="modal-chip">Score: 8.8 / 10</span>
+            `;
+
+            if (isSeries) {
+                document.getElementById('wActions').innerHTML = `
+                    <a class="btn btn-ghost" href="${item.url}" target="_blank">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        <span>Open Server Directory</span>
+                    </a>
+                    <button class="btn btn-ghost" onclick="copyLink('${item.url}')">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <span>Copy Series Link</span>
+                    </button>
+                `;
+
+                document.getElementById('tvExplorerWrap').style.display = 'block';
+                loadTvSeriesSeasons(item.url, item.title);
+            } else {
+                document.getElementById('wActions').innerHTML = `
+                    <button class="btn btn-primary" onclick="startStream('${item.url}', '${escapeQuotes(item.title)}')">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+                        <span>Play in Browser</span>
+                    </button>
+                    <button class="btn btn-vlc" onclick="openInVLC('${item.url}', '${escapeQuotes(item.title)}')">
+                        ${VLC_ICON_SVG}
+                        <span>Play in VLC</span>
+                    </button>
+                    <a class="btn btn-accent" href="${item.url}" download>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Download</span>
+                    </a>
+                    <button class="btn btn-ghost" onclick="copyLink('${item.url}')">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <span>Copy URL</span>
+                    </button>
+                `;
+
+                // Auto-open video player for movies
+                startStream(item.url, item.title);
+            }
+        }
+
+        async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
+            const tabs = document.getElementById('seasonTabs');
+            const epList = document.getElementById('episodeList');
+            const countBadge = document.getElementById('seasonCountBadge');
+
+            tabs.innerHTML = '<div style="font-size: 12px; color: var(--text-muted);">Loading seasons & episodes...</div>';
+            epList.innerHTML = '';
+            countBadge.textContent = 'Loading...';
+            motherFolderSpecials = [];
+
+            let matchedData = tvCatalog[seriesTitle];
+            if (!matchedData) {
+                const lowerTitle = seriesTitle.toLowerCase();
+                const key = Object.keys(tvCatalog).find(k => k.toLowerCase() === lowerTitle || lowerTitle.includes(k.toLowerCase()) || k.toLowerCase().includes(lowerTitle));
+                if (key) matchedData = tvCatalog[key];
+            }
+
+            if (matchedData) {
+                renderIndexedTvData(matchedData, seriesTitle);
+                return;
+            }
+
+            if (Object.keys(tvCatalog).length === 0) {
+                try {
+                    const res = await fetch('./tv_index.json?v=' + Date.now());
+                    tvCatalog = await res.json();
+                    matchedData = tvCatalog[seriesTitle];
+                    if (!matchedData) {
+                        const lowerTitle = seriesTitle.toLowerCase();
+                        const key = Object.keys(tvCatalog).find(k => k.toLowerCase() === lowerTitle || lowerTitle.includes(k.toLowerCase()) || k.toLowerCase().includes(lowerTitle));
+                        if (key) matchedData = tvCatalog[key];
+                    }
+                    if (matchedData) {
+                        renderIndexedTvData(matchedData, seriesTitle);
+                        return;
+                    }
+                } catch (e) {}
+            }
+
+            fallbackTvView(seriesUrl, seriesTitle);
+        }
+
+        function renderIndexedTvData(tvData, seriesTitle) {
+            const tabs = document.getElementById('seasonTabs');
+            const countBadge = document.getElementById('seasonCountBadge');
+
+            const folderUrl = tvData[0] || '';
+            const seasons = tvData[1] || [];
+            const specials = tvData[2] || [];
+
+            motherFolderSpecials = specials.map(spName => ({
+                name: spName,
+                url: folderUrl.endsWith('/') ? folderUrl + encodeURI(spName) : folderUrl + '/' + encodeURI(spName)
+            }));
+
+            if (seasons.length > 0) {
+                countBadge.textContent = `${seasons.length} Seasons ${specials.length > 0 ? '+ Specials' : ''}`;
+
+                let tabsHtml = seasons.map((s, idx) => {
+                    const sName = s[0];
+                    return `
+                    <button class="btn btn-ghost ${idx === 0 ? 'active' : ''}" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; ${idx === 0 ? 'background: var(--primary); color: #07090e; font-weight: 700;' : ''}" onclick="selectIndexedSeason(this, ${idx}, '${escapeQuotes(sName)}')">
+                        ${sName}
+                    </button>
+                    `;
+                }).join('');
+
+                if (specials.length > 0) {
+                    tabsHtml += `
+                        <button class="btn btn-ghost" style="font-size: 12px; padding: 6px 14px; border-radius: 20px; border-color: rgba(255, 184, 0, 0.4); color: #ffb800;" onclick="selectSpecialsTab(this)">
+                            ★ Specials / Bonus (${specials.length})
+                        </button>
+                    `;
+                }
+
+                tabs.innerHTML = tabsHtml;
+
+                currentTvEntry = tvData;
+                loadIndexedSeasonEpisodes(0, seasons[0][0]);
+            } else if (specials.length > 0) {
+                countBadge.textContent = `${specials.length} Specials`;
+                tabs.innerHTML = '<span style="font-size: 12px; color: var(--primary); font-weight: 700;">Bonus Videos</span>';
+                currentSeasonEpisodes = motherFolderSpecials;
+                currentPlayingEpisodeIdx = -1;
+                renderEpisodeListHtml(motherFolderSpecials);
+            } else {
+                fallbackTvView(folderUrl, seriesTitle);
+            }
+        }
+
+        function selectIndexedSeason(btnEl, seasonIdx, seasonName) {
+            document.querySelectorAll('#seasonTabs button').forEach(b => {
+                b.style.background = 'rgba(255, 255, 255, 0.05)';
+                b.style.color = '#fff';
+                b.style.fontWeight = '600';
+            });
+            btnEl.style.background = 'var(--primary)';
+            btnEl.style.color = '#07090e';
+            btnEl.style.fontWeight = '700';
+
+            loadIndexedSeasonEpisodes(seasonIdx, seasonName);
+        }
+
+        function loadIndexedSeasonEpisodes(seasonIdx, seasonName) {
+            if (!currentTvEntry || !currentTvEntry[1] || !currentTvEntry[1][seasonIdx]) return;
+
+            currentSeasonName = seasonName;
+            const seasonData = currentTvEntry[1][seasonIdx];
+            const sUrl = seasonData[1];
+            const epNames = seasonData[2] || [];
+
+            const episodes = epNames.map(name => {
+                const cleanUrl = sUrl.endsWith('/') ? sUrl + encodeURI(name) : sUrl + '/' + encodeURI(name);
+                return { name, url: cleanUrl };
+            });
+
+            currentSeasonEpisodes = episodes;
+            currentPlayingEpisodeIdx = -1;
+            renderEpisodeListHtml(episodes);
+        }
+
+        function selectSpecialsTab(btnEl) {
+            document.querySelectorAll('#seasonTabs button').forEach(b => {
+                b.style.background = 'rgba(255, 255, 255, 0.05)';
+                b.style.color = '#fff';
+                b.style.fontWeight = '600';
+            });
+            btnEl.style.background = 'var(--accent-gold)';
+            btnEl.style.color = '#07090e';
+            btnEl.style.fontWeight = '700';
+
+            currentSeasonName = 'Specials / Bonus';
+            currentSeasonEpisodes = motherFolderSpecials;
+            currentPlayingEpisodeIdx = -1;
+            renderEpisodeListHtml(motherFolderSpecials);
+        }
+
+        function renderEpisodeListHtml(episodes) {
+            const epList = document.getElementById('episodeList');
+            epList.innerHTML = episodes.map((ep, idx) => {
+                const isPlaying = idx === currentPlayingEpisodeIdx;
+                return `
+                <div id="ep-item-${idx}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: ${isPlaying ? 'rgba(0, 229, 255, 0.1)' : 'rgba(255,255,255,0.03)'}; border: 1px solid ${isPlaying ? 'var(--primary)' : 'var(--border)'}; border-radius: 8px; transition: all 0.2s ease;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex: 1; overflow: hidden;">
+                        <span style="font-size: 11px; font-weight: 800; color: ${isPlaying ? 'var(--primary)' : 'var(--text-dim)'}; min-width: 22px;">${idx + 1}</span>
+                        <div style="font-size: 12.5px; font-weight: 600; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeQuotes(ep.name)}">
+                            ${ep.name}
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 6px; flex-shrink: 0;">
+                        <button class="btn btn-primary" style="padding: 5px 10px; font-size: 11px;" onclick="playSpecificEpisode(${idx})">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="10" height="10"><path d="M8 5v14l11-7z"/></svg>
+                            <span>${isPlaying ? 'Playing' : 'Play'}</span>
+                        </button>
+                        <button class="btn btn-vlc" style="padding: 5px 10px; font-size: 11px;" onclick="openInVLC('${ep.url}', '${escapeQuotes(ep.name)}')">
+                            ${VLC_ICON_SVG}
+                            <span>VLC</span>
+                        </button>
+                        <a class="btn btn-ghost" style="padding: 5px 8px; font-size: 11px;" href="${ep.url}" download>
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        </a>
+                    </div>
+                </div>
+            `;}).join('');
+        }
+
+        function playSpecificEpisode(idx) {
+            if (!currentSeasonEpisodes[idx]) return;
+            currentPlayingEpisodeIdx = idx;
+            const ep = currentSeasonEpisodes[idx];
+
+            document.getElementById('playerCurrentTitle').textContent = `${currentSeasonName} • ${ep.name}`;
+            document.getElementById('playerNavBtns').style.display = 'flex';
+
+            renderEpisodeListHtml(currentSeasonEpisodes);
+
+            startStream(ep.url, `${currentSeasonName} • ${ep.name}`);
+
+            document.getElementById('playerSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function playNextEpisode() {
+            if (currentPlayingEpisodeIdx + 1 < currentSeasonEpisodes.length) {
+                playSpecificEpisode(currentPlayingEpisodeIdx + 1);
+            } else {
+                showToast('End of this season');
+            }
+        }
+
+        function playPrevEpisode() {
+            if (currentPlayingEpisodeIdx > 0) {
+                playSpecificEpisode(currentPlayingEpisodeIdx - 1);
+            }
+        }
+
+        function fallbackTvView(seriesUrl, seriesTitle) {
+            document.getElementById('seasonCountBadge').textContent = 'Series Directory';
+            document.getElementById('seasonTabs').innerHTML = `
+                <a class="btn btn-primary" style="font-size: 12px; padding: 6px 14px; border-radius: 20px;" href="${seriesUrl}" target="_blank">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    <span>Browse All Seasons & Episodes on Server</span>
+                </a>
+            `;
+            document.getElementById('episodeList').innerHTML = `
+                <div style="font-size: 12px; color: var(--text-muted); padding: 8px 4px; line-height: 1.5;">
+                    Click above to browse all season folders and stream/download any episode directly via high-speed BDIX.
+                </div>
+            `;
+        }
+
+        function openInVLC(url, title) {
+            const cleanTitle = (title || 'movie').replace(/[/\\?%*:|"<>]/g, '_');
+            const m3uContent = `#EXTM3U\n#EXTINF:-1,${title}\n${url}\n`;
+            const blob = new Blob([m3uContent], { type: 'application/x-mpegurl' });
+            const blobUrl = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `${cleanTitle}.m3u`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(blobUrl);
+
+            setTimeout(() => {
+                try {
+                    window.location.href = `vlc://${url}`;
+                } catch (e) {}
+            }, 300);
+
+            showToast('Opening stream in VLC Player...');
+        }
+
+        function startStream(url, title) {
+            const pSection = document.getElementById('playerSection');
+            const player = document.getElementById('videoPlayer');
+            pSection.style.display = 'block';
+            document.getElementById('playerCurrentTitle').textContent = title || 'Playing Media';
+            player.src = url;
+            player.play().catch(e => console.log(e));
+        }
+
+        function copyLink(url) {
+            navigator.clipboard.writeText(url);
+            showToast('Link copied to clipboard');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function searchToHome(q) {
+            if (q) {
+                window.location.href = `index.html?q=${encodeURIComponent(q)}`;
+            }
+        }
+
+        function escapeQuotes(str) {
+            return (str || '').replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
+        }
+
+        window.onload = initWatch;
+    </script>
+</body>
+</html>

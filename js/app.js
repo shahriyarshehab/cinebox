@@ -82,7 +82,15 @@ async function init() {
         document.getElementById('totalCountBadge').textContent = `${allMovies.length.toLocaleString()} Movies`;
         
         setupCarousel();
-        renderView();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const queryParam = urlParams.get('q');
+        if (queryParam) {
+            document.getElementById('searchInput').value = queryParam;
+            handleSearch();
+        } else {
+            renderView();
+        }
     } catch (err) {
         console.error("Load error:", err);
         main.innerHTML = `
@@ -200,10 +208,11 @@ function goToSlide(idx) {
 }
 
 function openDirectMovie(title) {
-    const item = allMovies.find(m => m.title === title);
-    if (item) {
-        renderModalContent(item);
-    }
+    window.location.href = `watch.html?title=${encodeURIComponent(title)}`;
+}
+
+function navigateToWatch(title) {
+    window.location.href = `watch.html?title=${encodeURIComponent(title)}`;
 }
 
 function renderView() {
@@ -279,11 +288,10 @@ function renderCategoryFullGrid(container) {
 
 function renderMovieCardHtml(item) {
     const safeTitle = escapeQuotes(item.title);
-    const safeObj = encodeURIComponent(JSON.stringify(item));
     const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || item.url.endsWith('/');
 
     return `
-        <div class="movie-card" onclick="openItemFromData('${safeObj}')">
+        <div class="movie-card" onclick="navigateToWatch('${safeTitle}')">
             <div class="card-cover">
                 <img src="${item.poster}" alt="${safeTitle}" loading="lazy"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
@@ -305,7 +313,7 @@ function renderMovieCardHtml(item) {
                             '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>'
                         }
                     </div>
-                    <span style="font-size: 11px; font-weight: 700; color: #fff;">${isSeries ? 'Browse Seasons & Episodes' : 'Stream / VLC / Download'}</span>
+                    <span style="font-size: 11px; font-weight: 700; color: #fff;">${isSeries ? 'Browse Seasons & Episodes' : 'Watch in Full Page'}</span>
                 </div>
             </div>
 
