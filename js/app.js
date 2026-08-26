@@ -115,11 +115,46 @@ const CATEGORY_JSON_MAP = {
 
 const categoryCache = {};
 
+function cleanItem(item) {
+    if (Array.isArray(item)) {
+        return {
+            title: item[0] || '',
+            poster: item[1] || '',
+            url: item[2] || '',
+            tag: item[3] || 'HD',
+            category: item[4] || 'Cinema',
+            size: item[5] || 'HD',
+            date: item[6] || ''
+        };
+    }
+    return item;
+}
+
 async function init() {
     updateWatchlistNavBadge();
     const page = detectPageType();
 
-    // 1. Check URL parameters
+    // 1. Check client cached home_data or fetch home_data.json immediately for 0ms instant render
+    const cachedHome = sessionStorage.getItem('cinebox_home_v2');
+    if (cachedHome) {
+        try {
+            homeData = JSON.parse(cachedHome);
+        } catch (e) {}
+    }
+
+    if (!homeData) {
+        try {
+            const res = await fetch('./home_data.json?v=' + Date.now());
+            if (res.ok) {
+                homeData = await res.json();
+                sessionStorage.setItem('cinebox_home_v2', JSON.stringify(homeData));
+            }
+        } catch (e) {
+            console.warn('Home data load notice:', e);
+        }
+    }
+
+    // 2. Check URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const queryParam = urlParams.get('q');
     const catParam = urlParams.get('cat');
@@ -128,42 +163,108 @@ async function init() {
     if (page === 'tv') {
         activeNavTab = 'tv';
         currentView = 'category';
-        currentCategoryTag = 'All_TV';
-        currentCategoryName = 'TV Shows & Korean Dramas';
-        const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
-        rawCategoryPool = [...tv, ...kdrama];
-        if (rawCategoryPool.length > 0) {
-            setupCarousel(rawCategoryPool.slice(0, 10));
+        currentCategoryTag = catParam || 'All_TV';
+        currentCategoryName = catParam ? catParam : 'TV Shows & Korean Dramas';
+        
+        // Instant 0ms Preview from homeData
+        if (homeData && homeData.categories) {
+            const tvHome = (homeData.categories['TV Series'] || []).map(cleanItem);
+            const kdHome = (homeData.categories['K-Drama'] || []).map(cleanItem);
+            rawCategoryPool = [...tvHome, ...kdHome];
+            if (rawCategoryPool.length > 0) {
+                setupCarousel(rawCategoryPool.slice(0, 10));
+            }
+            applyAllFilters();
+            renderView();
         }
-        applyAllFilters();
-        renderView();
+
+        // Fetch complete TV datasets in background
+        Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]).then(([tv, kd]) => {
+            if (currentCategoryTag === 'All_TV') {
+                rawCategoryPool = [...tv, ...kd];
+            } else if (currentCategoryTag === 'TV Series') {
+                rawCategoryPool = tv;
+            } else if (currentCategoryTag === 'K-Drama') {
+                rawCategoryPool = kd;
+            }
+            if (rawCategoryPool.length > 0) {
+                setupCarousel(rawCategoryPool.slice(0, 10));
+            }
+            applyAllFilters();
+            renderView();
+        });
     } else if (page === 'movies') {
         activeNavTab = 'movies';
         currentView = 'category';
-        currentCategoryTag = 'All_Movies';
-        currentCategoryName = 'Movies Collection';
-        const [hollywood, bollywood, south] = await Promise.all([
+        currentCategoryTag = catParam || 'All_Movies';
+        currentCategoryName = catParam ? catParam : 'Movies Collection';
+
+        // Instant 0ms Preview from homeData
+        if (homeData && homeData.categories) {
+            const cats = homeData.categories;
+            const h = (cats['Hollywood 1080p'] || []).map(cleanItem);
+            const b = (cats['Bollywood'] || []).map(cleanItem);
+            const s = (cats['South Action'] || []).map(cleanItem);
+            const so = (cats['South Original'] || []).map(cleanItem);
+            const bg = (cats['Bangla'] || []).map(cleanItem);
+            const f = (cats['Foreign Movies'] || []).map(cleanItem);
+            const tr = (cats['Top Rated'] || []).map(cleanItem);
+            const threeD = (cats['3D Movies'] || []).map(cleanItem);
+            rawCategoryPool = [...h, ...b, ...s, ...so, ...bg, ...f, ...tr, ...threeD];
+            if (rawCategoryPool.length > 0) {
+                setupCarousel(rawCategoryPool.slice(0, 10));
+            }
+            applyAllFilters();
+            renderView();
+        }
+
+        // Fetch complete Movie datasets in background
+        Promise.all([
             fetchCategoryData('Hollywood 1080p'),
             fetchCategoryData('Bollywood'),
-            fetchCategoryData('South Action')
-        ]);
-        rawCategoryPool = [...hollywood, ...bollywood, ...south];
-        if (rawCategoryPool.length > 0) {
-            setupCarousel(rawCategoryPool.slice(0, 10));
-        }
-        applyAllFilters();
-        renderView();
+            fetchCategoryData('South Action'),
+            fetchCategoryData('South Original'),
+            fetchCategoryData('Bangla'),
+            fetchCategoryData('Foreign Movies'),
+            fetchCategoryData('Top Rated'),
+            fetchCategoryData('3D Movies')
+        ]).then(([h, b, s, so, bg, f, tr, threeD]) => {
+            if (currentCategoryTag === 'All_Movies') {
+                rawCategoryPool = [...h, ...b, ...s, ...so, ...bg, ...f, ...tr, ...threeD];
+            } else {
+                rawCategoryPool = categoryCache[currentCategoryTag] || [];
+            }
+            if (rawCategoryPool.length > 0) {
+                setupCarousel(rawCategoryPool.slice(0, 10));
+            }
+            applyAllFilters();
+            renderView();
+        });
     } else if (page === 'animation') {
         activeNavTab = 'animation';
         currentView = 'category';
-        currentCategoryTag = 'All_Animation';
-        currentCategoryName = 'Animation & Anime Collection';
-        rawCategoryPool = await fetchCategoryData('Animation');
-        if (rawCategoryPool.length > 0) {
-            setupCarousel(rawCategoryPool.slice(0, 10));
+        currentCategoryTag = catParam || 'All_Animation';
+        currentCategoryName = catParam ? catParam : 'Animation & Anime Collection';
+
+        // Instant 0ms Preview from homeData
+        if (homeData && homeData.categories && homeData.categories['Animation']) {
+            rawCategoryPool = homeData.categories['Animation'].map(cleanItem);
+            if (rawCategoryPool.length > 0) {
+                setupCarousel(rawCategoryPool.slice(0, 10));
+            }
+            applyAllFilters();
+            renderView();
         }
-        applyAllFilters();
-        renderView();
+
+        // Fetch full animation dataset in background
+        fetchCategoryData('Animation').then((anim) => {
+            rawCategoryPool = anim;
+            if (rawCategoryPool.length > 0) {
+                setupCarousel(rawCategoryPool.slice(0, 10));
+            }
+            applyAllFilters();
+            renderView();
+        });
     } else if (page === 'watchlist') {
         activeNavTab = 'watchlist';
         currentView = 'watchlist';
@@ -171,29 +272,16 @@ async function init() {
     } else {
         // Standard Home Page
         activeNavTab = 'home';
-        const cachedHome = sessionStorage.getItem('cinebox_home_v2');
-        if (cachedHome) {
-            try {
-                homeData = JSON.parse(cachedHome);
-                applyHomeData(homeData);
-            } catch (e) {}
-        }
-        try {
-            const res = await fetch('./home_data.json?v=' + Date.now());
-            if (res.ok) {
-                homeData = await res.json();
-                sessionStorage.setItem('cinebox_home_v2', JSON.stringify(homeData));
-                applyHomeData(homeData);
-            }
-        } catch (e) {
-            console.warn('Fast home load notice:', e);
+        if (homeData) {
+            applyHomeData(homeData);
         }
     }
 
     if (queryParam) {
-        document.getElementById('searchInput').value = queryParam;
+        const input = document.getElementById('searchInput');
+        if (input) input.value = queryParam;
         loadFullCatalogInBackground().then(() => handleSearch());
-    } else if (catParam) {
+    } else if (catParam && page === 'home') {
         loadFullCatalogInBackground().then(() => openCategoryView(catParam, catParam));
     } else if (tabParam && page === 'home') {
         switchNavTab(tabParam);
@@ -226,15 +314,7 @@ async function loadFullCatalogInBackground() {
                 const res = await fetch(`./${file}`);
                 if (!res.ok) return [];
                 const data = await res.json();
-                return data.map(item => Array.isArray(item) ? {
-                    title: item[0] || '',
-                    poster: item[1] || '',
-                    url: item[2] || '',
-                    tag: item[3] || 'HD',
-                    category: item[4] || 'Cinema',
-                    size: item[5] || 'HD',
-                    date: item[6] || ''
-                } : item);
+                return data.map(cleanItem);
             } catch (e) {
                 return [];
             }
@@ -248,8 +328,28 @@ async function loadFullCatalogInBackground() {
 
         isFullCatalogLoaded = true;
 
-        if (currentView !== 'home') {
+        // Cache category pools for instantaneous tab switching
+        for (const [tag, file] of Object.entries(CATEGORY_JSON_MAP)) {
+            if (!categoryCache[tag]) {
+                categoryCache[tag] = allMovies.filter(m => matchesCategory(m, tag));
+            }
+        }
+
+        const page = detectPageType();
+        if (page === 'movies' && currentCategoryTag === 'All_Movies') {
+            rawCategoryPool = allMovies.filter(m => !(m.tag === 'TV Series' || m.tag === 'K-Drama'));
+            applyAllFilters();
             renderView();
+        } else if (page === 'tv' && currentCategoryTag === 'All_TV') {
+            rawCategoryPool = allMovies.filter(m => (m.tag === 'TV Series' || m.tag === 'K-Drama'));
+            applyAllFilters();
+            renderView();
+        } else if (page === 'animation' && currentCategoryTag === 'All_Animation') {
+            rawCategoryPool = allMovies.filter(m => matchesCategory(m, 'Animation'));
+            applyAllFilters();
+            renderView();
+        } else if (currentView === 'search') {
+            handleSearch();
         }
     } catch (e) {
         console.warn('Modular catalog load notice:', e);
@@ -499,8 +599,7 @@ function renderHomeRowsFromPayload(categoriesMap) {
     container.innerHTML = html;
 }
 
-function renderShowAllCardHtml(cat, count) {
-    const countText = count ? `${count.toLocaleString()} Titles` : 'Full Collection';
+function renderShowAllCardHtml(cat) {
     return `
         <div class="movie-card show-all-card" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
             <div class="show-all-card-inner">
@@ -512,10 +611,6 @@ function renderShowAllCardHtml(cat, count) {
                 </div>
                 <div class="show-all-card-title">Show All</div>
                 <div class="show-all-card-cat">${cat.name}</div>
-                <div class="show-all-card-btn">
-                    <span>${countText}</span>
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
-                </div>
             </div>
         </div>
     `;
@@ -892,17 +987,40 @@ async function openCategoryView(tag, name) {
     currentView = 'category';
     currentCategoryTag = tag;
     currentCategoryName = name || tag;
+    displayedCount = BATCH_SIZE;
+
+    const container = document.getElementById('mainContent');
+    if (container && (!categoryCache[tag] || categoryCache[tag].length === 0)) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 80px 20px;">
+                <div class="surprise-spinner" style="font-size: 38px; margin-bottom: 12px;">🍿</div>
+                <div style="font-size: 16px; font-weight: 700; color: var(--primary);">Loading ${name || tag}...</div>
+            </div>
+        `;
+    }
 
     if (tag === 'All') {
         if (!isFullCatalogLoaded && allMovies.length === 0) {
-            document.getElementById('mainContent').innerHTML = `
-                <div style="text-align: center; padding: 60px 20px;">
-                    <div style="font-size: 14px; font-weight: 600; color: var(--text-muted);">Loading catalog...</div>
-                </div>
-            `;
             await loadFullCatalogInBackground();
         }
         rawCategoryPool = [...allMovies];
+    } else if (tag === 'All_TV' || tag === 'TV Shows') {
+        const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
+        rawCategoryPool = [...tv, ...kdrama];
+    } else if (tag === 'All_Movies' || tag === 'Movies') {
+        const [h, b, s1, s2, bg, f, tr, threeD] = await Promise.all([
+            fetchCategoryData('Hollywood 1080p'),
+            fetchCategoryData('Bollywood'),
+            fetchCategoryData('South Action'),
+            fetchCategoryData('South Original'),
+            fetchCategoryData('Bangla'),
+            fetchCategoryData('Foreign Movies'),
+            fetchCategoryData('Top Rated'),
+            fetchCategoryData('3D Movies')
+        ]);
+        rawCategoryPool = [...h, ...b, ...s1, ...s2, ...bg, ...f, ...tr, ...threeD];
+    } else if (tag === 'All_Animation' || tag === 'Animation & Anime') {
+        rawCategoryPool = await fetchCategoryData('Animation');
     } else {
         rawCategoryPool = await fetchCategoryData(tag);
     }
