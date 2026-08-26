@@ -254,10 +254,16 @@ async function fetchOnlineMetadata(rawTitle, fallbackCategory = '') {
     // 2. If Series or TVMaze lookup
     if (!meta && (isSeries || fallbackCategory.includes('TV') || fallbackCategory.includes('Drama') || fallbackCategory.includes('Series'))) {
         try {
-            const res = await fetch(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(cleanName)}`);
+            const res = await fetch(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(cleanName)}&embed=cast`);
             if (res.ok) {
                 const data = await res.json();
                 const summary = (data.summary || '').replace(/<[^>]*>/g, '').trim();
+                const embeddedCast = (data._embedded && Array.isArray(data._embedded.cast)) ? data._embedded.cast.slice(0, 10).map(c => ({
+                    name: c.person ? c.person.name : '',
+                    character: c.character ? c.character.name : 'Cast',
+                    image: (c.person && c.person.image) ? (c.person.image.medium || c.person.image.original) : null
+                })).filter(c => c.name) : [];
+
                 meta = {
                     title: data.name,
                     year: data.premiered ? data.premiered.slice(0, 4) : year,
@@ -265,6 +271,7 @@ async function fetchOnlineMetadata(rawTitle, fallbackCategory = '') {
                     imdbRating: data.rating && data.rating.average ? data.rating.average.toString() : null,
                     runtime: data.averageRuntime ? `${data.averageRuntime} min` : null,
                     genres: data.genres || [],
+                    actors: embeddedCast,
                     synopsis: summary,
                     network: data.network ? data.network.name : (data.webChannel ? data.webChannel.name : null),
                     poster: data.image ? (data.image.original || data.image.medium) : null,
@@ -299,6 +306,26 @@ async function fetchOnlineMetadata(rawTitle, fallbackCategory = '') {
     }
 
     return meta;
+}
+
+async function getActorPortraitPhoto(actorName) {
+    if (!actorName) return null;
+    const cacheKey = `cinebox_actor_${actorName.toLowerCase().replace(/\s+/g, '_')}`;
+    try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) return cached;
+    } catch(e) {}
+    try {
+        const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(actorName.replace(/\s+/g, '_'))}`);
+        if (res.ok) {
+            const data = await res.json();
+            if (data.thumbnail && data.thumbnail.source) {
+                try { localStorage.setItem(cacheKey, data.thumbnail.source); } catch(e) {}
+                return data.thumbnail.source;
+            }
+        }
+    } catch(e) {}
+    return null;
 }
 
 let currentTrailerQuery = '';
@@ -418,7 +445,15 @@ async function loadAndApplyOnlineMetadata(item) {
         }
 
         // 9. Top Cast & Characters Section
-        if (meta.actors && meta.actors.length > 0) {
+        let rawActors = meta.actors;
+        let actorsList = [];
+        if (Array.isArray(rawActors)) {
+            actorsList = rawActors.map(a => typeof a === 'string' ? { name: a, character: 'Cast', image: null } : a);
+        } else if (typeof rawActors === 'string') {
+            actorsList = rawActors.split(',').map(a => ({ name: a.trim(), character: 'Cast', image: null })).filter(a => a.name);
+        }
+
+        if (actorsList.length > 0) {
             const castSection = document.getElementById('wCastSection');
             const castGrid = document.getElementById('wCastGrid');
             const dirHeadline = document.getElementById('wDirectorHeadline');
@@ -428,19 +463,44 @@ async function loadAndApplyOnlineMetadata(item) {
             }
 
             if (castSection && castGrid) {
-                castGrid.innerHTML = meta.actors.map(actor => {
-                    const initials = actor.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                castGrid.innerHTML = actorsList.map((actor, idx) => {
+                    const initials = actor.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                    const roleLabel = (actor.character && actor.character !== 'Cast') ? actor.character : 'Cast Member';
                     return `
-                        <a class="mb-cast-card" href="https://www.google.com/search?q=${encodeURIComponent(actor + ' actor')}" target="_blank" title="Search ${escapeQuotes(actor)}">
-                            <div class="mb-cast-avatar">${initials}</div>
+                        <a class="mb-cast-card" href="https://www.google.com/search?q=${encodeURIComponent(actor.name + ' actor')}" target="_blank" title="Search ${escapeQuotes(actor.name)}">
+                            <div class="mb-cast-avatar" id="cast-avatar-${idx}">
+                                ${actor.image ? `<img src="${actor.image}" alt="${escapeQuotes(actor.name)}" />` : initials}
+                            </div>
                             <div class="mb-cast-info">
-                                <span class="mb-cast-name">${actor}</span>
-                                <span class="mb-cast-role">Cast Member</span>
+                                <span class="mb-cast-name">${actor.name}</span>
+                                <span class="mb-cast-role">${roleLabel}</span>
                             </div>
                         </a>
                     `;
                 }).join('');
                 castSection.style.display = 'flex';
+
+                // Asynchronously hydrate portrait photos for actors without images
+                actorsList.forEach((actor, idx) => {
+                    if (!actor.image) {
+                        getActorPortraitPhoto(actor.name).then(photoUrl => {
+                            if (photoUrl) {
+                                const avatarEl = document.getElementById(`cast-avatar-${idx}`);
+                                if (avatarEl) {
+                                    avatarEl.innerHTML = `<img src="${photoUrl}" alt="${escapeQuotes(actor.name)}" />`;
+                                }
+                            }
+                        }).catch(() => {});
+                    }
+                });
+            }
+
+            // Also fill technical card
+            const actWrap = document.getElementById('wActorsWrap');
+            const actVal = document.getElementById('wActorsVal');
+            if (actWrap && actVal) {
+                actVal.textContent = actorsList.map(a => a.name).join(', ');
+                actWrap.style.display = 'flex';
             }
         }
 

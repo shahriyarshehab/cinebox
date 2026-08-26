@@ -11,7 +11,23 @@
       "Drama"
     ],
     "director": null,
-    "actors": "Kiefer Sutherland, Mary Lynn Rajskub, Carlos Bernard",
+    "actors": [
+      {
+        "name": "Kiefer Sutherland",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Mary Lynn Rajskub",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Carlos Bernard",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "In this concept drama, each season takes place within one 24 hour period. Day 1: Jack Bauer is the head of field ops for an elite team of CTU agents who uncover an assassination plot targeting Presidential nominee David Palmer. Meanwhile, Jack's strained marriage to his wife, Teri, is pushed to the brink by the sudden disappearance of their troubled teenage daughter. What will the next 24 hours hold?",
     "awards": "Won 20 Primetime Emmys. 74 wins & 208 nominations total"
   },
@@ -27,7 +43,23 @@
       "War"
     ],
     "director": null,
-    "actors": "Pilou Asbæk, Sarah-Sofie Boussnina, Bent Mejding",
+    "actors": [
+      {
+        "name": "Pilou Asbæk",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Sarah-Sofie Boussnina",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Bent Mejding",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "The Danes are thrilled after the victory in the 1st Schleswig War. Danish politicians now dream of incorporating Schleswig into the Kingdom of Denmark, in defiance of the peace agreement. In a small community, the brothers Peter (Jens Sætter-Lassen) and Laust (Jakob Oftebro) grow up, and both fall in love with Inge (Marie Tourell Søderberg). When the Danish President of the Council of Ministers, Mr. Monrad (Nicolas Bro), claims that Schleswig must be incorporated to the Kingdom, everyone is aware that it is the start of 2nd Schleswig War. But only this time, the Danish troops are met by Otto von Bismarck's (Rainer Bock) Prussian and Austrian army. An army much bigger and stronger than the Danish. 150 years later the maladjusted teenage girl, Claudia (Sarah-Sofie Boussnina) is on the edge of a meltdown and is forced to be visit friend to the old Baron, Severin (Bent Mejding). Inges old dairy catches Claudias interest, and through Inges writings, Claudia experience thousands of young Danes, sacrificing their lives in the Battle at Dybboel, 1864, for a meaningless and incomprehensible war. This is the story of one of the greatest defeats of Danish history in the middle of a period of blooming patriotism. 1864 is the story about innocence and love, ignorance and rashness.",
     "awards": "8 nominations total"
   },
@@ -42,7 +74,23 @@
       "Western"
     ],
     "director": null,
-    "actors": "Tim McGraw, Sam Elliott, Faith Hill",
+    "actors": [
+      {
+        "name": "Tim McGraw",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Sam Elliott",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Faith Hill",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "The post-Civil war generation of the Dutton family travels to Texas, and joins a wagon train undertaking the arduous journey west to Oregon, before settling in Montana to establish what would eventually become the Yellowstone Ranch.",
     "awards": "Nominated for 3 Primetime Emmys. 6 wins & 18 nominations total"
   },
@@ -58,7 +106,23 @@
       "Thriller"
     ],
     "director": null,
-    "actors": "Emily Beecham, Aneurin Barnard, Andreas Pietschmann",
+    "actors": [
+      {
+        "name": "Emily Beecham",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Aneurin Barnard",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Andreas Pietschmann",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "The whole European angle was very important for us, not only story wise but also the way we were going to produce it. It really had to be a European collaboration, not just cast but also crew. We felt that with the past years of Europe being on the decline, we wanted to give a counterpoint to Brexit, and to nationalism rising in different countries, to go back to that idea of Europe and Europeans working and creating together.",
     "awards": "1 win & 5 nominations total"
   },
@@ -70,7 +134,23 @@
     "rated": null,
     "genres": [],
     "director": null,
-    "actors": "Carlos Salamano, Felice Nazzaro, Jimmy Murphy",
+    "actors": [
+      {
+        "name": "Carlos Salamano",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Felice Nazzaro",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Jimmy Murphy",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": null,
     "awards": null
   },
@@ -84,7 +164,28 @@
       "Horror"
     ],
     "director": "Tony Randel",
-    "actors": "Stephen Macht, Shawn Weatherly, Megan Ward, Damon Martin",
+    "actors": [
+      {
+        "name": "Stephen Macht",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Shawn Weatherly",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Megan Ward",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Damon Martin",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "When an old clock arrives at home as a gift, strange things begin to happen. The family that proudly assigned a privileged place to the clock in the living room, is unaware that this thing is a link to an old and evil house...",
     "awards": null
   },
@@ -98,7 +199,23 @@
       "Drama"
     ],
     "director": "Frank Darabont",
-    "actors": "Tim Robbins, Morgan Freeman, Bob Gunton",
+    "actors": [
+      {
+        "name": "Tim Robbins",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Morgan Freeman",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Bob Gunton",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Chronicles the experiences of a formerly successful banker as a prisoner in the gloomy jailhouse of Shawshank after being found guilty of a crime he did not commit. The film portrays the man's unique way of dealing with his new, torturous life; along the way he befriends a number of fellow prisoners, most notably a wise long-term inmate named Red.",
     "awards": "Nominated for 7 Oscars. 21 wins & 43 nominations total"
   },
@@ -113,7 +230,23 @@
       "Drama"
     ],
     "director": "Francis Ford Coppola",
-    "actors": "Marlon Brando, Al Pacino, James Caan",
+    "actors": [
+      {
+        "name": "Marlon Brando",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Al Pacino",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "James Caan",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "The Godfather \"Don\" Vito Corleone is the head of the Corleone mafia family in New York. He is at the event of his daughter's wedding. Michael, Vito's youngest son and a decorated WWII Marine is also present at the wedding. Michael seems to be uninterested in being a part of the family business. Vito is a powerful man, and is kind to all those who give him respect but is ruthless against those who do not. But when a powerful and treacherous rival wants to sell drugs and needs the Don's influence for the same, Vito refuses to do it. What follows is a clash between Vito's fading old values and the new ways which may cause Michael to do the thing he was most reluctant in doing and wage a mob war against all the other mafia families which could tear the Corleone family apart.",
     "awards": "Won 3 Oscars. 31 wins & 31 nominations total"
   },
@@ -129,7 +262,23 @@
       "Drama"
     ],
     "director": "Christopher Nolan",
-    "actors": "Christian Bale, Heath Ledger, Aaron Eckhart",
+    "actors": [
+      {
+        "name": "Christian Bale",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Heath Ledger",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Aaron Eckhart",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Set within a year after the events of Batman Begins (2005), Batman, Lieutenant James Gordon, and new District Attorney Harvey Dent successfully begin to round up the criminals that plague Gotham City, until a mysterious and sadistic criminal mastermind known only as \"The Joker\" appears in Gotham, creating a new wave of chaos. Batman's struggle against The Joker becomes deeply personal, forcing him to \"confront everything he believes\" and improve his technology to stop him. A love triangle develops between Bruce Wayne, Dent, and Rachel Dawes.",
     "awards": "Won 2 Oscars. 163 wins & 165 nominations total"
   },
@@ -144,7 +293,23 @@
       "Drama"
     ],
     "director": "Francis Ford Coppola",
-    "actors": "Al Pacino, Robert De Niro, Robert Duvall",
+    "actors": [
+      {
+        "name": "Al Pacino",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Robert De Niro",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Robert Duvall",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "The continuing saga of the Corleone crime family tells the story of a young Vito Corleone growing up in Sicily and in 1910s New York; and follows Michael Corleone in the 1950s as he attempts to expand the family business into Las Vegas, Hollywood and Cuba.",
     "awards": "Won 6 Oscars. 17 wins & 21 nominations total"
   },
@@ -159,7 +324,23 @@
       "Drama"
     ],
     "director": "Sidney Lumet",
-    "actors": "Henry Fonda, Lee J. Cobb, Martin Balsam",
+    "actors": [
+      {
+        "name": "Henry Fonda",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Lee J. Cobb",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Martin Balsam",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "The defense and the prosecution have rested, and the jury is filing into the jury room to decide if a young man is guilty or innocent of murdering his father. What begins as an open-and-shut case of murder soon becomes a detective story that presents a succession of clues creating doubt, and a mini-drama of each of the jurors' prejudices and preconceptions about the trial, the accused, AND each other. Based on the play, all of the action takes place on the stage of the jury room.",
     "awards": "Nominated for 3 Oscars. 16 wins & 12 nominations total"
   },
@@ -190,7 +371,23 @@
       "Fantasy"
     ],
     "director": "Peter Jackson",
-    "actors": "Elijah Wood, Viggo Mortensen, Ian McKellen",
+    "actors": [
+      {
+        "name": "Elijah Wood",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Viggo Mortensen",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Ian McKellen",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "The final confrontation between the forces of good and evil fighting for control of the future of Middle-earth. Frodo and Sam reach Mordor in their quest to destroy the One Ring, while Aragorn leads the forces of good against Sauron's evil army at the stone city of Minas Tirith.",
     "awards": "Won 11 Oscars. 215 wins & 124 nominations total"
   },
@@ -205,7 +402,23 @@
       "Drama"
     ],
     "director": "Quentin Tarantino",
-    "actors": "John Travolta, Uma Thurman, Samuel L. Jackson",
+    "actors": [
+      {
+        "name": "John Travolta",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Uma Thurman",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Samuel L. Jackson",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Jules Winnfield (Samuel L. Jackson) and Vincent Vega (John Travolta) are two hitmen who are out to retrieve a suitcase stolen from their employer, mob boss Marsellus Wallace (Ving Rhames). Wallace has also asked Vincent to take his wife Mia (Uma Thurman) out a few days later when Wallace himself will be out of town. Butch Coolidge (Bruce Willis) is an aging boxer who is paid by Wallace to lose his fight. The lives of these seemingly unrelated people are woven together comprising of a series of funny, bizarre and uncalled-for incidents.",
     "awards": "Won 1 Oscar. 69 wins & 72 nominations total"
   },
@@ -221,7 +434,23 @@
       "Fantasy"
     ],
     "director": "Peter Jackson",
-    "actors": "Elijah Wood, Ian McKellen, Orlando Bloom",
+    "actors": [
+      {
+        "name": "Elijah Wood",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Ian McKellen",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Orlando Bloom",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "An ancient Ring thought lost for centuries has been found, and through a strange twist of fate has been given to a small Hobbit named Frodo. When Gandalf discovers the Ring is in fact the One Ring of the Dark Lord Sauron, Frodo must make an epic quest to Mount Doom in order to destroy it. However, he does not go alone. He is joined by Gandalf, Legolas the elf, Gimli the Dwarf, Aragorn, Boromir, and his three Hobbit friends Merry, Pippin, and Samwise. Through mountains, snow, darkness, forests, rivers and plains, facing evil and danger at every corner the Fellowship of the Ring must go. Their quest to destroy the One Ring is the only hope for the end of the Dark Lords reign.",
     "awards": "Won 4 Oscars. 126 wins & 127 nominations total"
   },
@@ -237,7 +466,23 @@
       "Fantasy"
     ],
     "director": null,
-    "actors": "Park Ji-hu, Yoon Chan-young, Cho Yi-hyun",
+    "actors": [
+      {
+        "name": "Park Ji-hu",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Yoon Chan-young",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Cho Yi-hyun",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "It was a normal school day for the students of a Korean high school-until a student returns from the school's science lab, infected by an unknown virus. As the infection spreads out of school and throughout the peninsula, the Military desperately interrogates the psychotic science teacher who started it all, while his students struggle to survive until help arrives.",
     "awards": "2 nominations total"
   },
@@ -253,7 +498,23 @@
       "Fantasy"
     ],
     "director": null,
-    "actors": "Victoria Grace, Alexandra Bokyun Chun, Hao Feng",
+    "actors": [
+      {
+        "name": "Victoria Grace",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Alexandra Bokyun Chun",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Hao Feng",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Set in a fictional country called Daeho, it is about the love and growth of young mages as they overcome their twisted fates due to a forbidden magic spell known as the \"alchemy of souls\", which allows souls to switch bodies.",
     "awards": null
   },
@@ -269,7 +530,23 @@
       "Drama"
     ],
     "director": null,
-    "actors": "Choi Woo-sik, Son Suk-ku, Lee Hee-joon",
+    "actors": [
+      {
+        "name": "Choi Woo-sik",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Son Suk-ku",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Lee Hee-joon",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "When one accidental killing leads to another, an ordinary young man finds himself stuck in an endless cat-and-mouse chase with a shrewd detective.",
     "awards": "1 win & 6 nominations total"
   },
@@ -285,7 +562,23 @@
       "Mystery"
     ],
     "director": null,
-    "actors": "Lee Dong-wook, Chase Kim, Kim Hye-jun",
+    "actors": [
+      {
+        "name": "Lee Dong-wook",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Chase Kim",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kim Hye-jun",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "An action drama in which a niece who lost her parents and grew up in the hands of an uncle who runs a shopping mall, faces a new truth after her uncle's sudden death.",
     "awards": "1 win & 2 nominations total"
   },
@@ -301,7 +594,23 @@
       "Romance"
     ],
     "director": null,
-    "actors": "Ahn Hyo-seop, Jeon Yeo-been, Kang Hoon",
+    "actors": [
+      {
+        "name": "Ahn Hyo-seop",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Jeon Yeo-been",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kang Hoon",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "A grieving woman magically travels through time to 1998, where she meets a man with an uncanny resemblance to her late love.",
     "awards": null
   },
@@ -317,7 +626,23 @@
       "Thriller"
     ],
     "director": null,
-    "actors": "Park Gyuyoung, Victoria Grace, Eugene Ko",
+    "actors": [
+      {
+        "name": "Park Gyuyoung",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Victoria Grace",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Eugene Ko",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Fame. Money. Power. One young woman fights to become the next hottest celebrity in the glamorous yet scandalous world of influencers in Seoul.",
     "awards": null
   },
@@ -333,7 +658,23 @@
       "Drama"
     ],
     "director": null,
-    "actors": "Hyun Bin, Son Ye-jin, Seo Ji-hye",
+    "actors": [
+      {
+        "name": "Hyun Bin",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Son Ye-jin",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Seo Ji-hye",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "When famous fashion company owner Yoon Se-ri finds herself trapped in North Korea after a devastating paragliding accident, she meets Ri Jeong-hyeok, a respectable military captain. During her stay, Se-ri discovers the hardships of living in North Korea, and as she slowly falls in love with Captain Ri, it is up to her and her fellow North Korean comrades to find her way back home to the South while hiding their love for each other.",
     "awards": "4 wins & 9 nominations total"
   },
@@ -348,7 +689,23 @@
       "Fantasy"
     ],
     "director": null,
-    "actors": "Seo In-guk, Park So-dam, Go Youn-jung",
+    "actors": [
+      {
+        "name": "Seo In-guk",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Park So-dam",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Go Youn-jung",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Facing hardships and contemplating suicide after a series of setbacks, a man is confronted by Death and tasked with experiencing death over and over again through 13 other lives to earn the chance to live.",
     "awards": "1 nomination total"
   },
@@ -364,7 +721,23 @@
       "Romance"
     ],
     "director": null,
-    "actors": "Bae Suzy, Yang Se-jong, Harrison Xu",
+    "actors": [
+      {
+        "name": "Bae Suzy",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Yang Se-jong",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Harrison Xu",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Follows the romance between a freshman college student and an established female pop idol.",
     "awards": null
   },
@@ -379,7 +752,23 @@
       "Thriller"
     ],
     "director": null,
-    "actors": "Kwon Eun-bin, Kim Ki-hae, Kim Min-chul",
+    "actors": [
+      {
+        "name": "Kwon Eun-bin",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kim Ki-hae",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kim Min-chul",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "A science fiction thriller that depicts all students across the country fighting against unidentified objects ahead of the CSAT and fighting for extra points.",
     "awards": "3 nominations total"
   },
@@ -393,7 +782,23 @@
       "Drama"
     ],
     "director": null,
-    "actors": "Park Eun-bin, Kang Tae-oh, Kang Ki-young",
+    "actors": [
+      {
+        "name": "Park Eun-bin",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kang Tae-oh",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kang Ki-young",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Follows the brilliant attorney Woo Young-woo, who tackles challenges in and out of the courtroom as a rookie at a prominent law firm and a woman on the autism spectrum.",
     "awards": "4 wins & 4 nominations total"
   },
@@ -409,7 +814,23 @@
       "History"
     ],
     "director": null,
-    "actors": "Park Seo-joon, Han So-hee, Steven Lim",
+    "actors": [
+      {
+        "name": "Park Seo-joon",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Han So-hee",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Steven Lim",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "In Spring 1945 in Gyeongseong, during Japanese rule over Korea, two young adults confront a strange creature born of greed, and battle against it for survival.",
     "awards": "2 nominations total"
   },
@@ -425,7 +846,23 @@
       "Horror"
     ],
     "director": null,
-    "actors": "Han Hyo-joo, Park Hyung-sik, Jo Woo-jin",
+    "actors": [
+      {
+        "name": "Han Hyo-joo",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Park Hyung-sik",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Jo Woo-jin",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Set in the near future, a high-rise apartment building has been newly constructed in the big city. The apartment building has residents from diverse backgrounds, but a new infectious disease breaks out. Because of the outbreak, the high-rise apartment is sealed off. The residents struggle to survive, while stricken with fear and distrust of others.",
     "awards": "1 win & 1 nomination total"
   },
@@ -441,7 +878,23 @@
       "Drama"
     ],
     "director": null,
-    "actors": "Ryu Seung-ryong, Han Hyo-joo, Zo In-sung",
+    "actors": [
+      {
+        "name": "Ryu Seung-ryong",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Han Hyo-joo",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Zo In-sung",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "The quiet lives of three high school students with genetic superhuman abilities turn upside down when a mysterious organization starts to hunt them down one by one.",
     "awards": "8 wins & 11 nominations total"
   },
@@ -457,7 +910,23 @@
       "Fantasy"
     ],
     "director": null,
-    "actors": "Kim Yoo-jung, Song Kang, Lee Sang-yi",
+    "actors": [
+      {
+        "name": "Kim Yoo-jung",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Song Kang",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Lee Sang-yi",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "A pitiless demon becomes powerless after getting entangled with an icy heiress, who may hold the key to his lost abilities -- and his heart.",
     "awards": "3 wins & 1 nomination total"
   },
@@ -473,7 +942,23 @@
       "Romance"
     ],
     "director": null,
-    "actors": "Kim Soo-hyun, Kim Ji-won, Park Sung-hoon",
+    "actors": [
+      {
+        "name": "Kim Soo-hyun",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kim Ji-won",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Park Sung-hoon",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "A miraculous love story of a married couple overcoming a dizzying crisis.",
     "awards": "4 wins & 7 nominations total"
   },
@@ -487,7 +972,23 @@
       "Comedy"
     ],
     "director": null,
-    "actors": "Lindsey Shaw, Meaghan Martin, Ethan Peck",
+    "actors": [
+      {
+        "name": "Lindsey Shaw",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Meaghan Martin",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Ethan Peck",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Kat Stratford is an outspoken, independent feminist; her sister Bianca is a social butterfly who wants nothing more than to be popular, even if it means bowing to the whims of people like the demanding Chastity Church. The series highlights the Stratford sisters as they experience the highs and lows of high school, deal with their overprotective father, and find love. In Bianca's case this is her friend Cameron who has a huge crush on her, while Kat finds herself in an interesting relationship with school bad boy Patrick Verona.",
     "awards": "1 win & 8 nominations total"
   },
@@ -503,7 +1004,23 @@
       "Horror"
     ],
     "director": null,
-    "actors": "Rahman, Sanju Sivram, Adil Ibrahim",
+    "actors": [
+      {
+        "name": "Rahman",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Sanju Sivram",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Adil Ibrahim",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Enter a cradle of mysteries where a man with a dark past manipulates multiple lives through a series of cryptic letters and deadly games.",
     "awards": null
   },
@@ -519,7 +1036,23 @@
       "Romance"
     ],
     "director": null,
-    "actors": "James Franco, Sarah Gadon, George MacKay",
+    "actors": [
+      {
+        "name": "James Franco",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Sarah Gadon",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "George MacKay",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "A teacher discovers a time portal that leads to October 21st, 1960 and goes on a quest to try and prevent the assassination of John F. Kennedy, which is complicated by the presence of Lee Harvey Oswald and the fact that he's falling in love with the past itself.",
     "awards": "Nominated for 1 Primetime Emmy. 2 wins & 12 nominations total"
   },
@@ -535,7 +1068,23 @@
       "Mystery"
     ],
     "director": null,
-    "actors": "Aaron Stanford, Amanda Schull, Noah Bean",
+    "actors": [
+      {
+        "name": "Aaron Stanford",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Amanda Schull",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Noah Bean",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "In the year 2043, scavenger James Cole (Aaron Stanford) has been recruited by a team of \"Project Splinter\" scientists led by physicist Katarina Jones (Barbara Sukowa), to travel back in time to the year 2015, and stop the release of a deadly virus by the enigmatic organization known as the \"Army of the 12 Monkeys\". In Cole's original time-line, the virus caused a plague that resulted in the death of seven billion humans in the year 2017, and its on-going mutations will mean the eventual end of the human race. In the 2015 time-line, Cole will meet and enlist the help of brilliant virologist Dr. Cassandra \"Cassie\" Railly (Amanda Schull); the two are brought together because a recording mentioning Cole, that Cassie made after the viral outbreak, is uncovered by Jones in the future time-line, prompting her to select Cole for the mission. Cole will also encounter a seemingly unstable math genius named Jennifer Goines (Emily Hampshire), whose father Cole has been tasked to kill, Cassie's ex-boyfriend Aaron Marker (Noah Bean), and the dangerous high-ranking members of the Army of the 12 Monkeys, \"Pallid Man\" (Tom Noonan) and Olivia (Alisen Down). In the future time-line, Cole will also have to deal with his best friend José Ramse (Kirk Acevedo), and a man named Theodore Deacon (Todd Stashwick), who leads a brutal pack of scavengers from which Cole and Ramse fled. Meanwhile, Cole and Cassie will try to unveil the identity and whereabouts of the mysterious leader of the Army of the 12 Monkeys, who is only known as \"The Witness\", and is always one step ahead of them.",
     "awards": "4 wins & 10 nominations total"
   },
@@ -551,7 +1100,23 @@
       "Thriller"
     ],
     "director": null,
-    "actors": "Dylan Minnette, Katherine Langford, Christian Navarro",
+    "actors": [
+      {
+        "name": "Dylan Minnette",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Katherine Langford",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Christian Navarro",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Thirteen Reasons Why, based on the best-selling books by Jay Asher, follows teenager Clay Jensen (Dylan Minnette) as he returns home from school to find a mysterious box with his name on it lying on his porch. Inside he discovers a group of cassette tapes recorded by Hannah Baker (Katherine Langford) -his classmate and crush-who tragically committed suicide two weeks earlier. On tape, Hannah unfolds an emotional audio diary, detailing the thirteen reasons why she decided to end her life. Through Hannah and Clay's dual narratives, Thirteen Reasons Why weaves an intricate and heartrending story of confusion and desperation that will deeply affect viewers.",
     "awards": "5 wins & 15 nominations total"
   },
@@ -566,7 +1131,23 @@
       "Romance"
     ],
     "director": null,
-    "actors": "Abhishek Ranjan, Jai Kishan, Keshav Mehta",
+    "actors": [
+      {
+        "name": "Abhishek Ranjan",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Jai Kishan",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Keshav Mehta",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "A startup founder's transformation as he shifts from business success to finding life's deeper purpose.",
     "awards": null
   },
@@ -582,7 +1163,23 @@
       "Mystery"
     ],
     "director": null,
-    "actors": "Zheming Wei, Qian Sun, Shu Bai",
+    "actors": [
+      {
+        "name": "Zheming Wei",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Qian Sun",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Shu Bai",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "University students Chun Yu and Qing You, along with others, mysteriously find themselves trapped in a dangerous VR game world after a car accident, except for substitute teacher Gao Xuan who claims to have simply fallen asleep.",
     "awards": "1 nomination"
   },
@@ -596,7 +1193,23 @@
       "Comedy"
     ],
     "director": null,
-    "actors": "Kat Dennings, Beth Behrs, Garrett Morris",
+    "actors": [
+      {
+        "name": "Kat Dennings",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Beth Behrs",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Garrett Morris",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Sassy, streetwise Max works two jobs just to get by, one of which is waiting tables during the night shift at the retro-hip Williamsburg Diner. Sophisticated Caroline is an uptown trust fund princess who's having a run of bad luck that forces her to reluctantly give waitressing a shot. At first, Max sees Caroline as yet another in a long line of inept servers she must cover for, but she's surprised to find that Caroline has as much substance as she does style. When Caroline discovers Max's knack for baking amazing cupcakes, she sees a lucrative future for them, but they first need to raise the start-up money.",
     "awards": "Won 1 Primetime Emmy. 3 wins & 24 nominations total"
   },
@@ -612,7 +1225,23 @@
       "Crime"
     ],
     "director": null,
-    "actors": "Anil Kapoor, Neil Bhoopalam, Raaghav Chanana",
+    "actors": [
+      {
+        "name": "Anil Kapoor",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Neil Bhoopalam",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Raaghav Chanana",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Jai Singh Rathod, having battled alcohol issues in rehab, is estranged from his son Veer (Akshay Ajit Singh) who holds him responsible for his mother's (Tisca Chopra) death. Jai gets a terror mastermind Roshan Sherchan (Ashish Vidyarthi) arrested along with accomplice Shivani Malik (Sakshi Tanwar). But Roshan's brother Haroon Sherchan (Sikander Kher) has made a deadly plan. He threatens to infect Mumbai with a virus that can put everyone's life at risk. While members of the Anti Terrorism Unit (including Shivani Malik) are trying their best to solve the case, Jai Rathod, unbeknownst to them, is hatching a plan to free Roshan. Jai has drawn further ire from his son for being romantically involved with a new woman Maya (Surveen Chawla). Maya also has a connection to the terrorist brothers and is in a relationship with Haroon.",
     "awards": "10 wins & 12 nominations"
   },
@@ -627,7 +1256,23 @@
       "Thriller"
     ],
     "director": "Rob Reiner",
-    "actors": "Tom Cruise, Jack Nicholson, Demi Moore",
+    "actors": [
+      {
+        "name": "Tom Cruise",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Jack Nicholson",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Demi Moore",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "In this dramatic courtroom thriller, LT Daniel Kaffee, a Navy lawyer who has never seen the inside of the courtroom, defends two stubborn Marines who have been accused of murdering a colleague. Kaffee is known as being lazy and had arranged for a plea bargain. Downey's Aunt Ginny appoints Cmdr. Galloway to represent him. Also on the legal staff is LTJG Sam Weinberg. The team rounds up many facts and Kaffee is discovering that he is really cut out for trial work. The defense is originally based upon the fact that PFC Santiago, the victim, was given a \"CODE RED\". Santiago was basically a screw-up. At Gitmo, screw-ups aren't tolerated. Especially by Col. Nathan Jessup. In Cuba, Jessup and two senior officers try to give all the help they can, but Kaffee knows something's fishy. In the conclusion of the film, the fireworks are set off by a confrontation between Jessup and Kaffee.",
     "awards": "Nominated for 4 Oscars. 11 wins & 30 nominations total"
   },
@@ -642,7 +1287,23 @@
       "Fantasy"
     ],
     "director": "Barry Sonnenfeld",
-    "actors": "Anjelica Huston, Raul Julia, Christopher Lloyd",
+    "actors": [
+      {
+        "name": "Anjelica Huston",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Raul Julia",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Christopher Lloyd",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "When an adorable baby boy is added to the Addams household, Wednesday and Pugsley do not hate him, they just aren't necessarily excited about his existence. OK...yeah, they do hate him. So they plot to get rid of him one way or another. Meanwhile, their parents hire a nanny for him and she charms Fester, but has evil intentions for him. The Addamses must stop her, but how?",
     "awards": "Nominated for 1 Oscar. 3 wins & 17 nominations total"
   },
@@ -657,7 +1318,23 @@
       "Sci-Fi"
     ],
     "director": "Ridley Scott",
-    "actors": "Sigourney Weaver, Tom Skerritt, John Hurt",
+    "actors": [
+      {
+        "name": "Sigourney Weaver",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Tom Skerritt",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "John Hurt",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "In the distant future, the commercial spaceship \"Nostromo\" crew is on its way home when the crew picks up a distress call from a distant moon. The crew must investigate, and the spaceship descends on the small planetoid afterwards. After a rough landing, three crew members leave the spaceship to explore the area on the planetoid. At the same time, the ship's computer deciphers the message. When the crew realizes it is not alone on the spaceship, they must deal with the consequences.",
     "awards": "Won 1 Oscar. 19 wins & 22 nominations total"
   },
@@ -671,7 +1348,23 @@
       "Documentary"
     ],
     "director": "Paul Bernard",
-    "actors": "Michael Biehn, Ralph Brown, James Cameron",
+    "actors": [
+      {
+        "name": "Michael Biehn",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Ralph Brown",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "James Cameron",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "This made-for-TV documentary details the work that went into the production of Alien 3, David Fincher's 1992 continuation of the classic series about the battle between starship crewman Ripley and the killer alien species that just won't die. Science fiction fans are treated to a behind-the-scenes look at the making of this third installment of the Alien series, as well as to interviews with the director, cast members and special effects artists, who give their insights into the efforts that were needed to bring this project to completion.",
     "awards": null
   },
@@ -687,7 +1380,23 @@
       "Horror"
     ],
     "director": "James Cameron",
-    "actors": "Sigourney Weaver, Michael Biehn, Carrie Henn",
+    "actors": [
+      {
+        "name": "Sigourney Weaver",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Michael Biehn",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Carrie Henn",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "57 years after Ellen Ripley had a close encounter with the reptilian alien creature from the first movie, she is called back, this time, to help a group of highly trained colonial marines fight off against the sinister extraterrestrials. But this time, the aliens have taken over a space colony on the moon LV-426. When the colonial marines are called upon to search the deserted space colony, they later find out that they are up against more than what they bargained for. Using specially modified machine guns and enough firepower, it's either fight or die as the space marines battle against the aliens.",
     "awards": "Won 2 Oscars. 20 wins & 25 nominations total"
   },
@@ -703,7 +1412,23 @@
       "War"
     ],
     "director": "Francis Ford Coppola",
-    "actors": "Martin Sheen, Marlon Brando, Robert Duvall",
+    "actors": [
+      {
+        "name": "Martin Sheen",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Marlon Brando",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Robert Duvall",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "It is the height of the war in Vietnam, and U.S. Army Captain Willard is sent by Colonel Lucas and a General to carry out a mission that, officially, 'does not exist - nor will it ever exist'. The mission: To seek out a mysterious Green Beret Colonel, Walter Kurtz, whose army has crossed the border into Cambodia and is conducting hit-and-run missions against the Viet Cong and NVA. The army believes Kurtz has gone completely insane and Willard's job is to eliminate him. Willard, sent up the Nung River on a U.S. Navy patrol boat, discovers that his target is one of the most decorated officers in the U.S. Army. His crew meets up with surfer-type Lt-Colonel Kilgore, head of a U.S Army helicopter cavalry group which eliminates a Viet Cong outpost to provide an entry point into the Nung River. After some hair-raising encounters, in which some of his crew are killed, Willard, Lance and Chef reach Colonel Kurtz's outpost, beyond the Do Lung Bridge. Now, after becoming prisoners of Kurtz, will Willard & the others be able to fulfill their mission?",
     "awards": "Won 2 Oscars. 21 wins & 33 nominations total"
   },
@@ -719,7 +1444,23 @@
       "History"
     ],
     "director": "Ron Howard",
-    "actors": "Tom Hanks, Bill Paxton, Kevin Bacon",
+    "actors": [
+      {
+        "name": "Tom Hanks",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Bill Paxton",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kevin Bacon",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Based on the true story of the ill-fated 13th Apollo mission bound for the moon. Astronauts Lovell, Haise and Swigert were scheduled to fly Apollo 14, but are moved up to 13. It's 1970, and The US has already achieved their lunar landing goal, so there's little interest in this \"routine\" flight.. until that is, things go very wrong, and prospects of a safe return fade.",
     "awards": "Won 2 Oscars. 31 wins & 59 nominations total"
   },
@@ -734,7 +1475,23 @@
       "Horror"
     ],
     "director": "Sam Raimi",
-    "actors": "Bruce Campbell, Embeth Davidtz, Marcus Gilbert",
+    "actors": [
+      {
+        "name": "Bruce Campbell",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Embeth Davidtz",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Marcus Gilbert",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Ash is transported with his car to 1,300 A.D., where he is captured by Lord Arthur and turned slave with Duke Henry the Red and a couple of his men. When Ash is thrown into a pit, he defeats two monsters and wins respect of Arthur's army and vassals. The Wiseman points Ash as The Chosen One that will retrieve the Necronomicon but Ash is only interested in returning home. When he learns that the only way to return to his time is using the Necronomicon, Ash decides to travel to the unholy land of the Deadites. The Wiseman advises that he must say the words \"Klaatu Barada Nikto\" to safely get the evil book. However, Ash forgets the last word and an army of the dead resurrects to attack Arthur fortress and recover the Necronomicon. The battle between the living and the dead is about to start and the support of Henry the Red is the only way to help Ash and Arthur to defeat the army of darkness.",
     "awards": "12 wins & 6 nominations total"
   },
@@ -750,7 +1507,23 @@
       "Crime"
     ],
     "director": "Patrick Read Johnson",
-    "actors": "Lara Flynn Boyle, Joe Mantegna, Joe Pantoliano",
+    "actors": [
+      {
+        "name": "Lara Flynn Boyle",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Joe Mantegna",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Joe Pantoliano",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Baby Bink couldn't ask for more; he has adoring (if somewhat sickly-sweet) parents, he lives in a huge mansion, and he's just about to appear in the social pages of the paper. Unfortunately, not everyone in the world is as nice as Baby Bink's parents; especially the three enterprising kidnappers who pretend to be photographers from the newspaper. Successfully kidnapping Baby Bink, they have a harder time keeping hold of the rascal, who not only keeps one step ahead of them, but seems to be more than a little bit smarter than the three bumbling criminals.",
     "awards": null
   },
@@ -766,7 +1539,23 @@
       "War"
     ],
     "director": "Stanley Kubrick",
-    "actors": "Ryan O'Neal, Marisa Berenson, Patrick Magee",
+    "actors": [
+      {
+        "name": "Ryan O'Neal",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Marisa Berenson",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Patrick Magee",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "In the eighteenth century, in a small village in Ireland, Redmond Barry (Ryan O'Neal) is a young farm boy in love with his cousin Nora Brady (Gay Hamilton). When Nora gets engaged to British Captain John Quin (Leonard Rossiter), Barry challenges him to a duel of pistols. He wins and escapes to Dublin, but is robbed on the road. Without an alternative, Barry joins the British Army to fight in the Seven Years War. He deserts and is forced to join the Prussian Army, where he saves the life of his Captain and becomes his protégé and spy of Irish gambler Chevalier de Balibari (Patrick Magee). He helps Chevalier and becomes his associate until he decides to marry the wealthy Lady Lyndon (Marisa Berenson). They move to England and Barry, in his obsession of nobility, dissipates her fortune and makes a dangerous and revengeful enemy.",
     "awards": "Won 4 Oscars. 18 wins & 14 nominations total"
   },
@@ -781,7 +1570,23 @@
       "Adventure"
     ],
     "director": "Tim Burton",
-    "actors": "Michael Keaton, Jack Nicholson, Kim Basinger",
+    "actors": [
+      {
+        "name": "Michael Keaton",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Jack Nicholson",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kim Basinger",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Gotham City. Crime boss Carl Grissom (Jack Palance) effectively runs the town but there's a new crime fighter in town - Batman (Michael Keaton). Grissom's right-hand man is Jack Napier (Jack Nicholson), a brutal man who is not entirely sane... After falling out between the two Grissom has Napier set up with the Police and Napier falls to his apparent death in a vat of chemicals. However, he soon reappears as The Joker and starts a reign of terror in Gotham City. Meanwhile, reporter Vicki Vale (Kim Basinger) is in the city to do an article on Batman. She soon starts a relationship with Batman's everyday persona, billionaire Bruce Wayne.",
     "awards": "Won 1 Oscar. 13 wins & 30 nominations total"
   },
@@ -797,7 +1602,23 @@
       "Fantasy"
     ],
     "director": "Tim Burton",
-    "actors": "Michael Keaton, Danny DeVito, Michelle Pfeiffer",
+    "actors": [
+      {
+        "name": "Michael Keaton",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Danny DeVito",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Michelle Pfeiffer",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "In the sewers of gotham city to the rooftops of the gotham city the penguin wants to know where he came from well in his villain ways catwoman plans to kill rich man of gotham max shreak but as he battles with millionaire Bruce Wayne both ladies men have their own secrets Bruce Wayne is back as Bat man trying to stop the penguin Max is helping penguin steal gotham city while selina Kyle/catwoman tries to help penguin not knowing her man murder target also her murder is helping him but all four men have their goals taking gotham from crime winning gotham city assassination for two men and more money to be gotham citys number one rich man.",
     "awards": "Nominated for 2 Oscars. 2 wins & 29 nominations total"
   },
@@ -813,7 +1634,23 @@
       "Crime"
     ],
     "director": "Robert Clouse",
-    "actors": "Jackie Chan, Kristine DeBell, José Ferrer",
+    "actors": [
+      {
+        "name": "Jackie Chan",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Kristine DeBell",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "José Ferrer",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "A young Asian-American martial artist is forced to participate in a brutal formal street-fighting competition.",
     "awards": "1 nomination total"
   },
@@ -829,7 +1666,23 @@
       "Thriller"
     ],
     "director": "Partho Ghosh, Parto Ghosh, Raam Laxman",
-    "actors": "Jackie Shroff, Madhuri Dixit, Jaaved Jaaferi",
+    "actors": [
+      {
+        "name": "Jackie Shroff",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Madhuri Dixit",
+        "character": "Cast",
+        "image": null
+      },
+      {
+        "name": "Jaaved Jaaferi",
+        "character": "Cast",
+        "image": null
+      }
+    ],
     "synopsis": "Gifted with powers to oversee incidents much before they happen; Devi attempts to uncover the secrets of her sister Rama's death whose body was discovered in one of the walls of her multi-millionaire husband, Ram Kumar bungalow. Devi's investigations lead her to discover that Ram Kumar was involved in the death of her sister - while she has another vision - such a vision that will make her a target by an unstoppable assassin.",
     "awards": "1 nomination"
   }

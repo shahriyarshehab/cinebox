@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cinebox-v10';
+const CACHE_NAME = 'cinebox-v11';
 const STATIC_ASSETS = [
   './',
   './index.html',
