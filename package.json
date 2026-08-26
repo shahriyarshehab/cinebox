@@ -1,0 +1,20 @@
+{
+  "name": "cinebox",
+  "version": "1.0.0",
+  "description": "CineBox - HD Movies, TV Shows & Animation Streaming Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "serve:py": "python server.py"
+  },
+  "keywords": [
+    "movies",
+    "cinema",
+    "tv-shows",
+    "streaming",
+    "pwa"
+  ],
+  "author": "",
+  "license": "ISC"
+}
