@@ -729,6 +729,9 @@ function enterPlayerMode(url, title) {
     const pView = document.getElementById('playerView');
     pView.style.display = 'block';
 
+    const mobNav = document.querySelector('.mobile-bottom-nav');
+    if (mobNav) mobNav.style.display = 'none';
+
     // Populate Player Heading Info & Custom Overlay Title
     document.getElementById('playerHeadingTitle').textContent = currentActiveStreamTitle;
     const mediaTag = (currentItem && currentItem.tag) ? currentItem.tag : '1080p HD';
@@ -813,6 +816,9 @@ function exitPlayerMode() {
     // Switch Views back
     document.getElementById('playerView').style.display = 'none';
     document.getElementById('detailView').style.display = 'flex';
+
+    const mobNav = document.querySelector('.mobile-bottom-nav');
+    if (mobNav) mobNav.style.display = '';
 
     // Remove play query param
     const urlObj = new URL(window.location);

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cinebox-v17';
+const CACHE_NAME = 'cinebox-v18';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -11,6 +11,9 @@ const STATIC_ASSETS = [
   './js/core.js',
   './js/app.js',
   './js/watch.js',
+  './icons/icons.js',
+  './icons/icons.json',
+  './icons/mx-player.svg',
   './home_data.json',
   './data/latest.json',
   './data/today.json',
@@ -45,7 +48,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   // Cache-first for local static assets, network-first for data/video
-  if (url.origin === location.origin && (url.pathname.endsWith('.html') || url.pathname.endsWith('.css') || url.pathname.endsWith('.js'))) {
+  if (url.origin === location.origin && (url.pathname.endsWith('.html') || url.pathname.endsWith('.css') || url.pathname.endsWith('.js') || url.pathname.endsWith('.svg') || url.pathname.endsWith('.json'))) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         return cachedResponse || fetch(event.request);
