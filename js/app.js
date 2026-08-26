@@ -963,11 +963,6 @@ function setFacetQuality(val) {
     renderView();
 }
 
-function loadMore() {
-    displayedCount += BATCH_SIZE;
-    renderView();
-}
-
 function applyAllFilters() {
     let dataset = rawCategoryPool || [];
 
@@ -1285,13 +1280,6 @@ function showRecentSearchesDropdown(dropdown) {
     `;
     dropdown.style.display = 'block';
     refreshLucideIcons();
-}
-
-function clearRecentSearches(e) {
-    if (e) e.stopPropagation();
-    try {
-        localStorage.removeItem('cinebox_recent_searches');
-    } catch (e) {}
 }
 
 function removeSingleRecentSearch(e, query) {

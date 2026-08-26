@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cinebox-v18';
+const CACHE_NAME = 'cinebox-v19';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -8,12 +8,13 @@ const STATIC_ASSETS = [
   './watchlist.html',
   './watch.html',
   './css/style.css',
+  './js/lucide.min.js',
   './js/core.js',
   './js/app.js',
   './js/watch.js',
-  './icons/icons.js',
-  './icons/icons.json',
-  './icons/mx-player.svg',
+  './icons/icon.svg',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
   './home_data.json',
   './data/latest.json',
   './data/today.json',

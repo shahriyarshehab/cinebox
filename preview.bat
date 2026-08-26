@@ -1,7 +1,7 @@
 @echo off
-title DhakaFlix GitHub Website Preview
+title CineBox GitHub Website Preview
 echo ============================================================
-echo Starting Local Preview of your GitHub Website...
+echo Starting Local Preview of CineBox Web Application...
 echo ============================================================
 cd /d "%~dp0"
 start http://localhost:8000
