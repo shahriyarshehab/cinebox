@@ -1409,7 +1409,7 @@ function renderMovieCardHtml(item) {
     const rawTitle = item.title || '';
     const safeTitle = escapeQuotes(rawTitle);
     const itemData = encodeURIComponent(JSON.stringify(item));
-    const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
+    const isSeries = typeof isMediaSeries === 'function' ? isMediaSeries(item) : (item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/')));
     const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
     const markerHtml = getMediaReleaseMarker(item.date);
     const isRecent = markerHtml.length > 0;
@@ -1417,14 +1417,14 @@ function renderMovieCardHtml(item) {
     return `
         <a class="movie-card" href="${linkUrl}">
             <div class="card-cover">
-                <img src="${item.poster}" alt="${safeTitle}" loading="lazy"
+                <img src="${item.poster}" alt="${safeTitle}" loading="lazy" decoding="async"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="cover-fallback" style="display: none;">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
                     <div style="font-size: 10px; font-weight: 600;">${item.title}</div>
                 </div>
                 ${markerHtml}
-                <div class="tag-badge">${item.tag || 'HD'}</div>
+                <div class="tag-badge">${item.tag || (isSeries ? 'Series' : 'HD')}</div>
                 <div class="cover-overlay">
                     <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
                         ${isSeries ? 

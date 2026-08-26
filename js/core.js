@@ -336,6 +336,18 @@ function slideRow(rowId, direction) {
     slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 }
 
+function isMediaSeries(item) {
+    if (!item) return false;
+    const tag = (item.tag || '').toLowerCase();
+    const cat = (item.category || '').toLowerCase();
+    const title = (item.title || '').toLowerCase();
+    const url = item.url || '';
+    return tag.includes('series') || tag.includes('drama') || tag === 'tv' || tag === 'tv series' ||
+           cat.includes('series') || cat.includes('drama') || cat.includes('tv') ||
+           title.includes('season') || title.includes('s0') || title.includes('s1') ||
+           url.endsWith('/') || url.includes('/tv/') || url.includes('/series/');
+}
+
 // ==========================================
 // 📱 PWA Install Promotion Engine
 // ==========================================

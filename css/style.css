@@ -1190,7 +1190,7 @@ header {
 .movie-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1198,30 +1198,50 @@ header {
     position: relative;
     text-decoration: none;
     color: inherit;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.28s ease, box-shadow 0.28s ease;
     user-select: none;
+    will-change: transform;
+    contain: content;
 }
 
 .movie-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px) scale(1.015);
     border-color: var(--border-hover);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.2);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 20px rgba(0, 229, 255, 0.25);
 }
 
 .movie-card:active {
-    transform: scale(0.97);
+    transform: scale(0.975);
+}
+
+[data-theme="light"] .movie-card {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .movie-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 0 14px rgba(2, 132, 199, 0.2);
 }
 
 .card-cover {
     position: relative;
     width: 100%;
     padding-top: 144%;
-    background: linear-gradient(135deg, #151c2a 0%, #0a0e16 100%);
+    background: linear-gradient(110deg, #0e131d 8%, #171f2e 18%, #0e131d 33%);
+    background-size: 200% 100%;
+    animation: cardShimmer 1.8s infinite linear;
     overflow: hidden;
 }
 
+@keyframes cardShimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
 [data-theme="light"] .card-cover {
-    background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+    background: linear-gradient(110deg, #e2e8f0 8%, #f1f5f9 18%, #e2e8f0 33%);
+    background-size: 200% 100%;
+    animation: cardShimmer 1.8s infinite linear;
 }
 
 .card-cover img {
@@ -1230,11 +1250,11 @@ header {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.35s ease;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .movie-card:hover .card-cover img {
-    transform: scale(1.06);
+    transform: scale(1.07);
 }
 
 .cover-fallback {
@@ -1253,9 +1273,10 @@ header {
 .cover-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%);
+    backdrop-filter: blur(2px);
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1270,69 +1291,90 @@ header {
 }
 
 .play-button-symbol {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: var(--primary);
     color: #07090e;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 14px var(--primary-glow);
+    box-shadow: 0 4px 16px var(--primary-glow);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.movie-card:hover .play-button-symbol {
+    transform: scale(1.12);
 }
 
 .tag-badge {
     position: absolute;
     top: 8px;
     left: 8px;
-    background: rgba(7, 9, 14, 0.85);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0, 229, 255, 0.3);
+    background: rgba(7, 9, 14, 0.82);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 229, 255, 0.35);
     color: var(--primary);
     font-size: 9px;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 4px;
+    font-weight: 800;
+    padding: 3px 7px;
+    border-radius: 6px;
     z-index: 2;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme="light"] .tag-badge {
-    background: rgba(255, 255, 255, 0.94);
+    background: rgba(255, 255, 255, 0.95);
     color: #0284c7;
-    border: 1px solid rgba(2, 132, 199, 0.3);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(2, 132, 199, 0.35);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .card-body {
-    padding: 9px 11px;
+    padding: 10px 12px;
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
     background: var(--bg-card);
+    border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="light"] .card-body {
+    border-top-color: rgba(0, 0, 0, 0.04);
 }
 
 .card-title {
-    font-size: 12px;
+    font-size: 12.5px;
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.35;
     color: #fff;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     word-break: break-word;
+    transition: color 0.15s ease;
+}
+
+.movie-card:hover .card-title {
+    color: var(--primary);
 }
 
 [data-theme="light"] .card-title {
     color: #0c121e;
 }
 
+[data-theme="light"] .movie-card:hover .card-title {
+    color: #0284c7;
+}
+
 .card-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 10px;
+    font-size: 10.5px;
+    font-weight: 500;
     color: var(--text-muted);
 }
 
@@ -3682,19 +3724,34 @@ kbd {
 /* Toast */
 .toast {
     position: fixed;
-    bottom: 74px;
+    bottom: 78px;
     left: 50%;
-    transform: translateX(-50%);
-    background: var(--accent-green);
-    color: #07090e;
-    padding: 9px 20px;
+    transform: translateX(-50%) translateY(16px);
+    background: rgba(14, 18, 26, 0.95);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 229, 255, 0.4);
+    color: #fff;
+    padding: 10px 22px;
     border-radius: 30px;
     font-size: 12.5px;
     font-weight: 700;
     display: none;
     z-index: 600;
-    box-shadow: 0 8px 24px rgba(0, 230, 118, 0.3);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 16px var(--primary-glow);
     white-space: nowrap;
+    animation: toastPop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toastPop {
+    0% { opacity: 0; transform: translateX(-50%) translateY(16px) scale(0.94); }
+    100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+[data-theme="light"] .toast {
+    background: rgba(255, 255, 255, 0.96);
+    color: #0f172a;
+    border-color: rgba(2, 132, 199, 0.4);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.15), 0 0 14px rgba(2, 132, 199, 0.2);
 }
 
 /* ==========================================================================
@@ -4838,7 +4895,36 @@ kbd {
     }
 }
 
+/* ==========================================================================
+   ✨ GLOBAL SMOOTH SCROLLBAR & SELECTION STYLES
+   ========================================================================== */
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
 
+::-webkit-scrollbar-track {
+    background: var(--bg-base);
+}
 
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.16);
+    border-radius: 4px;
+}
 
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
 
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary);
+}
+
+::selection {
+    background: var(--primary);
+    color: #07090e;
+}
