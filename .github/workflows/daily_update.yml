@@ -1,0 +1,35 @@
+name: CineBox Mother Server Auto-Update
+
+on:
+  schedule:
+    # Run everyday at 00:00 UTC (6:00 AM Bangladesh Time)
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions UI
+
+jobs:
+  update-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run Auto-Update Crawler
+        run: |
+          python scripts/auto_update.py
+
+      - name: Commit and push updated catalog
+        run: |
+          git config --global user.name "CineBox Bot"
+          git config --global user.email "bot@cinebox.app"
+          git add data/*.json movies.json home_data.json
+          if git diff --staged --quiet; then
+            echo "No new updates found from mother server."
+          else
+            git commit -m "Auto-update movie & series catalog with latest uploads [skip ci]"
+            git push origin main
+          fi

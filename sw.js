@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cinebox-v11';
+const CACHE_NAME = 'cinebox-v12';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,8 @@ const STATIC_ASSETS = [
   './js/app.js',
   './js/watch.js',
   './home_data.json',
+  './data/latest.json',
+  './data/today.json',
   './metadata_cache.json',
   './manifest.json'
 ];

@@ -24,6 +24,7 @@ let carouselTimer = null;
 let isFullCatalogLoaded = false;
 
 const CATEGORY_ROWS = [
+    { name: "🔥 Today's Updates", tag: "Today", limit: 14 },
     { name: 'IMDb Top 250', tag: 'Top Rated', limit: 14 },
     { name: 'Animation & Anime', tag: 'Animation', limit: 14 },
     { name: 'Hollywood 1080p', tag: 'Hollywood 1080p', limit: 14 },
@@ -40,6 +41,7 @@ const CATEGORY_ROWS = [
 
 const ALL_CATEGORY_PILLS = [
     { label: 'All Categories', tag: 'All' },
+    { label: "🔥 Today's Updates", tag: 'Today' },
     { label: 'IMDb Top 250', tag: 'Top Rated' },
     { label: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
     { label: 'Animation & Anime', tag: 'Animation' },
@@ -56,6 +58,7 @@ const ALL_CATEGORY_PILLS = [
 
 const TV_CATEGORY_PILLS = [
     { label: 'All TV & K-Drama', tag: 'All_TV' },
+    { label: "🔥 Today's New Series", tag: 'Today' },
     { label: 'TV & Web Series', tag: 'TV Series' },
     { label: 'Korean Drama (K-Drama)', tag: 'K-Drama' },
     { label: 'Animation & Anime Series', tag: 'Animation' }
@@ -63,6 +66,7 @@ const TV_CATEGORY_PILLS = [
 
 const MOVIES_CATEGORY_PILLS = [
     { label: 'All 36,000+ Movies', tag: 'All_Movies' },
+    { label: "🔥 Today's New Movies", tag: 'Today' },
     { label: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
     { label: 'Bollywood (Hindi)', tag: 'Bollywood' },
     { label: 'South Action (Dubbed)', tag: 'South Action' },
@@ -76,6 +80,7 @@ const MOVIES_CATEGORY_PILLS = [
 
 const ANIMATION_CATEGORY_PILLS = [
     { label: 'All Animation & Anime', tag: 'All_Animation' },
+    { label: "🔥 Today's Anime", tag: 'Today' },
     { label: 'Anime & TV Series', tag: 'TV Series' },
     { label: 'Animated Movies', tag: 'Hollywood 1080p' }
 ];
@@ -99,6 +104,9 @@ function getActivePagePills() {
 }
 
 const CATEGORY_JSON_MAP = {
+    'Today': 'data/latest.json',
+    "Today's Updates": 'data/latest.json',
+    "🔥 Today's Updates": 'data/latest.json',
     'K-Drama': 'data/kdrama.json',
     'TV Series': 'data/tv_series.json',
     'Hollywood 1080p': 'data/hollywood.json',
@@ -988,6 +996,9 @@ function applyAllFilters() {
 function matchesCategory(m, tag) {
     if (!m) return false;
     if (tag === 'All') return true;
+    if (tag === 'Today' || tag === "Today's Updates" || tag === "🔥 Today's Updates") {
+        return (m.date && m.date.trim().length > 0);
+    }
     if (m.tag === tag) return true;
     if (tag === 'K-Drama' && (m.tag === 'K-Drama' || (m.category && m.category.includes('Korean')) || (m.url && m.url.includes('KOREAN')))) return true;
     if (tag === 'TV Series' && (m.tag === 'TV Series' || (m.category && m.category.includes('Series')) || (m.url && m.url.includes('TV-WEB-Series')))) return true;
@@ -1014,6 +1025,8 @@ async function selectFilterPill(tag, label) {
             await loadFullCatalogInBackground();
         }
         rawCategoryPool = [...allMovies];
+    } else if (tag === 'Today' || tag === "Today's Updates" || tag === "🔥 Today's Updates") {
+        rawCategoryPool = await fetchCategoryData('Today');
     } else if (tag === 'All_TV') {
         const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
         rawCategoryPool = [...tv, ...kdrama];
@@ -1402,6 +1415,7 @@ function renderMovieCardHtml(item) {
     const itemData = encodeURIComponent(JSON.stringify(item));
     const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
     const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
+    const isNew = item.date && (item.date.startsWith('2026') || item.date.startsWith('2025-11') || item.date.startsWith('2025-12'));
 
     return `
         <a class="movie-card" href="${linkUrl}">
@@ -1412,6 +1426,7 @@ function renderMovieCardHtml(item) {
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
                     <div style="font-size: 10px; font-weight: 600;">${item.title}</div>
                 </div>
+                ${isNew ? '<div class="new-release-badge">🔥 NEW</div>' : ''}
                 <div class="tag-badge">${item.tag || 'HD'}</div>
                 <div class="cover-overlay">
                     <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
@@ -1427,7 +1442,7 @@ function renderMovieCardHtml(item) {
                 <div class="card-title" title="${item.title}">${item.title}</div>
                 <div class="card-meta">
                     <span>${item.size || 'HD'}</span>
-                    <span>${item.date || ''}</span>
+                    <span style="${isNew ? 'color: #ff5252; font-weight: 700;' : ''}">${item.date || ''}</span>
                 </div>
             </div>
         </a>
