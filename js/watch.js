@@ -623,10 +623,10 @@ function renderWatchPage(item) {
     document.getElementById('wPoster').src = item.poster;
     document.getElementById('mbBackdrop').style.backgroundImage = `url('${item.poster}')`;
     
-    const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
+    const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/')) || (item.category && /TV|Series|Drama/i.test(item.category));
 
     // Quality Badge
-    document.getElementById('wQualityBadge').textContent = item.tag || '1080p HD';
+    document.getElementById('wQualityBadge').textContent = item.tag || (isSeries ? 'Series' : '1080p HD');
     
     // Meta Specs
     document.getElementById('wYear').textContent = item.date || '2024';
@@ -658,9 +658,9 @@ function renderWatchPage(item) {
     // MovieBox Action Buttons (On Details View)
     document.getElementById('wActions').innerHTML = `
         ${isSeries ? `
-            <button class="mb-btn-primary" onclick="scrollTvExplorer()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
-                <span>Select Episode</span>
+            <button class="mb-btn-primary" onclick="playFirstEpisodeOrScroll()">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
+                <span>Watch Episode 1</span>
             </button>
         ` : `
             <button class="mb-btn-primary" onclick="enterPlayerMode('${item.url}', '${escapeQuotes(item.title)}')">
@@ -830,9 +830,20 @@ function toggleSynopsis() {
     }
 }
 
+function playFirstEpisodeOrScroll() {
+    if (currentSeasonEpisodes && currentSeasonEpisodes.length > 0) {
+        playSpecificEpisode(0);
+    } else {
+        scrollTvExplorer();
+    }
+}
+
 function scrollTvExplorer() {
     const exp = document.getElementById('tvExplorerWrap');
-    if (exp) exp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (exp) {
+        exp.style.display = 'flex';
+        exp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
 function toggleCurrentWatchlist() {
