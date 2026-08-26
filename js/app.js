@@ -554,6 +554,7 @@ function renderView() {
         }
         renderCategoryFullGrid(main);
     }
+    refreshLucideIcons();
 }
 
 function renderHomeRowsFromPayload(categoriesMap) {

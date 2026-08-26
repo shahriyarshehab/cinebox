@@ -384,3 +384,25 @@ function dismissPwaBanner() {
     localStorage.setItem('cinebox_pwa_dismissed', (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
 }
 
+// ==========================================
+// Lucide Icons Integration Engine
+// ==========================================
+function refreshLucideIcons() {
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        try {
+            window.lucide.createIcons({
+                attrs: {
+                    'stroke-width': 2,
+                    class: 'lucide-icon'
+                }
+            });
+        } catch (e) {}
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', refreshLucideIcons);
+} else {
+    refreshLucideIcons();
+}
+

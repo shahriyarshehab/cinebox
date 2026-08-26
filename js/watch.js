@@ -703,6 +703,7 @@ function renderWatchPage(item) {
 
     // Retrieve & apply rich real-time metadata (IMDb rating, Rotten Tomatoes, Cast, Director, Box office, Awards)
     loadAndApplyOnlineMetadata(item);
+    refreshLucideIcons();
 }
 
 // ==========================================
@@ -1475,6 +1476,7 @@ function renderEpisodeListHtml(episodes) {
     `;}).join('');
 
     epList.innerHTML = html;
+    refreshLucideIcons();
 }
 
 function renderPlayerEpisodeList(episodes) {

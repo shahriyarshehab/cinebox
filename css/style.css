@@ -83,12 +83,17 @@ body {
     padding-bottom: 0;
 }
 
-.icon {
+.icon, .lucide-icon, svg.lucide, i[data-lucide] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     vertical-align: middle;
     flex-shrink: 0;
+}
+
+i[data-lucide] {
+    width: 1em;
+    height: 1em;
 }
 
 /* Header */
