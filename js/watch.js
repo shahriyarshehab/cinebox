@@ -999,10 +999,12 @@ function startStream(url, title) {
     const cpTitleEl = document.getElementById('cpMediaTitle');
     if (cpTitleEl) cpTitleEl.textContent = currentActiveStreamTitle;
 
-    player.src = url;
+    // Reset audio state to unmuted and full volume
+    player.muted = false;
+    player.volume = 1.0;
+    updateVolumeUI();
 
-    // Apply audio booster engine on play
-    setupAudioBooster();
+    player.src = url;
 
     // Auto-resume from last saved time
     if (playerSettings.autoResume) {
@@ -1018,7 +1020,29 @@ function startStream(url, title) {
         player.playbackRate = playerSettings.defaultSpeed;
     }
 
-    player.play().catch(e => console.log(e));
+    // Start playback with unmuted audio
+    const playPromise = player.play();
+    if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+            console.log('Autoplay restriction encountered, starting with user prompt', err);
+            player.muted = true;
+            updateVolumeUI();
+            player.play().then(() => {
+                showToast('Tap screen to unmute sound 🔊');
+                const enableSound = () => {
+                    player.muted = false;
+                    player.volume = 1.0;
+                    updateVolumeUI();
+                    window.removeEventListener('click', enableSound);
+                    window.removeEventListener('touchstart', enableSound);
+                    window.removeEventListener('keydown', enableSound);
+                };
+                window.addEventListener('click', enableSound, { once: true });
+                window.addEventListener('touchstart', enableSound, { once: true });
+                window.addEventListener('keydown', enableSound, { once: true });
+            }).catch(() => {});
+        });
+    }
 }
 
 // ==========================================
