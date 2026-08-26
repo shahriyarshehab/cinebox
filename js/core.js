@@ -4,7 +4,7 @@
  */
 
 // ==========================================
-// 🎨 Theme Management
+//  Theme Management
 // ==========================================
 function initTheme() {
     const saved = localStorage.getItem('cinebox_theme') || 'dark';
@@ -21,7 +21,7 @@ function toggleTheme() {
 initTheme();
 
 // ==========================================
-// 🔔 Toast Notification System
+//  Toast Notification System
 // ==========================================
 let toastTimer = null;
 function showToast(msg) {
@@ -36,7 +36,7 @@ function showToast(msg) {
 }
 
 // ==========================================
-// 💖 Watchlist Storage Engine
+//  Watchlist Storage Engine
 // ==========================================
 function getWatchlist() {
     try {
@@ -65,7 +65,7 @@ function toggleWatchlist(movieObj) {
         showToast('Removed from Watchlist');
     } else {
         list.unshift(movieObj);
-        showToast('Added to Watchlist ❤️');
+        showToast('Added to Watchlist');
         isAdded = true;
     }
 
@@ -93,7 +93,7 @@ function updateWatchlistNavBadge() {
 }
 
 // ==========================================
-// ⏱️ Playback History & Resume Engine
+// ⏱ Playback History & Resume Engine
 // ==========================================
 function getWatchHistory() {
     try {
@@ -150,7 +150,7 @@ function removeWatchHistory(url, event) {
 }
 
 // ==========================================
-// 🔍 Recent Searches Manager
+//  Recent Searches Manager
 // ==========================================
 const RECENT_SEARCHES_KEY = 'cinebox_recent_searches';
 
@@ -190,7 +190,7 @@ function clearRecentSearches(event) {
 }
 
 // ==========================================
-// 🧠 Fuzzy Search & Typo-Tolerance Algorithms
+//  Fuzzy Search & Typo-Tolerance Algorithms
 // ==========================================
 function levenshteinDistance(s1, s2) {
     const a = s1.toLowerCase();
@@ -298,7 +298,7 @@ function filterFuzzyMatches(dataset, query, limit = 8) {
 }
 
 // ==========================================
-// 💬 Subtitles Parser (.srt to .vtt converter)
+//  Subtitles Parser (.srt to .vtt converter)
 // ==========================================
 function srtToVtt(srtContent) {
     if (!srtContent) return '';
@@ -308,7 +308,7 @@ function srtToVtt(srtContent) {
 }
 
 // ==========================================
-// 🛠️ String, UI & Formatting Helpers
+//  String, UI & Formatting Helpers
 // ==========================================
 function escapeQuotes(str) {
     return (str || '').replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
@@ -349,7 +349,7 @@ function isMediaSeries(item) {
 }
 
 // ==========================================
-// 📱 PWA Install Promotion Engine
+//  PWA Install Promotion Engine
 // ==========================================
 let deferredPwaPrompt = null;
 
@@ -371,7 +371,7 @@ function installPwaApp() {
     deferredPwaPrompt.prompt();
     deferredPwaPrompt.userChoice.then((choice) => {
         if (choice.outcome === 'accepted') {
-            showToast('Installing CineBox App... 🎉');
+            showToast('Installing CineBox App...');
         }
         deferredPwaPrompt = null;
         dismissPwaBanner();

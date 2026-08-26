@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 📦 CineBox Batch SVG Icon Pack Downloader
+ *  CineBox Batch SVG Icon Pack Downloader
  * Fetches and saves all essential UI and player icons from svgrepo.com
  * 
  * Usage:
@@ -24,7 +24,7 @@ const ICON_CATALOG = [
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 async function run() {
-    console.log('🚀 Downloading CineBox SVG Icon Pack from svgrepo.com...\n');
+    console.log(' Downloading CineBox SVG Icon Pack from svgrepo.com...\n');
     let success = 0;
 
     for (const item of ICON_CATALOG) {
@@ -44,7 +44,7 @@ async function run() {
         await sleep(1500); // 1.5s delay to respect rate limits
     }
 
-    console.log(`\n✨ Successfully fetched and optimized ${success}/${ICON_CATALOG.length} icons into icons/ directory!`);
+    console.log(`\n Successfully fetched and optimized ${success}/${ICON_CATALOG.length} icons into icons/ directory!`);
 }
 
 if (require.main === module) {

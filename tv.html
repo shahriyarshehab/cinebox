@@ -141,16 +141,20 @@
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: var(--primary);"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>
                     <span>Keyboard Shortcuts</span>
                 </div>
-                <button class="btn-close" onclick="toggleShortcutsModal()">✕</button>
+                <button class="btn-close" onclick="toggleShortcutsModal()" aria-label="Close"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             </div>
-            <div class="modal-body">
-                <div class="shortcuts-grid">
-                    <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>K</kbd> <span>Global Search</span></div>
-                    <div class="shortcut-item"><kbd>/</kbd> <span>Focus Search Bar</span></div>
-                    <div class="shortcut-item"><kbd>Esc</kbd> <span>Close Modals / Reset</span></div>
-                    <div class="shortcut-item"><kbd>D</kbd> <span>Roll Surprise Dice</span></div>
-                    <div class="shortcut-item"><kbd>T</kbd> <span>Toggle Dark / Light Theme</span></div>
-                </div>
+            <div class="modal-body" style="gap: 12px;">
+                <div class="shortcut-item"><kbd>Ctrl</kbd> + <kbd>K</kbd> / <kbd>/</kbd> <span>Focus Instant Search</span></div>
+                <div class="shortcut-item"><kbd>Space</kbd> / <kbd>K</kbd> <span>Play / Pause Video</span></div>
+                <div class="shortcut-item"><kbd>←</kbd> / <kbd>→</kbd> <span>Seek Backward / Forward</span></div>
+                <div class="shortcut-item"><kbd>S</kbd> <span>Player Customization Studio</span></div>
+                <div class="shortcut-item"><kbd>T</kbd> <span>Toggle Theater Mode</span></div>
+                <div class="shortcut-item"><kbd>V</kbd> <span>Cycle Video Filters (HDR/Cinema)</span></div>
+                <div class="shortcut-item"><kbd>C</kbd> <span>Toggle Subtitles (CC)</span></div>
+                <div class="shortcut-item"><kbd>F</kbd> <span>Toggle Fullscreen</span></div>
+                <div class="shortcut-item"><kbd>M</kbd> <span>Mute / Unmute Audio</span></div>
+                <div class="shortcut-item"><kbd>N</kbd> / <kbd>P</kbd> <span>Next / Previous Episode</span></div>
+                <div class="shortcut-item"><kbd>Esc</kbd> <span>Close Modals / Clear Search</span></div>
             </div>
         </div>
     </div>
@@ -163,12 +167,12 @@
             </div>
             <div>
                 <div style="font-size: 13.5px; font-weight: 700; color: #fff;">Install CineBox App</div>
-                <div style="font-size: 11px; color: var(--text-muted);">Instant TV series streaming & offline cache</div>
+                <div style="font-size: 11px; color: var(--text-muted);">Instant streaming & standalone app</div>
             </div>
         </div>
         <div style="display: flex; gap: 8px;">
             <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="installPwaApp()">Install</button>
-            <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="dismissPwaBanner()">✕</button>
+            <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="dismissPwaBanner()" aria-label="Close"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
     </div>
 

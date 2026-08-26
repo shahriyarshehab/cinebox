@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 🎬 CineBox App Usable SVG Icon Collector
+ *  CineBox App Usable SVG Icon Collector
  * Collects, optimizes, and registers all UI and Video Player SVG icons
  * specifically usable in CineBox (Navigation, Player HUD, Customizer, External Players, Metadata).
  * 
@@ -20,7 +20,7 @@ if (!fs.existsSync(ICONS_DIR)) {
 }
 
 // ==========================================================================
-// 🎨 CineBox Usable Vector Icon Catalog (Optimized Clean SVGs)
+//  CineBox Usable Vector Icon Catalog (Optimized Clean SVGs)
 // ==========================================================================
 const CINEBOX_APP_ICONS = {
     // 1. Navigation Bar & Header
@@ -275,6 +275,114 @@ const CINEBOX_APP_ICONS = {
         viewBox: '0 0 24 24',
         path: '<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>',
         source: 'svgrepo.com/svg/532988/play-circle'
+    },
+    'meta-tomato': {
+        category: 'meta',
+        viewBox: '0 0 24 24',
+        path: '<circle cx="12" cy="13" r="8"/><path d="M12 5V2m-3 3l3-2 3 2m-6 0c1.5 1 4.5 1 6 0"/>',
+        source: 'custom/tomato'
+    },
+    'meta-metacritic': {
+        category: 'meta',
+        viewBox: '0 0 24 24',
+        path: '<rect width="18" height="18" x="3" y="3" rx="4"/><path d="M7 16V8l5 5 5-5v8"/>',
+        source: 'custom/metacritic'
+    },
+    'ui-close': {
+        category: 'ui',
+        viewBox: '0 0 24 24',
+        path: '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+        source: 'svgrepo.com/svg/532976/x'
+    },
+    'preset-cinema': {
+        category: 'preset',
+        viewBox: '0 0 24 24',
+        path: '<rect width="20" height="15" x="2" y="7" rx="2"/><path d="m4 7 3-5 3 5 3-5 3 5 3-5 3 5"/>',
+        source: 'custom/clapper'
+    },
+    'preset-vivid': {
+        category: 'preset',
+        viewBox: '0 0 24 24',
+        path: '<path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/>',
+        source: 'custom/sparkle'
+    },
+    'preset-warm': {
+        category: 'preset',
+        viewBox: '0 0 24 24',
+        path: '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+        source: 'custom/flame'
+    },
+    'preset-night': {
+        category: 'preset',
+        viewBox: '0 0 24 24',
+        path: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+        source: 'custom/moon'
+    },
+    'preset-cyber': {
+        category: 'preset',
+        viewBox: '0 0 24 24',
+        path: '<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3 8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>',
+        source: 'custom/gem'
+    },
+    'ctrl-brightness': {
+        category: 'control',
+        viewBox: '0 0 24 24',
+        path: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
+        source: 'custom/sun'
+    },
+    'ctrl-contrast': {
+        category: 'control',
+        viewBox: '0 0 24 24',
+        path: '<circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12v12z" fill="currentColor"/>',
+        source: 'custom/contrast'
+    },
+    'ctrl-saturation': {
+        category: 'control',
+        viewBox: '0 0 24 24',
+        path: '<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"/>',
+        source: 'custom/palette'
+    },
+    'ctrl-hue': {
+        category: 'control',
+        viewBox: '0 0 24 24',
+        path: '<circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 22a10 10 0 0 1-10-10"/>',
+        source: 'custom/hue'
+    },
+    'audio-headphone': {
+        category: 'audio',
+        viewBox: '0 0 24 24',
+        path: '<path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>',
+        source: 'custom/headphones'
+    },
+    'audio-dialogue': {
+        category: 'audio',
+        viewBox: '0 0 24 24',
+        path: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/>',
+        source: 'custom/mic'
+    },
+    'audio-bass': {
+        category: 'audio',
+        viewBox: '0 0 24 24',
+        path: '<path d="M2 10v4M6 6v12M10 3v18M14 8v8M18 5v14M22 10v4"/>',
+        source: 'custom/wave'
+    },
+    'dl-fast': {
+        category: 'download',
+        viewBox: '0 0 24 24',
+        path: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+        source: 'custom/lightning'
+    },
+    'dl-batch': {
+        category: 'download',
+        viewBox: '0 0 24 24',
+        path: '<path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',
+        source: 'custom/package'
+    },
+    'dl-file': {
+        category: 'download',
+        viewBox: '0 0 24 24',
+        path: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>',
+        source: 'custom/file'
     }
 };
 
@@ -288,7 +396,7 @@ function generateSvgDocument(iconKey, item) {
 
 function generateJsRegistry(catalog) {
     let code = `/**
- * 🎨 CineBox Unified SVG Icon Registry
+ *  CineBox Unified SVG Icon Registry
  * Auto-generated by scripts/collect-app-icons.js
  * Source vectors from SVGRepo (https://www.svgrepo.com/)
  */
@@ -318,7 +426,7 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 function main() {
-    console.log('🚀 Generating CineBox usable SVG Icon Collection...\n');
+    console.log(' Generating CineBox usable SVG Icon Collection...\n');
 
     let count = 0;
     for (const [key, item] of Object.entries(CINEBOX_APP_ICONS)) {
@@ -328,16 +436,16 @@ function main() {
         count++;
     }
 
-    console.log(`✅ Saved ${count} usable SVGs into icons/ directory!`);
+    console.log(` Saved ${count} usable SVGs into icons/ directory!`);
 
     // Write icons/icons.js registry
     const registryJs = generateJsRegistry(CINEBOX_APP_ICONS);
     fs.writeFileSync(path.join(ICONS_DIR, 'icons.js'), registryJs, 'utf8');
-    console.log(`📦 Generated JS icon registry at: icons/icons.js\n`);
+    console.log(` Generated JS icon registry at: icons/icons.js\n`);
 
     // Write JSON manifest
     fs.writeFileSync(path.join(ICONS_DIR, 'icons.json'), JSON.stringify(CINEBOX_APP_ICONS, null, 2), 'utf8');
-    console.log(`📋 Generated JSON icon manifest at: icons/icons.json\n`);
+    console.log(` Generated JSON icon manifest at: icons/icons.json\n`);
 }
 
 if (require.main === module) {

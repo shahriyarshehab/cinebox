@@ -1379,7 +1379,7 @@ header {
 }
 
 /* ==========================================================================
-   🎬 MOVIEBOX-STYLE DETAILS & DEDICATED STREAMING PAGE ARCHITECTURE
+    MOVIEBOX-STYLE DETAILS & DEDICATED STREAMING PAGE ARCHITECTURE
    ========================================================================== */
 
 /* 1. Default MovieBox Details Page Container */
@@ -1721,7 +1721,7 @@ header {
 }
 
 /* ==========================================================================
-   🌞 LIGHT THEME REFINEMENTS FOR ITEM DETAILS PAGE & CARDS
+    LIGHT THEME REFINEMENTS FOR ITEM DETAILS PAGE & CARDS
    ========================================================================== */
 [data-theme="light"] .mb-hero-section {
     background: #ffffff;
@@ -2177,7 +2177,7 @@ header {
 }
 
 /* ==========================================================================
-   📺 2. DEDICATED ONLINE PLAYER VIEW STYLING (.player-fullscreen-layout)
+    2. DEDICATED ONLINE PLAYER VIEW STYLING (.player-fullscreen-layout)
    ========================================================================== */
 .player-fullscreen-layout {
     width: 100%;
@@ -2298,7 +2298,7 @@ header {
 }
 
 /* ==========================================================================
-   🎛️ CUSTOM OVERLAY CONTROLS (.custom-player-controls)
+    CUSTOM OVERLAY CONTROLS (.custom-player-controls)
    ========================================================================== */
 .custom-player-controls {
     position: absolute;
@@ -2694,7 +2694,7 @@ header {
 }
 
 /* ==========================================================================
-   📱 DOUBLE-TAP TOUCH SEEK OVERLAY (Left / Right YouTube Style)
+    DOUBLE-TAP TOUCH SEEK OVERLAY (Left / Right YouTube Style)
    ========================================================================== */
 .touch-seek-overlay {
     position: absolute;
@@ -2766,7 +2766,7 @@ header {
 }
 
 /* ==========================================================================
-   📱 GESTURE HUD INDICATORS & SCREEN LOCK
+    GESTURE HUD INDICATORS & SCREEN LOCK
    ========================================================================== */
 .gesture-hud-container {
     position: absolute;
@@ -2918,7 +2918,7 @@ header {
 }
 
 /* ==========================================================================
-   🎛️ PLAYER CUSTOMIZATION STUDIO MODAL STYLING
+    PLAYER CUSTOMIZATION STUDIO MODAL STYLING
    ========================================================================== */
 .player-custom-modal .modal-card {
     max-width: 720px;
@@ -3755,7 +3755,7 @@ kbd {
 }
 
 /* ==========================================================================
-   📱 RESPONSIVE MEDIA QUERIES (Computers, Tablets & Mobile Devices)
+    RESPONSIVE MEDIA QUERIES (Computers, Tablets & Mobile Devices)
    ========================================================================== */
 
 /* Mobile Devices (Max-Width 768px) */
@@ -4039,7 +4039,7 @@ kbd {
         padding: 4px 10px;
     }
 
-    /* 🎬 MOVIEBOX DETAILS PAGE ON MOBILE */
+    /*  MOVIEBOX DETAILS PAGE ON MOBILE */
     .mb-hero-section {
         margin: 10px 12px 0;
         border-radius: var(--radius-md);
@@ -4147,7 +4147,7 @@ kbd {
         gap: 8px;
     }
 
-    /* 📺 FOCUSED PLAYER VIEW ON MOBILE */
+    /*  FOCUSED PLAYER VIEW ON MOBILE */
     .player-fullscreen-layout {
         padding: 8px 12px 40px;
         gap: 12px;
@@ -4327,7 +4327,7 @@ kbd {
 }
 
 /* ==========================================================================
-   🎬 External Players Hub Modal Styling
+    External Players Hub Modal Styling
    ========================================================================== */
 .ext-player-card {
     display: flex;
@@ -4397,7 +4397,7 @@ kbd {
 }
 
 /* ==========================================================================
-   📥 In-App Download Manager Modal
+    In-App Download Manager Modal
    ========================================================================== */
 .download-modal-card {
     max-width: 620px;
@@ -4618,7 +4618,7 @@ kbd {
 }
 
 /* ==========================================
-   ✨ Category Slider "Show All" Card
+    Category Slider "Show All" Card
    ========================================== */
 .show-all-card {
     background: linear-gradient(160deg, rgba(14, 22, 36, 0.95) 0%, rgba(7, 10, 16, 0.98) 100%);
@@ -4724,7 +4724,7 @@ kbd {
 }
 
 /* ==========================================
-   🎬 Google Knowledge Panel / Rich Media Styles
+    Google Knowledge Panel / Rich Media Styles
    ========================================== */
 .mb-ratings-strip {
     display: flex;
@@ -4896,7 +4896,7 @@ kbd {
 }
 
 /* ==========================================================================
-   ✨ GLOBAL SMOOTH SCROLLBAR & SELECTION STYLES
+    GLOBAL SMOOTH SCROLLBAR & SELECTION STYLES
    ========================================================================== */
 ::-webkit-scrollbar {
     width: 7px;

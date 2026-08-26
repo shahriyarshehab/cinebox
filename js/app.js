@@ -364,7 +364,7 @@ async function loadFullCatalogInBackground() {
 }
 
 // ==========================================
-// 🎠 Hero Carousel
+//  Hero Carousel
 // ==========================================
 function setupCarousel(moviesList) {
     const rawList = moviesList || (homeData && homeData.carousel) || allMovies.slice(0, 10);
@@ -389,7 +389,7 @@ function setupCarousel(moviesList) {
                     <div class="slide-tag">Featured • ${m.tag || 'Latest'}</div>
                     <h2 class="slide-title" title="${escapeQuotes(m.title)}">${m.title}</h2>
                     <div class="slide-meta">
-                        <span style="color: var(--accent-gold); font-weight: 700;">★ 8.9</span>
+                        <span style="color: var(--accent-gold); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="12" height="12"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 8.9</span>
                         <span>•</span>
                         <span>${m.size || 'HD 1080P'}</span>
                         <span>•</span>
@@ -457,7 +457,7 @@ function goToSlide(idx) {
 }
 
 // ==========================================
-// ⏱️ Continue Watching UI
+// ⏱ Continue Watching UI
 // ==========================================
 function renderContinueWatchingHtml() {
     const history = getWatchHistory();
@@ -490,7 +490,7 @@ function renderContinueWatchingHtml() {
 
                     return `
                         <div class="continue-card">
-                            <button class="btn-remove-history" onclick="removeWatchHistory('${item.url}', event)" title="Remove">✕</button>
+                            <button class="btn-remove-history" onclick="removeWatchHistory('${item.url}', event)" title="Remove" aria-label="Remove"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                             <a href="${linkUrl}" style="text-decoration: none; color: inherit;">
                                 <div class="continue-thumb-wrap">
                                     <img src="${item.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300'}" alt="${escapeQuotes(item.title)}" loading="lazy">
@@ -527,7 +527,7 @@ function toggleWatchlistAndRefresh(movieObj, event) {
 }
 
 // ==========================================
-// 🖼️ Views Rendering (Home, Category, Watchlist)
+//  Views Rendering (Home, Category, Watchlist)
 // ==========================================
 function renderView() {
     const main = document.getElementById('mainContent');
@@ -748,19 +748,25 @@ function renderWatchlistView() {
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Home</span>
                     </a>
-                    <h1 class="row-heading" style="font-size: 18px;">❤️ My Watchlist & Library</h1>
+                    <h1 class="row-heading" style="font-size: 18px; display: inline-flex; align-items: center; gap: 8px;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" stroke-width="2" width="18" height="18"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <span>My Watchlist & Library</span>
+                    </h1>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="exportWatchlist()" title="Backup watchlist as JSON">
-                        <span>📥 Export JSON</span>
+                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 6px;" onclick="exportWatchlist()" title="Backup watchlist as JSON">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Export JSON</span>
                     </button>
-                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="triggerWatchlistImport()" title="Restore saved watchlist">
-                        <span>📤 Import JSON</span>
+                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 6px;" onclick="triggerWatchlistImport()" title="Restore saved watchlist">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <span>Import JSON</span>
                     </button>
                     ${list.length > 0 ? `
-                        <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; color: var(--accent);" onclick="clearAllWatchlist()" title="Clear all saved titles">
-                            <span>🗑️ Clear All</span>
+                        <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; color: var(--accent); display: inline-flex; align-items: center; gap: 6px;" onclick="clearAllWatchlist()" title="Clear all saved titles">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            <span>Clear All</span>
                         </button>
                     ` : ''}
                 </div>
@@ -789,10 +795,12 @@ function renderWatchlistView() {
             </div>
         ` : `
             <div style="text-align: center; padding: 60px 16px;">
-                <div style="font-size: 44px; margin-bottom: 12px;">💖</div>
+                <div style="margin-bottom: 16px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="1.5" width="48" height="48"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                </div>
                 <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">No Titles Found in This Tab</h2>
                 <p style="font-size: 13px; color: var(--text-muted); max-width: 380px; margin: 0 auto 16px;">
-                    Bookmark movies and series with the heart icon to access them here anytime!
+                    Bookmark movies and series with the save icon to access them here anytime!
                 </p>
                 <a class="btn btn-primary" style="text-decoration: none;" href="index.html">Explore Cinema Catalog</a>
             </div>
@@ -1055,7 +1063,7 @@ async function selectFilterPill(tag, label) {
             await loadFullCatalogInBackground();
         }
         rawCategoryPool = [...allMovies];
-    } else if (tag === 'Today' || tag === "Today's Updates" || tag === "🔥 Today's Updates") {
+    } else if (tag === 'Today' || tag === "Today's Updates") {
         rawCategoryPool = await fetchCategoryData('Today');
     } else if (tag === 'All_TV') {
         const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
@@ -1119,7 +1127,9 @@ async function openCategoryView(tag, name) {
     if (container && (!categoryCache[tag] || categoryCache[tag].length === 0)) {
         container.innerHTML = `
             <div style="text-align: center; padding: 80px 20px;">
-                <div class="surprise-spinner" style="font-size: 38px; margin-bottom: 12px;">🍿</div>
+                <div class="surprise-spinner" style="margin-bottom: 16px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="36" height="36"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                </div>
                 <div style="font-size: 16px; font-weight: 700; color: var(--primary);">Loading ${name || tag}...</div>
             </div>
         `;
@@ -1157,7 +1167,7 @@ async function openCategoryView(tag, name) {
 }
 
 // ==========================================
-// 🔍 Live Fuzzy Search & Recent Searches UI
+//  Live Fuzzy Search & Recent Searches UI
 // ==========================================
 let liveSearchTimer = null;
 
@@ -1264,7 +1274,7 @@ function showRecentSearchesDropdown(dropdown) {
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color:var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         <span>${escapeQuotes(q)}</span>
                     </div>
-                    <button class="remove-search-btn" onclick="removeSingleRecentSearch(event, '${escapeQuotes(q)}')" title="Remove">✕</button>
+                    <button class="remove-search-btn" onclick="removeSingleRecentSearch(event, '${escapeQuotes(q)}')" title="Remove" aria-label="Remove"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                 </div>
             `).join('')}
         </div>

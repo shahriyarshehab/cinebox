@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * 🎨 SVGRepo Icon Collector & Search Tool for CineBox
+ *  SVGRepo Icon Collector & Search Tool for CineBox
  * Searches, fetches, cleans, and optimizes SVG icons from svgrepo.com
  * 
  * Usage:
@@ -124,12 +124,12 @@ function cleanAndNormalizeSvg(rawSvg, options = {}) {
 }
 
 async function searchSvgRepo(query, limit = 10) {
-    console.log(`\n🔍 Searching svgrepo.com for: "${query}"...`);
+    console.log(`\n Searching svgrepo.com for: "${query}"...`);
     const cleanQuery = query.toLowerCase().replace(/[^a-z0-9]+/g, '-');
     const searchUrl = `https://www.svgrepo.com/vectors/${encodeURIComponent(cleanQuery)}/`;
 
-    console.log(`📍 Web Search URL: ${searchUrl}`);
-    console.log(`💡 You can browse and select any icon ID from https://www.svgrepo.com/vectors/${encodeURIComponent(cleanQuery)}/\n`);
+    console.log(` Web Search URL: ${searchUrl}`);
+    console.log(` You can browse and select any icon ID from https://www.svgrepo.com/vectors/${encodeURIComponent(cleanQuery)}/\n`);
 
     // Common curated matches for CineBox
     const commonVectors = {
@@ -149,7 +149,7 @@ async function searchSvgRepo(query, limit = 10) {
 
     const qKey = Object.keys(commonVectors).find(k => query.toLowerCase().includes(k));
     if (qKey) {
-        console.log(`✨ Direct CineBox Vector Matches:`);
+        console.log(` Direct CineBox Vector Matches:`);
         commonVectors[qKey].forEach(item => {
             console.log(`   • ${item.title}: https://www.svgrepo.com/svg/${item.id}/${item.slug}`);
             console.log(`     Download URL: https://www.svgrepo.com/show/${item.id}/${item.slug}.svg\n`);
@@ -159,7 +159,7 @@ async function searchSvgRepo(query, limit = 10) {
 
 async function processUrl(inputUrl, options = {}) {
     const directUrl = getDirectSvgUrl(inputUrl);
-    console.log(`\n📥 Fetching SVG from: ${directUrl}`);
+    console.log(`\n Fetching SVG from: ${directUrl}`);
 
     try {
         const raw = await fetchSvg(directUrl);
@@ -178,21 +178,21 @@ async function processUrl(inputUrl, options = {}) {
             const outPath = path.resolve(process.cwd(), options.out);
             fs.mkdirSync(path.dirname(outPath), { recursive: true });
             fs.writeFileSync(outPath, cleaned, 'utf8');
-            console.log(`✅ Saved optimized SVG to: ${options.out}`);
+            console.log(` Saved optimized SVG to: ${options.out}`);
         }
 
         if (options.jsConst) {
-            console.log(`\n📦 JavaScript Constant (${options.jsConst}):\n`);
+            console.log(`\n JavaScript Constant (${options.jsConst}):\n`);
             console.log(`const ${options.jsConst} = \`${cleaned}\`;\n`);
         } else if (!options.out) {
-            console.log('\n✨ Optimized SVG Output:\n');
+            console.log('\n Optimized SVG Output:\n');
             console.log(cleaned);
             console.log('\n');
         }
 
         return cleaned;
     } catch (err) {
-        console.error(`❌ Error fetching ${inputUrl}:`, err.message);
+        console.error(` Error fetching ${inputUrl}:`, err.message);
         return null;
     }
 }

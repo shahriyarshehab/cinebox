@@ -19,7 +19,7 @@ let isSynopsisExpanded = false;
 let isPlayerMode = false;
 
 // ==========================================================================
-// 🎛️ CineBox Player Customization & Settings Engine State
+//  CineBox Player Customization & Settings Engine State
 // ==========================================================================
 const DEFAULT_PLAYER_SETTINGS = {
     videoFilter: 'normal', // normal, vivid, cinema, night, crisp, oled
@@ -215,7 +215,7 @@ async function initWatch() {
 }
 
 // ==========================================
-// 🌐 Real-Time Online Movie & Series Metadata Engine
+//  Real-Time Online Movie & Series Metadata Engine
 // ==========================================
 function parseCleanMediaInfo(rawTitle) {
     if (!rawTitle) return { cleanName: '', year: '', isSeries: false };
@@ -437,10 +437,11 @@ async function loadAndApplyOnlineMetadata(item) {
         }
 
         // 2. IMDb Rating
-        if (meta.imdbRating) {
+        if (meta.imdbRating && meta.imdbRating !== 'N/A') {
             const rateEl = document.getElementById('wRating');
             if (rateEl) {
-                rateEl.innerHTML = `<span style="color:#ffb800; font-size:14px;">★</span> ${meta.imdbRating} / 10`;
+                rateEl.innerHTML = `<span style="color:#ffb800; font-size:14px; display:inline-flex; align-items:center;"><svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> ${meta.imdbRating} / 10`;
+                rateEl.style.display = 'inline-flex';
             }
         }
 
@@ -502,7 +503,7 @@ async function loadAndApplyOnlineMetadata(item) {
                 genEl.innerHTML = meta.genres.map(g => `
                     <a class="mb-genre-pill" href="index.html?q=${encodeURIComponent(g)}"># ${g}</a>
                 `).join('') + `
-                    <span class="mb-genre-pill" style="border-color: rgba(255, 184, 0, 0.4); color: #ffb800;">★ Official IMDb</span>
+                    <span class="mb-genre-pill" style="border-color: rgba(255, 184, 0, 0.4); color: #ffb800; display: inline-flex; align-items: center; gap: 4px;"><svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Official IMDb</span>
                 `;
             }
         }
@@ -681,7 +682,7 @@ function renderWatchPage(item) {
         `}
         <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
             <svg class="icon" id="wHeartIconAction" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-            <span id="wWatchlistActionText">${isInWatchlist(item.title) ? 'Saved ❤️' : 'Watchlist'}</span>
+            <span id="wWatchlistActionText">${isInWatchlist(item.title) ? 'Saved' : 'Watchlist'}</span>
         </button>
         <button class="mb-btn-action" onclick="shareCurrentMedia()">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
@@ -705,7 +706,7 @@ function renderWatchPage(item) {
 }
 
 // ==========================================
-// 📺 Dedicated Online Player View Mode
+//  Dedicated Online Player View Mode
 // ==========================================
 function enterPlayerMode(url, title) {
     if (!url && currentItem) url = currentItem.url;
@@ -748,7 +749,7 @@ function enterPlayerMode(url, title) {
             </button>
             <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
                 <svg class="icon" id="wHeartIconPlayer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-                <span id="wWatchlistPlayerText">${isInWatchlist(currentItem ? currentItem.title : '') ? 'Saved ❤️' : 'Save'}</span>
+                <span id="wWatchlistPlayerText">${isInWatchlist(currentItem ? currentItem.title : '') ? 'Saved' : 'Save'}</span>
             </button>
             <button class="mb-btn-action" onclick="shareCurrentMedia()">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
@@ -859,7 +860,7 @@ function updateWatchlistButtonState() {
     // Details Action button
     const actionText = document.getElementById('wWatchlistActionText');
     const actionIcon = document.getElementById('wHeartIconAction');
-    if (actionText) actionText.textContent = inList ? 'Saved ❤️' : 'Watchlist';
+    if (actionText) actionText.textContent = inList ? 'Saved' : 'Watchlist';
     if (actionIcon) {
         actionIcon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
         actionIcon.style.fill = inList ? 'var(--accent)' : 'none';
@@ -868,7 +869,7 @@ function updateWatchlistButtonState() {
     // Player View Action button
     const playerText = document.getElementById('wWatchlistPlayerText');
     const playerIcon = document.getElementById('wHeartIconPlayer');
-    if (playerText) playerText.textContent = inList ? 'Saved ❤️' : 'Save';
+    if (playerText) playerText.textContent = inList ? 'Saved' : 'Save';
     if (playerIcon) {
         playerIcon.style.stroke = inList ? 'var(--accent)' : 'currentColor';
         playerIcon.style.fill = inList ? 'var(--accent)' : 'none';
@@ -886,12 +887,12 @@ function shareCurrentMedia() {
         navigator.share(shareData).catch(() => {});
     } else {
         copyLink(window.location.href);
-        showToast('Page link copied to clipboard 🔗');
+        showToast('Page link copied to clipboard');
     }
 }
 
 // ==========================================
-// 🎬 Player Core & Listeners
+//  Player Core & Listeners
 // ==========================================
 function setupPlayerListeners() {
     const player = document.getElementById('videoPlayer');
@@ -964,7 +965,7 @@ function setupPlayerListeners() {
             currentItem || {}
         );
         if (playerSettings.sleepTimer === 'end') {
-            showToast('Sleep Timer: Playback ended. Goodnight! 🌙');
+            showToast('Sleep Timer: Playback ended');
             return;
         }
         if (currentPlayingEpisodeIdx >= 0 && currentSeasonEpisodes.length > currentPlayingEpisodeIdx + 1) {
@@ -1028,7 +1029,7 @@ function startStream(url, title) {
             player.muted = true;
             updateVolumeUI();
             player.play().then(() => {
-                showToast('Tap screen to unmute sound 🔊');
+                showToast('Tap screen to unmute sound');
                 const enableSound = () => {
                     player.muted = false;
                     player.volume = 1.0;
@@ -1046,7 +1047,7 @@ function startStream(url, title) {
 }
 
 // ==========================================
-// 📱 Mobile Double-Tap to Seek (YouTube Style)
+//  Mobile Double-Tap to Seek (YouTube Style)
 // ==========================================
 let leftTapTimer = null;
 let leftTapCount = 0;
@@ -1111,7 +1112,7 @@ function seekRelative(seconds, direction) {
 }
 
 // ==========================================
-// 💬 Subtitles (CC) Management & Converter
+//  Subtitles (CC) Management & Converter
 // ==========================================
 function openSubtitlePicker() {
     const fileInput = document.getElementById('subFileInput');
@@ -1198,7 +1199,7 @@ function loadSubtitleText(content, fileName = 'subtitles.srt') {
     const subBtn = document.getElementById('subBtn');
     if (subBtn) subBtn.classList.add('active');
 
-    showToast(`Loaded Subtitles: ${fileName} 💬`);
+    showToast(`Loaded Subtitles: ${fileName}`);
 }
 
 function toggleSubtitles() {
@@ -1216,14 +1217,14 @@ function toggleSubtitles() {
         if (subBtn) subBtn.classList.remove('active');
     } else {
         track.mode = 'showing';
-        showToast('Subtitles Enabled 💬');
+        showToast('Subtitles Enabled');
         const subBtn = document.getElementById('subBtn');
         if (subBtn) subBtn.classList.add('active');
     }
 }
 
 // ==========================================
-// ⏭️ Auto-Play Next Episode
+// ⏭ Auto-Play Next Episode
 // ==========================================
 function triggerNextEpisodeCountdown() {
     const nextIdx = currentPlayingEpisodeIdx + 1;
@@ -1262,7 +1263,7 @@ function cancelNextEpisode() {
 }
 
 // ==========================================
-// 📺 TV Explorer & Episode Management
+//  TV Explorer & Episode Management
 // ==========================================
 async function loadTvSeriesSeasons(seriesUrl, seriesTitle) {
     const tabs = document.getElementById('seasonTabs');
@@ -1349,8 +1350,9 @@ function renderIndexedTvData(tvData, seriesTitle) {
 
         if (specials.length > 0) {
             tabsHtml += `
-                <button class="season-pill-btn specials-pill" onclick="selectSpecialsTab(this)">
-                    ★ Specials (${specials.length})
+                <button class="season-pill-btn specials-pill" onclick="selectSpecialsTab(this)" style="display: inline-flex; align-items: center; gap: 5px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="12" height="12"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <span>Specials (${specials.length})</span>
                 </button>
             `;
         }
@@ -1436,7 +1438,7 @@ function renderEpisodeListHtml(episodes) {
         html += `
             <div style="position: relative; margin-bottom: 6px;">
                 <input type="text" class="ep-filter-input" placeholder="Filter ${episodes.length} episodes..." value="${escapeQuotes(episodeFilterQuery)}" oninput="filterEpisodes(this.value)">
-                ${episodeFilterQuery ? `<button onclick="filterEpisodes('');" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;">✕</button>` : ''}
+                ${episodeFilterQuery ? `<button onclick="filterEpisodes('');" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" aria-label="Clear"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
             </div>
         `;
     }
@@ -1580,7 +1582,7 @@ function fallbackTvView(seriesUrl, seriesTitle) {
 }
 
 // ==========================================
-// 📦 Season Batch Playlist (.m3u)
+//  Season Batch Playlist (.m3u)
 // ==========================================
 function downloadSeasonM3u() {
     if (!currentSeasonEpisodes || currentSeasonEpisodes.length === 0) {
@@ -1609,7 +1611,7 @@ function downloadSeasonM3u() {
 }
 
 // ==========================================
-// 🍦 External Player Launchers
+//  External Player Launchers
 // ==========================================
 function openInVLC(url, title) {
     url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
@@ -1628,7 +1630,7 @@ function openInVLC(url, title) {
         window.location.href = `vlc://${url}`;
     }
 
-    showToast('Launching VLC Media Player 🎬');
+    showToast('Launching VLC Media Player');
 }
 
 function openCurrentInVLC() {
@@ -1697,14 +1699,14 @@ function exportStreamM3u(url, title) {
     document.body.removeChild(a);
     URL.revokeObjectURL(blobUrl);
 
-    showToast('Downloaded stream playlist (.m3u) 📥');
+    showToast('Downloaded stream playlist (.m3u)');
 }
 
 function copyCurrentStreamUrl() {
     const url = currentActiveStreamUrl || (currentItem ? currentItem.url : '');
     if (url) {
         copyLink(url);
-        showToast('Stream URL copied to clipboard 🔗');
+        showToast('Stream URL copied to clipboard');
     }
 }
 
@@ -1714,7 +1716,7 @@ function copyLink(url) {
 
 // ==========================================
 // ==========================================================================
-// 🎛️ CINEBOX PLAYER CUSTOMIZATION & SETTINGS ENGINE
+//  CINEBOX PLAYER CUSTOMIZATION & SETTINGS ENGINE
 // ==========================================================================
 
 function loadPlayerSettings() {
@@ -1922,7 +1924,7 @@ function updateCustomizerUIState() {
 }
 
 // ==========================================
-// 🎨 Visual Filters Engine
+//  Visual Filters Engine
 // ==========================================
 const VIDEO_PRESET_CONFIGS = {
     normal: { brightness: 100, contrast: 100, saturation: 100, hue: 0 },
@@ -1944,7 +1946,7 @@ function applyVideoFilterPreset(presetName) {
 
     savePlayerSettings();
     applyAllPlayerSettings();
-    showToast(`Applied Visual Filter: ${presetName.toUpperCase()} ✨`);
+    showToast(`Applied Visual Filter: ${presetName.toUpperCase()}`);
 }
 
 function handleVideoFilterChange(prop, val) {
@@ -1997,7 +1999,7 @@ function cycleVideoFilter() {
 }
 
 // ==========================================
-// 💡 Dynamic Ambient Cinema Lighting
+//  Dynamic Ambient Cinema Lighting
 // ==========================================
 function setAmbientGlowMode(mode) {
     playerSettings.ambientMode = mode;
@@ -2036,7 +2038,7 @@ function updateAmbientGlow() {
 }
 
 // ==========================================
-// 📐 Aspect Ratio Fit Engine
+//  Aspect Ratio Fit Engine
 // ==========================================
 function setPlayerAspectRatio(mode) {
     playerSettings.aspectRatio = mode;
@@ -2072,7 +2074,7 @@ function applyAspectRatioCss() {
 }
 
 // ==========================================
-// 🔊 Audio Booster & Web Audio API Engine
+//  Audio Booster & Web Audio API Engine
 // ==========================================
 function setupAudioBooster() {
     const player = document.getElementById('videoPlayer');
@@ -2153,7 +2155,7 @@ function applyAudioSettings() {
 }
 
 // ==========================================
-// 💬 Subtitles (CC) Customizer
+//  Subtitles (CC) Customizer
 // ==========================================
 function setSubtitleSize(size) {
     playerSettings.subSize = parseInt(size, 10);
@@ -2259,7 +2261,7 @@ function updateSubtitleStyleSheet() {
 }
 
 // ==========================================
-// 🕹️ Playback, Gestures & Themes
+//  Playback, Gestures & Themes
 // ==========================================
 function setSeekStep(seconds) {
     playerSettings.seekStep = parseInt(seconds, 10);
@@ -2317,7 +2319,7 @@ function setPlayerTheme(themeKey, colorHex, titleName) {
     savePlayerSettings();
     applyAllPlayerSettings();
     updateAmbientGlow();
-    showToast(`Player Theme: ${titleName} 🎨`);
+    showToast(`Player Theme: ${titleName}`);
 }
 
 function setSleepTimer(minutesOrEnd) {
@@ -2338,7 +2340,7 @@ function setSleepTimer(minutesOrEnd) {
     if (minutesOrEnd === 'end') {
         playerSettings.sleepTimer = 'end';
         if (stat) stat.textContent = 'End of Video';
-        showToast('Sleep Timer set: Will pause at end of video 🌙');
+        showToast('Sleep Timer set: Will pause at end of video');
         return;
     }
 
@@ -2349,10 +2351,10 @@ function setSleepTimer(minutesOrEnd) {
     sleepTimeoutId = setTimeout(() => {
         const player = document.getElementById('videoPlayer');
         if (player) player.pause();
-        showToast('Sleep Timer: Paused playback. Sleep tight! 🌙');
+        showToast('Sleep Timer: Paused playback');
     }, mins * 60 * 1000);
 
-    showToast(`Sleep Timer set: ${mins} minutes 🌙`);
+    showToast(`Sleep Timer set: ${mins} minutes`);
 }
 
 async function acquireWakeLock() {
@@ -2364,16 +2366,14 @@ async function acquireWakeLock() {
 }
 
 function releaseWakeLock() {
-    try {
-        if (wakeLockSentinel) {
-            wakeLockSentinel.release();
-            wakeLockSentinel = null;
-        }
-    } catch (e) {}
+    if (wakeLockSentinel) {
+        wakeLockSentinel.release().catch(() => {});
+        wakeLockSentinel = null;
+    }
 }
 
 // ==========================================
-// 🎛️ Custom Video Player Overlay & Scrubber
+//  Custom Video Player Overlay & Scrubber
 // ==========================================
 function setupCustomPlayerControls() {
     const container = document.getElementById('videoContainer');
@@ -2451,7 +2451,7 @@ function toggleMute() {
     if (!player) return;
     player.muted = !player.muted;
     updateVolumeUI();
-    showToast(player.muted ? 'Muted 🔇' : 'Unmuted 🔊');
+    showToast(player.muted ? 'Muted' : 'Unmuted');
 }
 
 function handleVolumeSlider(val) {
@@ -2490,7 +2490,7 @@ function toggleTheaterMode() {
     if (box) {
         box.classList.toggle('theater-mode', isTheaterMode);
     }
-    showToast(isTheaterMode ? 'Theater Mode Active 🎭' : 'Standard Cinema Mode');
+    showToast(isTheaterMode ? 'Theater Mode Active' : 'Standard Cinema Mode');
 }
 
 function togglePlayerFullscreen() {
@@ -2510,7 +2510,7 @@ function lockPlayerScreen() {
     if (shield) shield.style.display = 'flex';
     const controls = document.getElementById('customPlayerControls');
     if (controls) controls.classList.remove('visible');
-    showToast('Screen touches locked 🔒');
+    showToast('Screen touches locked');
 }
 
 function unlockPlayerScreen() {
@@ -2518,7 +2518,7 @@ function unlockPlayerScreen() {
     const shield = document.getElementById('screenLockShield');
     if (shield) shield.style.display = 'none';
     showCustomControls();
-    showToast('Screen unlocked 🔓');
+    showToast('Screen unlocked');
 }
 
 // Scrubber interactions
@@ -2611,7 +2611,7 @@ function updateScrubberBuffer() {
 }
 
 // ==========================================
-// 📱 Touch Gestures & HUD Engine
+//  Touch Gestures & HUD Engine
 // ==========================================
 function setupMobileTouchGestures() {
     const container = document.getElementById('videoContainer');
@@ -2653,12 +2653,12 @@ function setupMobileTouchGestures() {
             const newB = Math.max(50, Math.min(160, initialTouchVal + (deltaY / 150) * 50));
             playerSettings.brightness = Math.round(newB);
             applyVideoFilterCss();
-            showGestureHud('brightness', '☀️', `${playerSettings.brightness}%`, (playerSettings.brightness - 50) / 110);
+            showGestureHud('brightness', `${playerSettings.brightness}%`, (playerSettings.brightness - 50) / 110);
         } else if (gestureType === 'volume' && Math.abs(deltaY) > 10) {
             const newGain = Math.max(0, Math.min(300, initialTouchVal + (deltaY / 150) * 100));
             playerSettings.audioBoostGain = Math.round(newGain);
             applyAudioSettings();
-            showGestureHud('volume', newGain > 100 ? '🚀' : '🔊', `${playerSettings.audioBoostGain}%`, playerSettings.audioBoostGain / 300);
+            showGestureHud('volume', `${playerSettings.audioBoostGain}%`, playerSettings.audioBoostGain / 300);
         } else if (gestureType === 'seek' && Math.abs(deltaX) > 15 && player.duration) {
             const timeDelta = (deltaX / 300) * 60; // 300px = 60s
             const targetTime = Math.max(0, Math.min(player.duration, initialTouchVal + timeDelta));
@@ -2672,7 +2672,7 @@ function setupMobileTouchGestures() {
     });
 }
 
-function showGestureHud(type, icon, value, percent) {
+function showGestureHud(type, value, percent) {
     const hudB = document.getElementById('hudBrightness');
     const hudV = document.getElementById('hudVolume');
 
@@ -2688,10 +2688,8 @@ function showGestureHud(type, icon, value, percent) {
         if (hudB) hudB.style.display = 'none';
         const fill = document.getElementById('hudVolumeFill');
         const val = document.getElementById('hudVolumeVal');
-        const ico = document.getElementById('hudVolumeIcon');
         if (fill) fill.style.height = `${Math.max(5, Math.min(100, percent * 100))}%`;
         if (val) val.textContent = value;
-        if (ico) ico.textContent = icon;
     }
 }
 
@@ -2729,7 +2727,7 @@ function showCenterPlayRipple(isPlaying) {
 }
 
 // ==========================================
-// 🎛️ Player Customization Studio Modal
+//  Player Customization Studio Modal
 // ==========================================
 function openPlayerCustomModal() {
     const modal = document.getElementById('playerCustomModal');
@@ -2753,7 +2751,7 @@ function switchCustomTab(tabId) {
 }
 
 // ==========================================
-// ⌨️ Comprehensive Keyboard Shortcuts
+// ⌨ Comprehensive Keyboard Shortcuts
 // ==========================================
 function setupSearchKeybindings() {
     document.addEventListener('keydown', (e) => {
@@ -2833,7 +2831,7 @@ function setupSearchKeybindings() {
 }
 
 // ==========================================
-// 🎬 Related Media Slider
+//  Related Media Slider
 // ==========================================
 async function loadRelatedMedia(tag, currentTitle) {
     const slider = document.getElementById('relatedSlider');
@@ -2917,7 +2915,7 @@ async function loadRelatedMedia(tag, currentTitle) {
 }
 
 // ==========================================
-// 🔍 Watch Page Search with Fuzzy Search & Recent Searches
+//  Watch Page Search with Fuzzy Search & Recent Searches
 // ==========================================
 let watchLiveSearchTimer = null;
 let watchAllMovies = [];
@@ -3001,7 +2999,10 @@ function showRecentSearchesDropdown(dropdown) {
     if (recent.length === 0) {
         dropdown.innerHTML = `
             <div style="padding: 12px; font-size: 11.5px; color: var(--text-muted);">
-                <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">🔥 Popular Searches</div>
+                <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <span>Popular Searches</span>
+                </div>
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                     <span class="search-pill-suggestion" onclick="fillAndSearch('Oppenheimer')">Oppenheimer</span>
                     <span class="search-pill-suggestion" onclick="fillAndSearch('Solo Leveling')">Solo Leveling</span>
@@ -3017,7 +3018,10 @@ function showRecentSearchesDropdown(dropdown) {
 
     dropdown.innerHTML = `
         <div style="padding: 6px 10px 4px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);">
-            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">🕒 Recent Searches</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Recent Searches</span>
+            </span>
             <button onclick="clearRecentSearches(event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; font-size: 10.5px; color: var(--accent); cursor: pointer; font-weight: 600;">Clear All</button>
         </div>
         <div style="padding: 4px 0;">
@@ -3027,7 +3031,7 @@ function showRecentSearchesDropdown(dropdown) {
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color: var(--text-dim);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                         <span style="font-size: 12.5px; font-weight: 600;">${q}</span>
                     </div>
-                    <button onclick="removeRecentSearch('${escapeQuotes(q)}', event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 6px; font-size: 13px;" title="Remove">✕</button>
+                    <button onclick="removeRecentSearch('${escapeQuotes(q)}', event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 6px; font-size: 13px;" title="Remove" aria-label="Remove"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
                 </div>
             `).join('')}
         </div>
@@ -3063,9 +3067,7 @@ function searchToHome(q) {
     }
 }
 
-// ==========================================
-// 📥 Comprehensive In-App Download Manager
-// ==========================================
+// Comprehensive In-App Download Manager
 function openDownloadModal(targetUrl, targetTitle, isBatch) {
     const modal = document.getElementById('downloadModal');
     const body = document.getElementById('downloadModalBody');
@@ -3091,7 +3093,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             <div class="dl-preview-info">
                 <div class="dl-preview-title" title="${escapeQuotes(title)}">${title}</div>
                 <div class="dl-preview-sub">
-                    <span class="dl-tag-badge">⚡ ${tag}</span>
+                    <span class="dl-tag-badge">${tag}</span>
                     <span style="color: var(--accent-green); font-weight: 600;">Direct BDIX CDN</span>
                 </div>
             </div>
@@ -3101,7 +3103,9 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
         <div class="dl-options-grid">
             <!-- 1. Direct Browser / Native Download -->
             <a class="dl-action-card primary-dl" href="${url}" download="${cleanFileName}.mp4" onclick="showToast('Starting high-speed download...');">
-                <div class="dl-action-icon" style="background: rgba(0, 229, 255, 0.2); color: var(--primary);">🚀</div>
+                <div class="dl-action-icon" style="background: rgba(0, 229, 255, 0.2); color: var(--primary);">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
                 <div class="dl-action-text">
                     <span class="dl-action-title">Direct Download</span>
                     <span class="dl-action-desc">High-speed browser / native engine</span>
@@ -3110,7 +3114,9 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
 
             <!-- 2. 1DM / IDM for Android -->
             <button class="dl-action-card" onclick="downloadVia1DM('${url}', '${escapeQuotes(title)}')">
-                <div class="dl-action-icon" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">⚡</div>
+                <div class="dl-action-icon" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
                 <div class="dl-action-text">
                     <span class="dl-action-title">1DM / IDM Android</span>
                     <span class="dl-action-desc">Multi-thread turbo download</span>
@@ -3119,7 +3125,9 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
 
             <!-- 3. ADM (Advanced Download Manager) -->
             <button class="dl-action-card" onclick="downloadViaADM('${url}', '${escapeQuotes(title)}')">
-                <div class="dl-action-icon" style="background: rgba(255, 42, 95, 0.15); color: var(--accent);">📥</div>
+                <div class="dl-action-icon" style="background: rgba(255, 42, 95, 0.15); color: var(--accent);">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </div>
                 <div class="dl-action-text">
                     <span class="dl-action-title">ADM Downloader</span>
                     <span class="dl-action-desc">Advanced Download Manager</span>
@@ -3128,7 +3136,9 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
 
             <!-- 4. Copy Direct Stream Link -->
             <button class="dl-action-card" onclick="copySpecificUrl('${url}')">
-                <div class="dl-action-icon" style="background: rgba(255, 184, 0, 0.15); color: var(--accent-gold);">📋</div>
+                <div class="dl-action-icon" style="background: rgba(255, 184, 0, 0.15); color: var(--accent-gold);">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                </div>
                 <div class="dl-action-text">
                     <span class="dl-action-title">Copy Direct Link</span>
                     <span class="dl-action-desc">For IDM PC, Aria2, JDownloader</span>
@@ -3142,16 +3152,19 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
         html += `
             <div class="dl-batch-box">
                 <div class="dl-batch-header">
-                    <span>📦 ${currentSeasonName || 'Season'} Batch Downloader</span>
+                    <span style="display: inline-flex; align-items: center; gap: 6px;">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        <span>${currentSeasonName || 'Season'} Batch Downloader</span>
+                    </span>
                     <span style="font-size: 11px; color: var(--primary);">${currentSeasonEpisodes.length} Episodes</span>
                 </div>
                 <div class="dl-batch-buttons">
                     <button class="dl-batch-btn" onclick="downloadSeasonM3u()">
-                        <span>📦</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                         <span>Export Playlist (.m3u)</span>
                     </button>
                     <button class="dl-batch-btn" onclick="exportSeasonLinksTxt()">
-                        <span>📄</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         <span>Export Links (.txt)</span>
                     </button>
                 </div>
