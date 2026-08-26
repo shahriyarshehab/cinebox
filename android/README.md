@@ -1,61 +1,37 @@
-# 📱 CineBox Android App (Trusted Web Activity)
+# 📱 CineBox Android Native App (Standalone Fullscreen)
 
-This folder contains the complete, production-ready **Android Studio / Gradle** native project for **CineBox**, built using Google's **Trusted Web Activity (TWA)** and `AndroidBrowserHelper`.
+This directory contains the **Standalone Fullscreen Native Android Application** for **CineBox**, built with Android SDK, Hardware-Accelerated WebView, and custom HTML5 video fullscreen controller.
 
 ---
 
-## 🚀 Features in Android App
-- ⚡ **Native Android Shell**: Runs fullscreen with 0ms startup delay using Android Browser Helper.
-- 🎨 **Deep System Theming**: Dark status bar (`#07090E`), ambient splash screen, and matching navigation bar.
-- 📲 **App Shortcuts**: Quick launcher shortcuts for **TV Shows**, **Movies**, and **Watchlist**.
-- 🎬 **Native Player Handlers**: Seamlessly launches external players like **VLC Media Player**, **MX Player**, and download managers via Android Intents.
-- 🔔 **Web Push Notifications**: Integrated with `DelegationService` for native notifications.
-- 🌐 **Digital Asset Links**: True fullscreen standalone mode without browser URL bars when verified with `.well-known/assetlinks.json`.
+## ✨ Features
+- 🚀 **100% Standalone (No Chrome Dependency)**: Completely removes browser UI, address bars, and Chrome Custom Tabs.
+- 📺 **Full-Screen Immersive Video Player**: Native `WebChromeClient` automatically rotates to landscape orientation on video fullscreen and hides status/navigation bars.
+- ⚡ **Hardware Acceleration**: 60fps smooth scrolling, instant media buffering, and 0ms startup lag.
+- 📥 **Integrated High-Speed Downloader**: Native `DownloadManager` integration for 1-tap background movie/episode downloads.
+- 🔄 **Pull-to-Refresh**: Native `SwipeRefreshLayout` with custom CineBox cyan glow styling.
+- 🎨 **Deep OLED Dark Theming**: Edge-to-edge system navigation and status bar (`#07090E`).
+- 📶 **Offline Fallback Screen**: Graceful retry screen when disconnected from Wi-Fi / mobile data.
 
 ---
 
 ## 🛠️ How to Build the APK
 
-### Option 1: Using Android Studio (Recommended)
-1. Open **Android Studio**.
-2. Click **Open** and select the `android` folder in this repository.
-3. Wait for Gradle sync to complete.
-4. Connect an Android device (or launch an Emulator) and click **Run (▶)**.
-5. To generate an APK:
-   - Go to **Build > Build Bundle(s) / APK(s) > Build APK(s)**.
-   - The APK will be generated at `app/build/outputs/apk/debug/app-debug.apk`.
+### Method 1: 1-Click Local Build Script (Windows)
+Double-click [`build_apk.bat`](file:///C:/Users/Shahriyar%20Shehab/Desktop/cinebox/build_apk.bat) in the root folder.
+It automatically locates Java 17 and Android SDK, compiles the project, and outputs `cinebox.apk` in the root folder.
 
 ---
 
-### Option 2: Using Bubblewrap CLI (Google Play Store Package)
-1. Install Bubblewrap CLI:
-   ```bash
-   npm install -g @bubblewrap/cli
-   ```
-2. Build the signed APK / AAB from project root:
-   ```bash
-   bubblewrap build
-   ```
+### Method 2: Using Command Line
+```powershell
+cd android
+.\gradlew.bat assembleDebug
+```
+Output APK is located at:
+`android/app/build/outputs/apk/debug/app-debug.apk`
 
 ---
 
-### Option 3: Automated Build with GitHub Actions
-- A GitHub Actions workflow is included at `.github/workflows/build-android.yml`.
-- Every time you push to `main`, GitHub will automatically compile the APK and attach it to the workflow run artifacts for instant 1-click download.
-
----
-
-## 🔑 Digital Asset Links Setup (Removing the URL Bar)
-
-For Android to run your app in 100% fullscreen mode without the Chrome top address bar, Android requires **Digital Asset Links** verification:
-
-1. Generate your release keystore (if not done yet):
-   ```bash
-   keytool -genkey -v -keystore cinebox-keystore.jks -alias cinebox -keyalg RSA -keysize 2048 -validity 10000
-   ```
-2. Extract the **SHA-256 fingerprint**:
-   ```bash
-   keytool -list -v -keystore cinebox-keystore.jks -alias cinebox
-   ```
-3. Open `cinebox/.well-known/assetlinks.json` and paste your SHA-256 fingerprint into the `sha256_cert_fingerprints` array.
-4. Deploy your changes to GitHub Pages (`https://shahriyarshehab.github.io/cinebox/`).
+### Method 3: Automated Build via GitHub Actions
+Every push to `main` automatically triggers `.github/workflows/build-android.yml`, which compiles the APK and attaches it to GitHub Releases for direct 1-click download.
