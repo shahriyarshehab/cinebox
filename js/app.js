@@ -1362,76 +1362,6 @@ window.addEventListener('scroll', () => {
     }, 100);
 });
 
-// ==========================================
-// 🎲 Surprise Me (Random Pick) Modal
-// ==========================================
-async function openSurpriseModal() {
-    const modal = document.getElementById('surpriseModal');
-    const body = document.getElementById('surpriseModalBody');
-    modal.style.display = 'flex';
-
-    body.innerHTML = `
-        <div class="surprise-loader">
-            <div class="surprise-spinner">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 8h.01M8 8h.01M8 16h.01M16 16h.01M12 12h.01"/></svg>
-            </div>
-            <div style="font-size: 14px; font-weight: 600; color: var(--primary);">Discovering a recommended title...</div>
-        </div>
-    `;
-
-    if (allMovies.length === 0) {
-        await loadFullCatalogInBackground();
-    }
-
-    setTimeout(() => {
-        let pool = allMovies;
-        if (pool.length === 0 && homeData && homeData.carousel) {
-            pool = homeData.carousel.map(item => Array.isArray(item) ? {
-                title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
-            } : item);
-        }
-
-        if (pool.length === 0) {
-            body.innerHTML = '<div style="text-align:center; padding: 20px;">Could not load pool. Try again.</div>';
-            return;
-        }
-
-        const randomPick = pool[Math.floor(Math.random() * pool.length)];
-        const itemData = encodeURIComponent(JSON.stringify(randomPick));
-        const linkUrl = `watch.html?title=${encodeURIComponent(randomPick.title)}&data=${itemData}`;
-        const isSeries = randomPick.tag === 'TV Series' || randomPick.tag === 'K-Drama' || (randomPick.url && randomPick.url.endsWith('/'));
-
-        body.innerHTML = `
-            <div class="surprise-result-grid">
-                <img class="surprise-thumb" src="${randomPick.poster}" alt="${escapeQuotes(randomPick.title)}" onerror="this.src='https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300';">
-                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                    <div class="slide-tag">${randomPick.tag || 'HD Cinema'}</div>
-                    <h3 style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.3;">${randomPick.title}</h3>
-                    <div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted);">
-                        <span>${randomPick.category || 'Cinema'}</span>
-                        <span>•</span>
-                        <span style="color: var(--accent-gold); font-weight: 700;">★ 9.0</span>
-                    </div>
-                    <div style="display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap;">
-                        <a class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" href="${linkUrl}">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M8 5v14l11-7z"/></svg>
-                            <span>${isSeries ? 'View Series' : 'Watch Now'}</span>
-                        </a>
-                        <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="openSurpriseModal()">
-                            <span>Pick Another</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }, 450);
-}
-
-function closeSurpriseModal() {
-    const modal = document.getElementById('surpriseModal');
-    if (modal) modal.style.display = 'none';
-}
-
 function toggleShortcutsModal() {
     const modal = document.getElementById('shortcutsModal');
     if (modal) {
@@ -1451,7 +1381,6 @@ function setupGlobalShortcuts() {
             if (input) { input.focus(); input.select(); }
         } else if (e.key === 'Escape') {
             hideSearchDropdown();
-            closeSurpriseModal();
             const scModal = document.getElementById('shortcutsModal');
             if (scModal) scModal.style.display = 'none';
         }

@@ -21,7 +21,6 @@ CineBox is an ultra-fast, modern cinema & streaming web portal featuring **36,00
 - **36,000+ Movies & TV Shows**: Hollywood 1080p, Bollywood, South Action (Dubbed & Original), K-Drama, TV Series, Animation & Bangla.
 - **⏱️ Continue Watching**: Automatically tracks and saves playback progress with a 1-click resume row.
 - **💖 My Watchlist**: Bookmark favorite movies and series directly in local storage.
-- **🎲 Surprise Me (Random Pick)**: Generates random top-rated movie recommendations with animated dice rolls.
 - **⏭️ Binge Auto-Play**: Netflix-style Next Episode countdown overlay with automatic progression.
 - **📦 Season Batch (.m3u) Export**: 1-click batch playlist downloader for VLC, PotPlayer, and IDM.
 - **🍦 External Player Hub**: Instant launchers for VLC Media Player, MX Player (Android), and PotPlayer (PC).

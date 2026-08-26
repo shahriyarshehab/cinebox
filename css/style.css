@@ -290,30 +290,6 @@ header {
     flex-shrink: 0;
 }
 
-/* Surprise Me Button */
-.btn-surprise {
-    background: linear-gradient(135deg, rgba(255, 184, 0, 0.15) 0%, rgba(255, 42, 95, 0.15) 100%);
-    border: 1px solid rgba(255, 184, 0, 0.4);
-    color: #fff;
-    font-size: 12.5px;
-    font-weight: 700;
-    padding: 7px 13px;
-    border-radius: 20px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    white-space: nowrap;
-}
-
-.btn-surprise:hover, .btn-surprise:active {
-    background: linear-gradient(135deg, #ffb800 0%, #ff2a5f 100%);
-    color: #07090e;
-    border-color: #ffb800;
-    box-shadow: 0 0 16px rgba(255, 184, 0, 0.4);
-    transform: translateY(-1px) scale(1.03);
-}
 
 .btn-icon-ghost {
     background: rgba(255, 255, 255, 0.05);
@@ -2270,41 +2246,6 @@ video::cue {
     color: #fff;
 }
 
-/* Surprise Dice Modal */
-.surprise-loader {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 36px 20px;
-    gap: 12px;
-}
-
-.surprise-spinner {
-    font-size: 44px;
-    animation: diceSpin 0.6s infinite ease-in-out;
-}
-
-@keyframes diceSpin {
-    0% { transform: rotate(0deg) scale(1); }
-    50% { transform: rotate(180deg) scale(1.2); }
-    100% { transform: rotate(360deg) scale(1); }
-}
-
-.surprise-result-grid {
-    display: flex;
-    gap: 18px;
-    align-items: flex-start;
-}
-
-.surprise-thumb {
-    width: 120px;
-    height: 180px;
-    border-radius: 12px;
-    object-fit: cover;
-    border: 2px solid var(--border-hover);
-    flex-shrink: 0;
-}
 
 /* Keyboard Shortcut Item */
 .shortcut-item {
@@ -2612,17 +2553,6 @@ kbd {
         display: none;
     }
 
-    .surprise-text {
-        display: none;
-    }
-
-    .btn-surprise {
-        padding: 6px 9px;
-        border-radius: 50%;
-        width: 32px;
-        height: 32px;
-        justify-content: center;
-    }
 
     .btn-icon-ghost {
         display: none;
