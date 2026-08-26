@@ -922,6 +922,80 @@ function renderCategoryFullGrid(container) {
     `;
 }
 
+function setFacetYear(val) {
+    filterYear = val;
+    applyAllFilters();
+    renderView();
+}
+
+function setFacetAudio(val) {
+    filterAudio = val;
+    applyAllFilters();
+    renderView();
+}
+
+function setFacetQuality(val) {
+    filterQuality = val;
+    applyAllFilters();
+    renderView();
+}
+
+function loadMore() {
+    displayedCount += BATCH_SIZE;
+    renderView();
+}
+
+function applyAllFilters() {
+    let dataset = rawCategoryPool || [];
+
+    // Apply Year Era
+    if (filterYear === '2024+') {
+        dataset = dataset.filter(m => (m.title && (m.title.includes('2024') || m.title.includes('2025') || m.title.includes('2026'))) || (m.date && (m.date.startsWith('2024') || m.date.startsWith('2025') || m.date.startsWith('2026'))));
+    } else if (filterYear === '2020-2023') {
+        dataset = dataset.filter(m => m.title && (m.title.includes('2020') || m.title.includes('2021') || m.title.includes('2022') || m.title.includes('2023')));
+    } else if (filterYear === '2010s') {
+        dataset = dataset.filter(m => m.title && /201[0-9]/.test(m.title));
+    } else if (filterYear === 'classic') {
+        dataset = dataset.filter(m => m.title && /(19[0-9]{2}|200[0-9])/.test(m.title));
+    }
+
+    // Apply Audio Track
+    if (filterAudio === 'dual') {
+        dataset = dataset.filter(m => m.title && m.title.toLowerCase().includes('dual audio'));
+    } else if (filterAudio === 'multi') {
+        dataset = dataset.filter(m => m.title && m.title.toLowerCase().includes('multi audio'));
+    }
+
+    // Apply Quality
+    if (filterQuality === '1080p') {
+        dataset = dataset.filter(m => m.title && m.title.includes('1080p'));
+    } else if (filterQuality === '720p') {
+        dataset = dataset.filter(m => m.title && m.title.includes('720p'));
+    }
+
+    filteredMovies = [...dataset];
+    applyCurrentSorting();
+}
+
+function matchesCategory(m, tag) {
+    if (!m) return false;
+    if (tag === 'All') return true;
+    if (m.tag === tag) return true;
+    if (tag === 'K-Drama' && (m.tag === 'K-Drama' || (m.category && m.category.includes('Korean')) || (m.url && m.url.includes('KOREAN')))) return true;
+    if (tag === 'TV Series' && (m.tag === 'TV Series' || (m.category && m.category.includes('Series')) || (m.url && m.url.includes('TV-WEB-Series')))) return true;
+    if (tag === 'Hollywood 1080p' && (m.tag === 'Hollywood 1080p' || (m.category && m.category.includes('English Movies (1080p)')))) return true;
+    if (tag === 'Bollywood' && (m.tag === 'Bollywood' || (m.category && m.category.includes('Hindi')))) return true;
+    if (tag === 'South Action' && (m.tag === 'South Action' || (m.category && m.category.includes('South Movies (Hindi Dubbed)')))) return true;
+    if (tag === 'South Original' && (m.tag === 'South Original' || (m.category && m.category.includes('South Indian Movies')))) return true;
+    if (tag === 'Animation' && (m.tag === 'Animation' || (m.category && m.category.includes('Animation')))) return true;
+    if (tag === 'Bangla' && (m.tag === 'Bangla' || (m.category && m.category.includes('Bangla')))) return true;
+    if (tag === 'Foreign Movies' && (m.tag === 'Foreign Movies' || (m.category && m.category.includes('Foreign')))) return true;
+    if (tag === '3D Movies' && (m.tag === '3D Movies' || (m.category && m.category.includes('3D')))) return true;
+    if (tag === 'English Movies' && (m.tag === 'English Movies' || (m.category && m.category.includes('English')))) return true;
+    if (tag === 'Top Rated' && (m.tag === 'Top Rated' || (m.category && m.category.includes('Top 250')))) return true;
+    return m.category && m.category.toLowerCase().includes(tag.toLowerCase());
+}
+
 async function selectFilterPill(tag, label) {
     currentCategoryTag = tag;
     currentCategoryName = label;
@@ -936,16 +1010,17 @@ async function selectFilterPill(tag, label) {
         const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
         rawCategoryPool = [...tv, ...kdrama];
     } else if (tag === 'All_Movies') {
-        const [h, b, s1, s2, bg, f, tr] = await Promise.all([
+        const [h, b, s1, s2, bg, f, tr, threeD] = await Promise.all([
             fetchCategoryData('Hollywood 1080p'),
             fetchCategoryData('Bollywood'),
             fetchCategoryData('South Action'),
             fetchCategoryData('South Original'),
             fetchCategoryData('Bangla'),
             fetchCategoryData('Foreign Movies'),
-            fetchCategoryData('Top Rated')
+            fetchCategoryData('Top Rated'),
+            fetchCategoryData('3D Movies')
         ]);
-        rawCategoryPool = [...h, ...b, ...s1, ...s2, ...bg, ...f, ...tr];
+        rawCategoryPool = [...h, ...b, ...s1, ...s2, ...bg, ...f, ...tr, ...threeD];
     } else if (tag === 'All_Animation') {
         rawCategoryPool = await fetchCategoryData('Animation');
     } else {
