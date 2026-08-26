@@ -54,6 +54,50 @@ const ALL_CATEGORY_PILLS = [
     { label: 'English Classic', tag: 'English Movies' }
 ];
 
+const TV_CATEGORY_PILLS = [
+    { label: 'All TV & K-Drama', tag: 'All_TV' },
+    { label: 'TV & Web Series', tag: 'TV Series' },
+    { label: 'Korean Drama (K-Drama)', tag: 'K-Drama' },
+    { label: 'Animation & Anime Series', tag: 'Animation' }
+];
+
+const MOVIES_CATEGORY_PILLS = [
+    { label: 'All 36,000+ Movies', tag: 'All_Movies' },
+    { label: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
+    { label: 'Bollywood (Hindi)', tag: 'Bollywood' },
+    { label: 'South Action (Dubbed)', tag: 'South Action' },
+    { label: 'South Original', tag: 'South Original' },
+    { label: 'Bangla Cinema', tag: 'Bangla' },
+    { label: 'Foreign & Asian', tag: 'Foreign Movies' },
+    { label: 'IMDb Top 250', tag: 'Top Rated' },
+    { label: '3D Cinema', tag: '3D Movies' },
+    { label: 'English Classic', tag: 'English Movies' }
+];
+
+const ANIMATION_CATEGORY_PILLS = [
+    { label: 'All Animation & Anime', tag: 'All_Animation' },
+    { label: 'Anime & TV Series', tag: 'TV Series' },
+    { label: 'Animated Movies', tag: 'Hollywood 1080p' }
+];
+
+function detectPageType() {
+    if (window.CINEBOX_PAGE) return window.CINEBOX_PAGE;
+    const path = (window.location.pathname || '').toLowerCase();
+    if (path.endsWith('tv.html')) return 'tv';
+    if (path.endsWith('movies.html')) return 'movies';
+    if (path.endsWith('animation.html')) return 'animation';
+    if (path.endsWith('watchlist.html')) return 'watchlist';
+    return 'home';
+}
+
+function getActivePagePills() {
+    const page = detectPageType();
+    if (page === 'tv') return TV_CATEGORY_PILLS;
+    if (page === 'movies') return MOVIES_CATEGORY_PILLS;
+    if (page === 'animation') return ANIMATION_CATEGORY_PILLS;
+    return ALL_CATEGORY_PILLS;
+}
+
 const CATEGORY_JSON_MAP = {
     'K-Drama': 'data/kdrama.json',
     'TV Series': 'data/tv_series.json',
@@ -73,41 +117,86 @@ const categoryCache = {};
 
 async function init() {
     updateWatchlistNavBadge();
+    const page = detectPageType();
 
-    // 1. Check client-side cached home data for 0ms instant render
-    const cachedHome = sessionStorage.getItem('cinebox_home_v2');
-    if (cachedHome) {
-        try {
-            homeData = JSON.parse(cachedHome);
-            applyHomeData(homeData);
-        } catch (e) {}
-    }
-
-    // 2. Fetch lightweight home_data.json (~90 KB)
-    try {
-        const res = await fetch('./home_data.json?v=' + Date.now());
-        if (res.ok) {
-            homeData = await res.json();
-            sessionStorage.setItem('cinebox_home_v2', JSON.stringify(homeData));
-            applyHomeData(homeData);
-        }
-    } catch (e) {
-        console.warn('Fast home load notice:', e);
-    }
-
-    // 3. Check URL parameters
+    // 1. Check URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const queryParam = urlParams.get('q');
-    const tabParam = urlParams.get('tab');
     const catParam = urlParams.get('cat');
+    const tabParam = urlParams.get('tab');
+
+    if (page === 'tv') {
+        activeNavTab = 'tv';
+        currentView = 'category';
+        currentCategoryTag = 'All_TV';
+        currentCategoryName = 'TV Shows & Korean Dramas';
+        const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
+        rawCategoryPool = [...tv, ...kdrama];
+        if (rawCategoryPool.length > 0) {
+            setupCarousel(rawCategoryPool.slice(0, 10));
+        }
+        applyAllFilters();
+        renderView();
+    } else if (page === 'movies') {
+        activeNavTab = 'movies';
+        currentView = 'category';
+        currentCategoryTag = 'All_Movies';
+        currentCategoryName = 'Movies Collection';
+        const [hollywood, bollywood, south] = await Promise.all([
+            fetchCategoryData('Hollywood 1080p'),
+            fetchCategoryData('Bollywood'),
+            fetchCategoryData('South Action')
+        ]);
+        rawCategoryPool = [...hollywood, ...bollywood, ...south];
+        if (rawCategoryPool.length > 0) {
+            setupCarousel(rawCategoryPool.slice(0, 10));
+        }
+        applyAllFilters();
+        renderView();
+    } else if (page === 'animation') {
+        activeNavTab = 'animation';
+        currentView = 'category';
+        currentCategoryTag = 'All_Animation';
+        currentCategoryName = 'Animation & Anime Collection';
+        rawCategoryPool = await fetchCategoryData('Animation');
+        if (rawCategoryPool.length > 0) {
+            setupCarousel(rawCategoryPool.slice(0, 10));
+        }
+        applyAllFilters();
+        renderView();
+    } else if (page === 'watchlist') {
+        activeNavTab = 'watchlist';
+        currentView = 'watchlist';
+        renderView();
+    } else {
+        // Standard Home Page
+        activeNavTab = 'home';
+        const cachedHome = sessionStorage.getItem('cinebox_home_v2');
+        if (cachedHome) {
+            try {
+                homeData = JSON.parse(cachedHome);
+                applyHomeData(homeData);
+            } catch (e) {}
+        }
+        try {
+            const res = await fetch('./home_data.json?v=' + Date.now());
+            if (res.ok) {
+                homeData = await res.json();
+                sessionStorage.setItem('cinebox_home_v2', JSON.stringify(homeData));
+                applyHomeData(homeData);
+            }
+        } catch (e) {
+            console.warn('Fast home load notice:', e);
+        }
+    }
 
     if (queryParam) {
         document.getElementById('searchInput').value = queryParam;
         loadFullCatalogInBackground().then(() => handleSearch());
     } else if (catParam) {
         loadFullCatalogInBackground().then(() => openCategoryView(catParam, catParam));
-    } else if (tabParam) {
-        loadFullCatalogInBackground().then(() => switchNavTab(tabParam));
+    } else if (tabParam && page === 'home') {
+        switchNavTab(tabParam);
     } else {
         setTimeout(loadFullCatalogInBackground, 300);
     }
@@ -490,94 +579,178 @@ async function fetchCategoryData(tag) {
 
 let activeNavTab = 'home';
 
-async function switchNavTab(tab) {
-    activeNavTab = tab;
-    document.querySelectorAll('.nav-link, .mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
-    
-    const navMap = {
-        'home': ['navHome', 'mobNavHome'],
-        'tv': ['navTv', 'mobNavTv'],
-        'movies': ['navMovies', 'mobNavMovies'],
-        'animation': ['navAnimation', 'mobNavAnimation'],
-        'watchlist': ['navWatchlist', 'mobNavWatchlist']
+function switchNavTab(tab) {
+    const pageMap = {
+        'home': 'index.html',
+        'tv': 'tv.html',
+        'movies': 'movies.html',
+        'animation': 'animation.html',
+        'watchlist': 'watchlist.html'
     };
-
-    (navMap[tab] || []).forEach(id => {
-        const b = document.getElementById(id);
-        if (b) b.classList.add('active');
-    });
-    
-    if (tab === 'home') {
-        showHomeView();
-    } else if (tab === 'tv') {
-        currentView = 'category';
-        currentCategoryTag = 'TV Series';
-        currentCategoryName = 'TV Shows & Korean Dramas';
-        const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
-        rawCategoryPool = [...tv, ...kdrama];
-        applyAllFilters();
-        renderView();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (tab === 'movies') {
-        openCategoryView('Hollywood 1080p', 'Movies Collection');
-    } else if (tab === 'animation') {
-        openCategoryView('Animation', 'Animation & Anime Collection');
-    } else if (tab === 'watchlist') {
-        currentView = 'watchlist';
-        renderView();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (pageMap[tab]) {
+        window.location.href = pageMap[tab];
     }
 }
 
 let rawCategoryPool = [];
+let currentWatchlistFilter = 'all'; // 'all' | 'movies' | 'tv' | 'history'
+
+function filterWatchlistTab(tab) {
+    currentWatchlistFilter = tab;
+    renderWatchlistView();
+}
 
 function renderWatchlistView() {
     const container = document.getElementById('mainContent');
+    if (!container) return;
+
     const list = getWatchlist();
+    const historyList = getWatchHistory();
+
+    const moviesOnly = list.filter(m => !(m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.url && m.url.endsWith('/'))));
+    const tvOnly = list.filter(m => (m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.url && m.url.endsWith('/'))));
+
+    let displayList = list;
+    if (currentWatchlistFilter === 'movies') displayList = moviesOnly;
+    else if (currentWatchlistFilter === 'tv') displayList = tvOnly;
+    else if (currentWatchlistFilter === 'history') displayList = historyList;
 
     container.innerHTML = `
         <div class="filter-bar-wrap">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="showHomeView()">
+                    <a class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; text-decoration: none;" href="index.html">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Home</span>
-                    </button>
-                    <h1 class="row-heading" style="font-size: 18px;">❤️ My Watchlist</h1>
+                    </a>
+                    <h1 class="row-heading" style="font-size: 18px;">❤️ My Watchlist & Library</h1>
                 </div>
-                <span style="font-size: 11.5px; color: var(--text-muted);">${list.length} saved</span>
+
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="exportWatchlist()" title="Backup watchlist as JSON">
+                        <span>📥 Export JSON</span>
+                    </button>
+                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="triggerWatchlistImport()" title="Restore saved watchlist">
+                        <span>📤 Import JSON</span>
+                    </button>
+                    ${list.length > 0 ? `
+                        <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; color: var(--accent);" onclick="clearAllWatchlist()" title="Clear all saved titles">
+                            <span>🗑️ Clear All</span>
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+
+            <!-- Horizontal Watchlist Tabs -->
+            <div class="filter-pills-row" style="margin-top: 10px;">
+                <button class="filter-pill ${currentWatchlistFilter === 'all' ? 'active' : ''}" onclick="filterWatchlistTab('all')">
+                    All Saved (${list.length})
+                </button>
+                <button class="filter-pill ${currentWatchlistFilter === 'movies' ? 'active' : ''}" onclick="filterWatchlistTab('movies')">
+                    Movies (${moviesOnly.length})
+                </button>
+                <button class="filter-pill ${currentWatchlistFilter === 'tv' ? 'active' : ''}" onclick="filterWatchlistTab('tv')">
+                    TV Shows (${tvOnly.length})
+                </button>
+                <button class="filter-pill ${currentWatchlistFilter === 'history' ? 'active' : ''}" onclick="filterWatchlistTab('history')">
+                    Continue Watching (${historyList.length})
+                </button>
             </div>
         </div>
 
-        ${list.length > 0 ? `
+        ${displayList.length > 0 ? `
             <div class="poster-grid" id="movieGrid">
-                ${list.map(item => renderMovieCardHtml(item)).join('')}
+                ${displayList.map(item => renderMovieCardHtml(item)).join('')}
             </div>
         ` : `
             <div style="text-align: center; padding: 60px 16px;">
-                <div style="font-size: 40px; margin-bottom: 10px;">💖</div>
-                <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">Your Watchlist is Empty</h2>
+                <div style="font-size: 44px; margin-bottom: 12px;">💖</div>
+                <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">No Titles Found in This Tab</h2>
                 <p style="font-size: 13px; color: var(--text-muted); max-width: 380px; margin: 0 auto 16px;">
-                    Bookmark any movie or series to keep track of what you want to watch!
+                    Bookmark movies and series with the heart icon to access them here anytime!
                 </p>
-                <button class="btn btn-primary" onclick="showHomeView()">Explore Movies</button>
+                <a class="btn btn-primary" style="text-decoration: none;" href="index.html">Explore Cinema Catalog</a>
             </div>
         `}
     `;
 }
 
+function exportWatchlist() {
+    const list = getWatchlist();
+    if (list.length === 0) {
+        showToast('Watchlist is empty');
+        return;
+    }
+    const json = JSON.stringify(list, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cinebox_watchlist_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('Watchlist exported (.json)');
+}
+
+function triggerWatchlistImport() {
+    const input = document.getElementById('watchlistFileInput');
+    if (input) input.click();
+}
+
+function handleWatchlistImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const imported = JSON.parse(e.target.result);
+            if (Array.isArray(imported)) {
+                const existing = getWatchlist();
+                const titles = new Set(existing.map(m => (m.title || '').toLowerCase()));
+                let added = 0;
+                for (const item of imported) {
+                    if (item && item.title && !titles.has(item.title.toLowerCase())) {
+                        existing.push(item);
+                        titles.add(item.title.toLowerCase());
+                        added++;
+                    }
+                }
+                localStorage.setItem('cinebox_watchlist', JSON.stringify(existing));
+                updateWatchlistNavBadge();
+                renderWatchlistView();
+                showToast(`Imported ${added} new saved titles!`);
+            }
+        } catch (err) {
+            showToast('Invalid JSON file format');
+        }
+    };
+    reader.readAsText(file);
+}
+
+function clearAllWatchlist() {
+    if (confirm('Are you sure you want to clear your entire watchlist?')) {
+        localStorage.removeItem('cinebox_watchlist');
+        updateWatchlistNavBadge();
+        renderWatchlistView();
+        showToast('Watchlist cleared');
+    }
+}
+
 function renderCategoryFullGrid(container) {
     const toShow = filteredMovies.slice(0, displayedCount);
+    const pills = getActivePagePills();
 
     container.innerHTML = `
         <!-- MovieBox Filter Bar with Horizontal Pills & Facets -->
         <div class="filter-bar-wrap">
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="showHomeView()">
+                    <a class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; text-decoration: none;" href="index.html">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Home</span>
-                    </button>
+                    </a>
                     <h1 class="row-heading" style="font-size: 18px;">${currentCategoryName}</h1>
                 </div>
 
@@ -593,7 +766,7 @@ function renderCategoryFullGrid(container) {
 
             <!-- Horizontal Category Filter Pills -->
             <div class="filter-pills-row">
-                ${ALL_CATEGORY_PILLS.map(p => `
+                ${pills.map(p => `
                     <button class="filter-pill ${currentCategoryTag === p.tag ? 'active' : ''}" onclick="selectFilterPill('${p.tag}', '${escapeQuotes(p.label)}')">
                         ${p.label}
                     </button>
@@ -632,88 +805,44 @@ function renderCategoryFullGrid(container) {
         </div>
 
         <div class="pagination-wrap">
-            <button class="btn btn-ghost" id="loadMoreBtn" style="${displayedCount < filteredMovies.length ? 'display:block' : 'display:none'}" onclick="loadMore()">Load More Movies</button>
+            <button class="btn btn-ghost" id="loadMoreBtn" style="${displayedCount < filteredMovies.length ? 'display:block' : 'display:none'}" onclick="loadMore()">Load More Titles</button>
         </div>
     `;
-}
-
-function setFacetYear(val) {
-    filterYear = val;
-    applyAllFilters();
-    renderView();
-}
-
-function setFacetAudio(val) {
-    filterAudio = val;
-    applyAllFilters();
-    renderView();
-}
-
-function setFacetQuality(val) {
-    filterQuality = val;
-    applyAllFilters();
-    renderView();
-}
-
-function applyAllFilters() {
-    let dataset = rawCategoryPool;
-
-    // Apply Year
-    if (filterYear === '2024+') {
-        dataset = dataset.filter(m => (m.title && (m.title.includes('2024') || m.title.includes('2025') || m.title.includes('2026'))) || (m.date && (m.date.startsWith('2024') || m.date.startsWith('2025') || m.date.startsWith('2026'))));
-    } else if (filterYear === '2020-2023') {
-        dataset = dataset.filter(m => m.title && (m.title.includes('2020') || m.title.includes('2021') || m.title.includes('2022') || m.title.includes('2023')));
-    } else if (filterYear === '2010s') {
-        dataset = dataset.filter(m => m.title && /201[0-9]/.test(m.title));
-    } else if (filterYear === 'classic') {
-        dataset = dataset.filter(m => m.title && /(19[0-9]{2}|200[0-9])/.test(m.title));
-    }
-
-    // Apply Audio
-    if (filterAudio === 'dual') {
-        dataset = dataset.filter(m => m.title && m.title.toLowerCase().includes('dual audio'));
-    } else if (filterAudio === 'multi') {
-        dataset = dataset.filter(m => m.title && m.title.toLowerCase().includes('multi audio'));
-    }
-
-    // Apply Quality
-    if (filterQuality === '1080p') {
-        dataset = dataset.filter(m => m.title && m.title.includes('1080p'));
-    } else if (filterQuality === '720p') {
-        dataset = dataset.filter(m => m.title && m.title.includes('720p'));
-    }
-
-    filteredMovies = [...dataset];
-    applyCurrentSorting();
-    displayedCount = BATCH_SIZE;
-}
-
-function matchesCategory(m, tag) {
-    if (tag === 'All') return true;
-    if (m.tag === tag) return true;
-    if (tag === 'K-Drama' && (m.tag === 'K-Drama' || (m.category && m.category.includes('Korean')) || (m.url && m.url.includes('KOREAN')))) return true;
-    if (tag === 'TV Series' && (m.tag === 'TV Series' || (m.category && m.category.includes('Series')))) return true;
-    if (tag === 'Bollywood' && (m.tag === 'Bollywood' || (m.category && m.category.includes('Hindi')))) return true;
-    if (tag === 'Animation' && (m.tag === 'Animation' || (m.category && m.category.includes('Animation')))) return true;
-    if (tag === 'Bangla' && (m.tag === 'Bangla' || (m.category && m.category.includes('Bangla')))) return true;
-    return m.category && m.category.toLowerCase().includes(tag.toLowerCase());
 }
 
 async function selectFilterPill(tag, label) {
     currentCategoryTag = tag;
     currentCategoryName = label;
+    displayedCount = BATCH_SIZE;
 
     if (tag === 'All') {
         if (!isFullCatalogLoaded && allMovies.length === 0) {
             await loadFullCatalogInBackground();
         }
         rawCategoryPool = [...allMovies];
+    } else if (tag === 'All_TV') {
+        const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
+        rawCategoryPool = [...tv, ...kdrama];
+    } else if (tag === 'All_Movies') {
+        const [h, b, s1, s2, bg, f, tr] = await Promise.all([
+            fetchCategoryData('Hollywood 1080p'),
+            fetchCategoryData('Bollywood'),
+            fetchCategoryData('South Action'),
+            fetchCategoryData('South Original'),
+            fetchCategoryData('Bangla'),
+            fetchCategoryData('Foreign Movies'),
+            fetchCategoryData('Top Rated')
+        ]);
+        rawCategoryPool = [...h, ...b, ...s1, ...s2, ...bg, ...f, ...tr];
+    } else if (tag === 'All_Animation') {
+        rawCategoryPool = await fetchCategoryData('Animation');
     } else {
         rawCategoryPool = await fetchCategoryData(tag);
     }
 
     applyAllFilters();
     renderView();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function handleSortChange(sortVal) {

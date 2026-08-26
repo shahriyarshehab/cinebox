@@ -6,7 +6,7 @@
         android:shortcutShortLabel="@string/shortcut_tv_name">
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="https://shahriyarshehab.github.io/cinebox/index.html#tv"
+            android:data="https://shahriyarshehab.github.io/cinebox/tv.html"
             android:targetPackage="com.shahriyarshehab.cinebox"
             android:targetClass="com.google.androidbrowserhelper.trusted.LauncherActivity" />
         <categories android:name="android.shortcut.conversation" />
@@ -18,7 +18,7 @@
         android:shortcutShortLabel="@string/shortcut_movies_name">
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="https://shahriyarshehab.github.io/cinebox/index.html#movies"
+            android:data="https://shahriyarshehab.github.io/cinebox/movies.html"
             android:targetPackage="com.shahriyarshehab.cinebox"
             android:targetClass="com.google.androidbrowserhelper.trusted.LauncherActivity" />
         <categories android:name="android.shortcut.conversation" />
@@ -30,7 +30,7 @@
         android:shortcutShortLabel="@string/shortcut_watchlist_name">
         <intent
             android:action="android.intent.action.VIEW"
-            android:data="https://shahriyarshehab.github.io/cinebox/index.html#watchlist"
+            android:data="https://shahriyarshehab.github.io/cinebox/watchlist.html"
             android:targetPackage="com.shahriyarshehab.cinebox"
             android:targetClass="com.google.androidbrowserhelper.trusted.LauncherActivity" />
         <categories android:name="android.shortcut.conversation" />

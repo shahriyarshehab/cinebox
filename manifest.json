@@ -45,7 +45,7 @@
       "name": "TV Shows",
       "short_name": "TV Shows",
       "description": "Browse popular and trending TV series",
-      "url": "./index.html#tv",
+      "url": "./tv.html",
       "icons": [
         {
           "src": "icons/icon-192.png",
@@ -57,7 +57,7 @@
       "name": "Movies",
       "short_name": "Movies",
       "description": "Browse 36,000+ Hollywood & regional movies",
-      "url": "./index.html#movies",
+      "url": "./movies.html",
       "icons": [
         {
           "src": "icons/icon-192.png",
@@ -69,7 +69,7 @@
       "name": "My Watchlist",
       "short_name": "Watchlist",
       "description": "View saved bookmarked movies and series",
-      "url": "./index.html#watchlist",
+      "url": "./watchlist.html",
       "icons": [
         {
           "src": "icons/icon-192.png",
