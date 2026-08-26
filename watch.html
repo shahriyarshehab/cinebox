@@ -141,9 +141,9 @@
                         <span>Seasons & Episodes</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <button class="btn btn-ghost" id="btnDownloadSeasonM3u" style="padding: 5px 12px; font-size: 11.5px; border-color: rgba(0, 229, 255, 0.3); color: var(--primary); border-radius: 20px;" onclick="downloadSeasonM3u()" title="Download whole season as .m3u playlist">
+                        <button class="btn btn-ghost" id="btnDownloadSeasonM3u" style="padding: 5px 12px; font-size: 11.5px; border-color: rgba(0, 229, 255, 0.3); color: var(--primary); border-radius: 20px;" onclick="openDownloadModal(null, null, true)" title="Download whole season batch, .m3u, or .txt links">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                            <span>Season Playlist (.m3u)</span>
+                            <span>Batch Download</span>
                         </button>
                         <div id="seasonCountBadge" class="badge-count-static">Loading...</div>
                     </div>
@@ -384,6 +384,22 @@
             <span class="mobile-nav-badge" id="mobWatchlistNavCount" style="display:none;">0</span>
         </a>
     </nav>
+
+    <!-- 📥 Comprehensive Download Manager Modal -->
+    <div class="modal" id="downloadModal">
+        <div class="modal-card download-modal-card">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
+                    <span style="font-size: 20px;">📥</span>
+                    <span style="font-size: 16px; font-family: var(--font-display);" id="dlModalHeading">Download Hub</span>
+                </div>
+                <button class="btn-close" onclick="closeDownloadModal()">✕</button>
+            </div>
+            <div class="modal-body" id="downloadModalBody">
+                <!-- Dynamically injected by openDownloadModal() -->
+            </div>
+        </div>
+    </div>
 
     <!-- Toast Notification -->
     <div class="toast" id="toast">Link copied to clipboard</div>

@@ -202,12 +202,17 @@ function renderWatchPage(item) {
             ${VLC_ICON_SVG}
             <span>Play in VLC</span>
         </button>
-        ${!isSeries ? `
-            <a class="mb-btn-action" href="${item.url}" download>
+        ${isSeries ? `
+            <button class="mb-btn-action" onclick="openDownloadModal(null, null, true)">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Download Hub</span>
+            </button>
+        ` : `
+            <button class="mb-btn-action" onclick="openDownloadModal('${item.url}', '${escapeQuotes(item.title)}')">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 <span>Download</span>
-            </a>
-        ` : ''}
+            </button>
+        `}
         <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
             <svg class="icon" id="wHeartIconAction" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
             <span id="wWatchlistActionText">${isInWatchlist(item.title) ? 'Saved ❤️' : 'Watchlist'}</span>
@@ -263,12 +268,10 @@ function enterPlayerMode(url, title) {
             ${VLC_ICON_SVG}
             <span>VLC Player</span>
         </button>
-        ${!isSeries ? `
-            <a class="mb-btn-action" href="${url}" download>
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>Download</span>
-            </a>
-        ` : ''}
+        <button class="mb-btn-action" onclick="openDownloadModal(currentActiveStreamUrl, currentActiveStreamTitle)">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download</span>
+        </button>
         <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
             <svg class="icon" id="wHeartIconPlayer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
             <span id="wWatchlistPlayerText">${isInWatchlist(currentItem ? currentItem.title : '') ? 'Saved ❤️' : 'Save'}</span>
@@ -863,9 +866,9 @@ function renderEpisodeListHtml(episodes) {
                 <button class="ep-icon-btn btn-vlc-sm" onclick="openInVLC('${ep.url}', '${escapeQuotes(ep.name)}')" title="Play in VLC Player">
                     ${VLC_ICON_SVG}
                 </button>
-                <a class="ep-icon-btn" href="${ep.url}" download title="Download Episode">
+                <button class="ep-icon-btn" onclick="openDownloadModal('${ep.url}', '${escapeQuotes(ep.name)}')" title="Download Episode">
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </a>
+                </button>
             </div>
         </div>
     `;}).join('');
@@ -904,6 +907,9 @@ function renderPlayerEpisodeList(episodes) {
             <div class="ep-action-btns" onclick="event.stopPropagation();">
                 <button class="ep-icon-btn btn-vlc-sm" onclick="openInVLC('${ep.url}', '${escapeQuotes(ep.name)}')" title="VLC">
                     ${VLC_ICON_SVG}
+                </button>
+                <button class="ep-icon-btn" onclick="openDownloadModal('${ep.url}', '${escapeQuotes(ep.name)}')" title="Download Episode">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 </button>
             </div>
         </div>
@@ -1367,5 +1373,192 @@ function searchToHome(q) {
         window.location.href = `index.html?q=${encodeURIComponent(clean)}`;
     }
 }
+
+// ==========================================
+// 📥 Comprehensive In-App Download Manager
+// ==========================================
+function openDownloadModal(targetUrl, targetTitle, isBatch) {
+    const modal = document.getElementById('downloadModal');
+    const body = document.getElementById('downloadModalBody');
+    const heading = document.getElementById('dlModalHeading');
+    if (!modal || !body) return;
+
+    const url = targetUrl || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
+    const title = targetTitle || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Media');
+    const isSeries = (currentItem && (currentItem.tag === 'TV Series' || currentItem.tag === 'K-Drama' || (currentItem.url && currentItem.url.endsWith('/')))) || isBatch;
+    
+    if (heading) {
+        heading.textContent = isBatch ? 'Batch Download Manager' : 'Download Hub';
+    }
+
+    const poster = (currentItem && currentItem.poster) ? currentItem.poster : '';
+    const cleanFileName = (title || 'media').replace(/[/\\?%*:|"<>]/g, '_');
+    const tag = (currentItem && currentItem.tag) ? currentItem.tag : '1080p HD';
+
+    let html = `
+        <!-- Active Media Preview Header -->
+        <div class="dl-preview-card">
+            ${poster ? `<img class="dl-preview-thumb" src="${poster}" alt="${escapeQuotes(title)}" onerror="this.style.display='none'">` : ''}
+            <div class="dl-preview-info">
+                <div class="dl-preview-title" title="${escapeQuotes(title)}">${title}</div>
+                <div class="dl-preview-sub">
+                    <span class="dl-tag-badge">⚡ ${tag}</span>
+                    <span style="color: var(--accent-green); font-weight: 600;">Direct BDIX CDN</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Channels Grid -->
+        <div class="dl-options-grid">
+            <!-- 1. Direct Browser / Native Download -->
+            <a class="dl-action-card primary-dl" href="${url}" download="${cleanFileName}.mp4" onclick="showToast('Starting high-speed download...');">
+                <div class="dl-action-icon" style="background: rgba(0, 229, 255, 0.2); color: var(--primary);">🚀</div>
+                <div class="dl-action-text">
+                    <span class="dl-action-title">Direct Download</span>
+                    <span class="dl-action-desc">High-speed browser / native engine</span>
+                </div>
+            </a>
+
+            <!-- 2. 1DM / IDM for Android -->
+            <button class="dl-action-card" onclick="downloadVia1DM('${url}', '${escapeQuotes(title)}')">
+                <div class="dl-action-icon" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">⚡</div>
+                <div class="dl-action-text">
+                    <span class="dl-action-title">1DM / IDM Android</span>
+                    <span class="dl-action-desc">Multi-thread turbo download</span>
+                </div>
+            </button>
+
+            <!-- 3. ADM (Advanced Download Manager) -->
+            <button class="dl-action-card" onclick="downloadViaADM('${url}', '${escapeQuotes(title)}')">
+                <div class="dl-action-icon" style="background: rgba(255, 42, 95, 0.15); color: var(--accent);">📥</div>
+                <div class="dl-action-text">
+                    <span class="dl-action-title">ADM Downloader</span>
+                    <span class="dl-action-desc">Advanced Download Manager</span>
+                </div>
+            </button>
+
+            <!-- 4. Copy Direct Stream Link -->
+            <button class="dl-action-card" onclick="copySpecificUrl('${url}')">
+                <div class="dl-action-icon" style="background: rgba(255, 184, 0, 0.15); color: var(--accent-gold);">📋</div>
+                <div class="dl-action-text">
+                    <span class="dl-action-title">Copy Direct Link</span>
+                    <span class="dl-action-desc">For IDM PC, Aria2, JDownloader</span>
+                </div>
+            </button>
+        </div>
+    `;
+
+    // If TV Series: Add Season Batch Section
+    if (isSeries && currentSeasonEpisodes && currentSeasonEpisodes.length > 0) {
+        html += `
+            <div class="dl-batch-box">
+                <div class="dl-batch-header">
+                    <span>📦 ${currentSeasonName || 'Season'} Batch Downloader</span>
+                    <span style="font-size: 11px; color: var(--primary);">${currentSeasonEpisodes.length} Episodes</span>
+                </div>
+                <div class="dl-batch-buttons">
+                    <button class="dl-batch-btn" onclick="downloadSeasonM3u()">
+                        <span>📦</span>
+                        <span>Export Playlist (.m3u)</span>
+                    </button>
+                    <button class="dl-batch-btn" onclick="exportSeasonLinksTxt()">
+                        <span>📄</span>
+                        <span>Export Links (.txt)</span>
+                    </button>
+                </div>
+                <div style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); margin-top: 4px;">Individual Episodes:</div>
+                <div class="dl-ep-quick-list">
+                    ${currentSeasonEpisodes.map((ep, idx) => `
+                        <div class="dl-ep-quick-item">
+                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;">${ep.name.replace(/\.(mp4|mkv|avi|webm)$/i, '')}</span>
+                            <div style="display: flex; gap: 6px;">
+                                <a class="btn btn-primary" style="padding: 4px 10px; font-size: 11px; border-radius: 12px; text-decoration: none;" href="${ep.url}" download>Download</a>
+                                <button class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-radius: 12px;" onclick="downloadVia1DM('${ep.url}', '${escapeQuotes(ep.name)}')">1DM</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    body.innerHTML = html;
+    modal.style.display = 'flex';
+}
+
+function closeDownloadModal() {
+    const modal = document.getElementById('downloadModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function downloadVia1DM(url, title) {
+    if (!url) return;
+    const cleanTitle = encodeURIComponent((title || 'Video').replace(/[/\\?%*:|"<>]/g, '_'));
+    const intentUrl = `intent:${url}#Intent;action=android.intent.action.VIEW;package=idm.internet.download.manager;type=video/*;S.title=${cleanTitle};end`;
+    window.location.href = intentUrl;
+    showToast('Sending to 1DM / IDM Downloader...');
+}
+
+function downloadViaADM(url, title) {
+    if (!url) return;
+    const cleanTitle = encodeURIComponent((title || 'Video').replace(/[/\\?%*:|"<>]/g, '_'));
+    const intentUrl = `intent:${url}#Intent;action=android.intent.action.VIEW;package=com.dv.adm;type=video/*;S.title=${cleanTitle};end`;
+    window.location.href = intentUrl;
+    showToast('Sending to ADM Downloader...');
+}
+
+function copySpecificUrl(url) {
+    if (!url) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(() => showToast('Direct download URL copied!'));
+    } else {
+        const input = document.createElement('input');
+        input.value = url;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        showToast('Direct download URL copied!');
+    }
+}
+
+function exportSeasonLinksTxt() {
+    if (!currentSeasonEpisodes || currentSeasonEpisodes.length === 0) {
+        showToast('No episodes in this season');
+        return;
+    }
+
+    const seriesName = currentItem ? currentItem.title : 'Series';
+    let text = `# CineBox Links Export: ${seriesName} - ${currentSeasonName}\n# Import directly into IDM / 1DM / JDownloader\n\n`;
+    for (const ep of currentSeasonEpisodes) {
+        text += `${ep.url}\n`;
+    }
+
+    const cleanFileName = `${seriesName}_${currentSeasonName}_links`.replace(/[/\\?%*:|"<>]/g, '_');
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `${cleanFileName}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+
+    showToast(`Exported ${currentSeasonName} links (.txt)`);
+}
+
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('downloadModal');
+    if (modal && e.target === modal) {
+        closeDownloadModal();
+    }
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeDownloadModal();
+    }
+});
 
 window.onload = initWatch;
