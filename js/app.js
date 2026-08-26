@@ -389,7 +389,7 @@ function setupCarousel(moviesList) {
                     <div class="slide-tag">Featured • ${m.tag || 'Latest'}</div>
                     <h2 class="slide-title" title="${escapeQuotes(m.title)}">${m.title}</h2>
                     <div class="slide-meta">
-                        <span style="color: var(--accent-gold); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="12" height="12"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 8.9</span>
+                        <span style="color: var(--accent-gold); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="star" style="color: #ffb800; fill: #ffb800; width: 12px; height: 12px;"></i> 8.9</span>
                         <span>•</span>
                         <span>${m.size || 'HD 1080P'}</span>
                         <span>•</span>
@@ -397,11 +397,11 @@ function setupCarousel(moviesList) {
                     </div>
                     <div style="display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap;">
                         <a class="btn btn-primary" href="${linkUrl}">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>
+                            <i data-lucide="play" style="fill: currentColor; width: 14px; height: 14px;"></i>
                             <span>Watch Now</span>
                         </a>
                         <button class="btn btn-ghost" onclick="toggleWatchlistAndRefresh(${escapeQuotesJson(m)})">
-                            <svg class="icon" viewBox="0 0 24 24" fill="${inWatchlist ? 'var(--accent)' : 'none'}" stroke="${inWatchlist ? 'var(--accent)' : 'currentColor'}" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                            <i data-lucide="bookmark" style="width: 14px; height: 14px; ${inWatchlist ? 'color: var(--accent); fill: var(--accent);' : ''}"></i>
                             <span>${inWatchlist ? 'In List' : 'Save'}</span>
                         </button>
                     </div>
@@ -422,6 +422,7 @@ function setupCarousel(moviesList) {
     `).join('');
 
     startCarouselAuto();
+    refreshLucideIcons();
 }
 
 function startCarouselAuto() {
@@ -467,17 +468,17 @@ function renderContinueWatchingHtml() {
         <div class="continue-watching-block">
             <div class="row-header" style="border-bottom: none; margin-bottom: 10px;">
                 <div class="row-title-wrap">
-                    <h2 class="row-heading">
-                        <span style="color: var(--primary);">▶</span> Continue Watching
+                    <h2 class="row-heading" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <i data-lucide="play" style="color: var(--primary); fill: var(--primary); width: 14px; height: 14px;"></i> Continue Watching
                     </h2>
                     <span class="row-badge">${history.length}</span>
                 </div>
                 <div class="row-controls">
                     <button class="row-nav-btn prev" onclick="slideRow('continueSlider', -1)" aria-label="Previous">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M15 18l-6-6 6-6"/></svg>
+                        <i data-lucide="chevron-left"></i>
                     </button>
                     <button class="row-nav-btn next" onclick="slideRow('continueSlider', 1)" aria-label="Next">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
+                        <i data-lucide="chevron-right"></i>
                     </button>
                 </div>
             </div>
@@ -490,7 +491,7 @@ function renderContinueWatchingHtml() {
 
                     return `
                         <div class="continue-card">
-                            <button class="btn-remove-history" onclick="removeWatchHistory('${item.url}', event)" title="Remove" aria-label="Remove"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                            <button class="btn-remove-history" onclick="removeWatchHistory('${item.url}', event)" title="Remove" aria-label="Remove"><i data-lucide="x"></i></button>
                             <a href="${linkUrl}" style="text-decoration: none; color: inherit;">
                                 <div class="continue-thumb-wrap">
                                     <img src="${item.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300'}" alt="${escapeQuotes(item.title)}" loading="lazy">
@@ -595,10 +596,10 @@ function renderHomeRowsFromPayload(categoriesMap) {
                     </div>
                     <div class="row-controls">
                         <button class="row-nav-btn prev" onclick="slideRow('${rowSliderId}', -1)" aria-label="Previous">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M15 18l-6-6 6-6"/></svg>
+                            <i data-lucide="chevron-left"></i>
                         </button>
                         <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
+                            <i data-lucide="chevron-right"></i>
                         </button>
                     </div>
                 </div>
@@ -620,9 +621,7 @@ function renderShowAllCardHtml(cat) {
             <div class="show-all-card-inner">
                 <div class="show-all-glow-orb"></div>
                 <div class="show-all-icon-circle">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
+                    <i data-lucide="arrow-right"></i>
                 </div>
                 <div class="show-all-card-title">Show All</div>
                 <div class="show-all-card-cat">${cat.name}</div>
@@ -663,10 +662,10 @@ function renderHomeRows(container) {
                     </div>
                     <div class="row-controls">
                         <button class="row-nav-btn prev" onclick="slideRow('${rowSliderId}', -1)" aria-label="Previous">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M15 18l-6-6 6-6"/></svg>
+                            <i data-lucide="chevron-left"></i>
                         </button>
                         <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
+                            <i data-lucide="chevron-right"></i>
                         </button>
                     </div>
                 </div>
@@ -746,27 +745,27 @@ function renderWatchlistView() {
             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <a class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; text-decoration: none;" href="index.html">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        <i data-lucide="arrow-left"></i>
                         <span>Home</span>
                     </a>
                     <h1 class="row-heading" style="font-size: 18px; display: inline-flex; align-items: center; gap: 8px;">
-                        <svg class="icon" viewBox="0 0 24 24" fill="var(--accent)" stroke="var(--accent)" stroke-width="2" width="18" height="18"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                        <i data-lucide="bookmark" style="color: var(--accent); fill: var(--accent); width: 18px; height: 18px;"></i>
                         <span>My Watchlist & Library</span>
                     </h1>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                     <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 6px;" onclick="exportWatchlist()" title="Backup watchlist as JSON">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <i data-lucide="download"></i>
                         <span>Export JSON</span>
                     </button>
                     <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 6px;" onclick="triggerWatchlistImport()" title="Restore saved watchlist">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <i data-lucide="upload"></i>
                         <span>Import JSON</span>
                     </button>
                     ${list.length > 0 ? `
                         <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; color: var(--accent); display: inline-flex; align-items: center; gap: 6px;" onclick="clearAllWatchlist()" title="Clear all saved titles">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            <i data-lucide="trash-2"></i>
                             <span>Clear All</span>
                         </button>
                     ` : ''}
@@ -797,7 +796,7 @@ function renderWatchlistView() {
         ` : `
             <div style="text-align: center; padding: 60px 16px;">
                 <div style="margin-bottom: 16px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="var(--text-dim)" stroke-width="1.5" width="48" height="48"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                    <i data-lucide="bookmark" style="color: var(--text-dim); width: 48px; height: 48px;"></i>
                 </div>
                 <h2 style="font-size: 18px; font-weight: 700; margin-bottom: 6px;">No Titles Found in This Tab</h2>
                 <p style="font-size: 13px; color: var(--text-muted); max-width: 380px; margin: 0 auto 16px;">
@@ -807,6 +806,7 @@ function renderWatchlistView() {
             </div>
         `}
     `;
+    refreshLucideIcons();
 }
 
 function exportWatchlist() {
@@ -882,7 +882,7 @@ function renderCategoryFullGrid(container) {
             <div class="category-bar-top">
                 <div class="category-bar-left">
                     <a class="btn btn-ghost btn-home-link" style="padding: 5px 10px; font-size: 11.5px; text-decoration: none;" href="index.html">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        <i data-lucide="arrow-left"></i>
                         <span>Home</span>
                     </a>
                     <h1 class="category-bar-title">${currentCategoryName}</h1>
@@ -942,6 +942,7 @@ function renderCategoryFullGrid(container) {
             <button class="btn btn-ghost" id="loadMoreBtn" style="${displayedCount < filteredMovies.length ? 'display:block' : 'display:none'}" onclick="loadMore()">Load More Titles</button>
         </div>
     `;
+    refreshLucideIcons();
 }
 
 function setFacetYear(val) {
@@ -1129,11 +1130,12 @@ async function openCategoryView(tag, name) {
         container.innerHTML = `
             <div style="text-align: center; padding: 80px 20px;">
                 <div class="surprise-spinner" style="margin-bottom: 16px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" width="36" height="36"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                    <i data-lucide="loader-2" style="width: 36px; height: 36px; color: var(--primary);"></i>
                 </div>
                 <div style="font-size: 16px; font-weight: 700; color: var(--primary);">Loading ${name || tag}...</div>
             </div>
         `;
+        refreshLucideIcons();
     }
 
     if (tag === 'All') {
@@ -1239,6 +1241,7 @@ function handleLiveSearch(val) {
             `;
             dropdown.style.display = 'block';
         }
+        refreshLucideIcons();
     }, 150);
 }
 
@@ -1272,15 +1275,16 @@ function showRecentSearchesDropdown(dropdown) {
             ${recent.map(q => `
                 <div class="search-dropdown-item" style="justify-content: space-between;" onclick="fillAndSearchHome('${escapeQuotes(q)}')">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color:var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <i data-lucide="search" style="color: var(--text-muted); width: 13px; height: 13px;"></i>
                         <span>${escapeQuotes(q)}</span>
                     </div>
-                    <button class="remove-search-btn" onclick="removeSingleRecentSearch(event, '${escapeQuotes(q)}')" title="Remove" aria-label="Remove"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                    <button class="remove-search-btn" onclick="removeSingleRecentSearch(event, '${escapeQuotes(q)}')" title="Remove" aria-label="Remove"><i data-lucide="x" style="width: 11px; height: 11px;"></i></button>
                 </div>
             `).join('')}
         </div>
     `;
     dropdown.style.display = 'block';
+    refreshLucideIcons();
 }
 
 function clearRecentSearches(e) {
@@ -1351,6 +1355,7 @@ function loadMore() {
         const toShow = filteredMovies.slice(0, displayedCount);
         grid.innerHTML = toShow.map(item => renderMovieCardHtml(item)).join('');
         document.getElementById('loadMoreBtn').style.display = displayedCount < filteredMovies.length ? 'block' : 'none';
+        refreshLucideIcons();
     }
 }
 
@@ -1431,17 +1436,14 @@ function renderMovieCardHtml(item) {
                 <img src="${item.poster}" alt="${safeTitle}" loading="lazy" decoding="async"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="cover-fallback" style="display: none;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                    <i data-lucide="film" style="width: 24px; height: 24px;"></i>
                     <div style="font-size: 10px; font-weight: 600;">${item.title}</div>
                 </div>
                 ${markerHtml}
                 <div class="tag-badge">${item.tag || (isSeries ? 'Series' : 'HD')}</div>
                 <div class="cover-overlay">
                     <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
-                        ${isSeries ? 
-                            '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="16" height="16"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
-                            '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M8 5v14l11-7z"/></svg>'
-                        }
+                        <i data-lucide="${isSeries ? 'tv' : 'play'}" style="width: 14px; height: 14px; fill: ${isSeries ? 'none' : 'currentColor'};"></i>
                     </div>
                     <span style="font-size: 10px; font-weight: 700; color: #fff;">${isSeries ? 'Series' : 'Watch'}</span>
                 </div>

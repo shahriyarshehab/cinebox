@@ -26,30 +26,30 @@
     <header>
         <a class="brand" href="index.html">
             <div class="brand-mark">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8 5v14l11-7z"/></svg>
+                <i data-lucide="play" style="fill: currentColor; width: 16px; height: 16px;"></i>
             </div>
             <div class="brand-name">Cine<span>Box</span></div>
         </a>
 
         <nav class="nav-links desktop-nav-links">
             <a class="nav-link" href="index.html">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                <i data-lucide="house"></i>
                 <span>Home</span>
             </a>
             <a class="nav-link" href="tv.html">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                <i data-lucide="tv"></i>
                 <span>Shows</span>
             </a>
             <a class="nav-link" href="movies.html">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                <i data-lucide="film"></i>
                 <span>Movies</span>
             </a>
             <a class="nav-link" href="animation.html">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                <i data-lucide="sparkles"></i>
                 <span>Animation</span>
             </a>
             <a class="nav-link" href="watchlist.html">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                <i data-lucide="bookmark"></i>
                 <span>Watchlist</span>
                 <span class="badge-count" id="watchlistNavCount" style="display:none;">0</span>
             </a>
@@ -57,7 +57,7 @@
 
         <div class="search-wrap">
             <span class="search-icon">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <i data-lucide="search"></i>
             </span>
             <input type="text" id="searchInput" placeholder="Search across 36,000+ movies..." onfocus="if(!this.value) handleLiveSearch('')" oninput="handleLiveSearch(this.value)" onkeydown="if(event.key==='Enter') { hideSearchDropdown(); searchToHome(this.value); }" autocomplete="off">
             <div class="search-dropdown" id="searchDropdown"></div>
@@ -68,18 +68,13 @@
             <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle Light / Dark Theme">
                 <div class="theme-toggle-track">
                     <div class="theme-toggle-thumb">
-                        <svg class="sun-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="4"/>
-                            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
-                        </svg>
-                        <svg class="moon-icon icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
-                        </svg>
+                        <i data-lucide="sun" class="sun-icon"></i>
+                        <i data-lucide="moon" class="moon-icon"></i>
                     </div>
                 </div>
             </button>
-            <a class="btn btn-ghost desktop-only-btn" href="index.html" style="padding: 7px 12px; font-size: 12px;">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <a class="btn btn-ghost desktop-only-btn" href="index.html" style="padding: 7px 12px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="arrow-left"></i>
                 <span>Home</span>
             </a>
         </div>
@@ -108,9 +103,9 @@
 
                     <!-- Ratings & Specs Row -->
                     <div class="mb-meta-bar" id="wMetaBar">
-                        <span class="mb-rating-chip" id="wRating"><svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 8.9 / 10</span>
-                        <span class="rating-pill-rt" id="wRtBadge" style="display: none;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#fa320a" stroke-width="2" width="13" height="13"><circle cx="12" cy="13" r="8"/><path d="M12 5V2m-3 3l3-2 3 2m-6 0c1.5 1 4.5 1 6 0"/></svg> <span id="wRtVal">81%</span></span>
-                        <span class="rating-pill-meta" id="wMetaBadge" style="display: none;"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#00ce7d" stroke-width="2" width="13" height="13"><rect width="18" height="18" x="3" y="3" rx="4"/><path d="M7 16V8l5 5 5-5v8"/></svg> <span id="wMetaVal">83</span></span>
+                        <span class="mb-rating-chip" id="wRating"><i data-lucide="star" style="color: #ffb800; fill: #ffb800; width: 13px; height: 13px;"></i> 8.9 / 10</span>
+                        <span class="rating-pill-rt" id="wRtBadge" style="display: none;"><i data-lucide="sparkles" style="color: #fa320a; width: 13px; height: 13px;"></i> <span id="wRtVal">81%</span></span>
+                        <span class="rating-pill-meta" id="wMetaBadge" style="display: none;"><i data-lucide="activity" style="color: #00ce7d; width: 13px; height: 13px;"></i> <span id="wMetaVal">83</span></span>
                         <span class="mb-meta-chip" id="wRatedBadge" style="display: none;">PG-13</span>
                         <span class="mb-meta-chip" id="wYear">2024</span>
                         <span class="mb-meta-chip" id="wDuration">HD Cinema</span>
@@ -139,7 +134,7 @@
             <div id="tvExplorerWrap" class="mb-episodes-section" style="display: none;">
                 <div class="mb-section-header">
                     <div class="mb-section-title">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                        <i data-lucide="tv"></i>
                         <span>Seasons & Episodes</span>
                     </div>
                     <div id="seasonCountBadge" class="badge-count-static">Loading...</div>
@@ -156,7 +151,7 @@
             <div class="mb-cast-section" id="wCastSection" style="display: none;">
                 <div class="mb-section-header">
                     <div class="mb-section-title">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        <i data-lucide="users"></i>
                         <span>Top Cast & Characters</span>
                     </div>
                     <span style="font-size: 11.5px; color: var(--text-muted);" id="wDirectorHeadline"></span>
@@ -167,7 +162,7 @@
             <!-- Technical & Media Overview Card -->
             <div class="mb-tech-info-card">
                 <div class="mb-section-title" style="margin-bottom: 12px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <i data-lucide="info"></i>
                     <span>Media Overview & Credits</span>
                 </div>
                 <div class="mb-info-grid">
@@ -218,7 +213,7 @@
             <div class="mb-external-players-card">
                 <div class="mb-section-header">
                     <div class="mb-section-title">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                        <i data-lucide="play"></i>
                         <span>External Players & Direct Streaming</span>
                     </div>
                     <span style="font-size: 11.5px; color: var(--text-muted);">Ultra-speed BDIX Playback</span>
@@ -226,48 +221,37 @@
                 <div class="player-hub-grid">
                     <!-- VLC Media Player -->
                     <button class="btn btn-vlc" onclick="openCurrentInVLC()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Stream directly in VLC Media Player">
-                        <svg class="icon" viewBox="0 0 512 512" width="16" height="16" aria-label="VLC" style="vertical-align: middle;">
-                            <g fill="#ffffff">
-                                <path d="M437 400l-36-94c-3-10-13-16-23-16H134c-10 0-20 6-23 16l-36 94c-2 3-2 7-2 11 0 16 13 29 29 29h308a29 29 0 0 0 27-40z"/>
-                                <path d="M299 109l-15-51c-3-11-13-18-24-18h-8c-11 0-21 7-24 18l-15 51a307 307 0 0 0 86 0zM256 183c-24 0-46-2-64-6l-19 65c20 8 49 13 83 13s63-5 83-13l-20-65c-17 4-39 6-63 6z"/>
-                            </g>
-                            <g fill="#ffe0b2">
-                                <path d="M319 177l-20-68a307 307 0 0 1-86 0l-21 68c18 4 40 6 64 6s46-2 63-6z"/>
-                                <path d="M173 242l-18 62c19 14 55 23 101 23s82-9 101-23l-18-62c-20 8-49 13-83 13s-63-5-83-13z"/>
-                            </g>
-                        </svg>
+                        <i data-lucide="cone"></i>
                         <span>VLC Player</span>
                     </button>
 
                     <!-- PotPlayer (PC) -->
                     <button class="btn btn-pot" onclick="openInPotPlayer()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Stream in PotPlayer (Windows PC)">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        <i data-lucide="monitor-play"></i>
                         <span>PotPlayer</span>
                     </button>
 
                     <!-- MX Player (Android) -->
                     <button class="btn btn-mx" onclick="openInMXPlayer()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Stream in MX Player (Android HW+)">
-                        <svg class="icon" viewBox="0 0 48 48" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M24,2.5A21.5,21.5,0,1,0,45.5,24,21.51,21.51,0,0,0,24,2.5ZM18.07,13.14a1.42,1.42,0,0,1,.82.23l15.75,10.2a1.44,1.44,0,0,1,0,2.41L18.89,36.18A1.44,1.44,0,0,1,16.67,35V14.57a1.43,1.43,0,0,1,1.4-1.43Z"/>
-                        </svg>
+                        <i data-lucide="play-circle"></i>
                         <span>MX Player</span>
                     </button>
 
                     <!-- Copy Stream Link -->
                     <button class="btn btn-ghost" onclick="copyCurrentStreamUrl()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Copy direct BDIX stream URL">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        <i data-lucide="link"></i>
                         <span>Copy Link</span>
                     </button>
 
                     <!-- Export Playlist (.m3u) -->
                     <button class="btn btn-ghost" onclick="exportStreamM3u(currentActiveStreamUrl, currentActiveStreamTitle)" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Export stream as .m3u playlist">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <i data-lucide="download"></i>
                         <span>Export .m3u</span>
                     </button>
 
                     <!-- More Players / External Player Hub -->
                     <button class="btn btn-ghost" onclick="openExternalPlayersModal(currentActiveStreamUrl, currentActiveStreamTitle)" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="View all external players & options">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                        <i data-lucide="share-2"></i>
                         <span>More Players</span>
                     </button>
                 </div>
@@ -279,7 +263,7 @@
                     <h2 class="mb-section-title" id="relatedHeading">You May Also Like</h2>
                     <a class="btn-see-all" id="relatedSeeAllBtn" href="index.html">
                         <span>Explore All</span>
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        <i data-lucide="arrow-right"></i>
                     </a>
                 </div>
                 <div class="row-slider" id="relatedSlider"></div>
@@ -297,7 +281,7 @@
         <div class="player-top-bar">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <button class="btn btn-ghost" onclick="exitPlayerMode()" style="padding: 7px 14px; font-size: 12.5px; border-radius: 20px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <i data-lucide="arrow-left"></i>
                     <span>Back to Details</span>
                 </button>
                 <div class="player-view-badge" id="playerMediaTypeBadge">
@@ -325,7 +309,7 @@
                         <div class="seek-touch-zone left" id="seekTouchLeft">
                             <div class="seek-ripple" id="seekRippleLeft">
                                 <div class="seek-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+                                    <i data-lucide="chevrons-left"></i>
                                 </div>
                                 <span class="seek-text" id="seekLeftText">-10s</span>
                             </div>
@@ -333,7 +317,7 @@
                         <div class="seek-touch-zone right" id="seekTouchRight">
                             <div class="seek-ripple" id="seekRippleRight">
                                 <div class="seek-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+                                    <i data-lucide="chevrons-right"></i>
                                 </div>
                                 <span class="seek-text" id="seekRightText">+10s</span>
                             </div>
@@ -345,7 +329,7 @@
                         <!-- Brightness HUD -->
                         <div class="gesture-hud" id="hudBrightness" style="display: none;">
                             <div class="hud-icon">
-                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                                <i data-lucide="sun"></i>
                             </div>
                             <div class="hud-bar-wrap">
                                 <div class="hud-bar-fill" id="hudBrightnessFill" style="height: 70%;"></div>
@@ -356,7 +340,7 @@
                         <!-- Volume / Audio Boost HUD -->
                         <div class="gesture-hud" id="hudVolume" style="display: none;">
                             <div class="hud-icon" id="hudVolumeIcon">
-                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                                <i data-lucide="volume-2"></i>
                             </div>
                             <div class="hud-bar-wrap">
                                 <div class="hud-bar-fill" id="hudVolumeFill" style="height: 100%;"></div>
@@ -373,14 +357,14 @@
 
                         <!-- Center Play/Pause Animated Ripple -->
                         <div class="center-play-ripple" id="centerPlayRipple">
-                            <svg class="center-icon icon" viewBox="0 0 24 24" fill="currentColor" width="36" height="36" id="centerPlayIcon"><path d="M8 5v14l11-7z"/></svg>
+                            <i data-lucide="play" class="center-icon icon" id="centerPlayIcon" style="width: 36px; height: 36px; fill: currentColor;"></i>
                         </div>
                     </div>
 
                     <!-- Mobile Screen Lock Shield -->
                     <div class="screen-lock-shield" id="screenLockShield" style="display: none;">
                         <button class="btn-unlock-pill" onclick="unlockPlayerScreen()">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <i data-lucide="unlock"></i>
                             <span>Screen Locked • Tap to Unlock</span>
                         </button>
                     </div>
@@ -398,6 +382,660 @@
                         </div>
                     </div>
 
+                    <!-- Backdrop Scrim for Mobile Settings Popup -->
+                    <div class="yt-settings-backdrop" id="ytSettingsBackdrop" onclick="closeYouTubeSettingsPopup()" style="display: none;"></div>
+
+                    <!-- ================================================= -->
+                    <!--  YOUTUBE-STYLE SETTINGS POPUP OVERLAY ON PLAYER   -->
+                    <!-- ================================================= -->
+                    <div class="yt-settings-popup" id="ytSettingsPopup" style="display: none;" role="menu" aria-label="Playback Settings">
+                        
+                        <!-- 1. MAIN MENU VIEW -->
+                        <div class="yt-menu-panel active" id="ytMenuMain">
+                            <div class="yt-menu-header">
+                                <div class="yt-menu-header-title">
+                                    <i data-lucide="settings"></i>
+                                    <span>Playback Settings</span>
+                                </div>
+                                <button class="yt-menu-close-btn" onclick="closeYouTubeSettingsPopup()" aria-label="Close settings">
+                                    <i data-lucide="x"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="yt-menu-list">
+                                <!-- Audio Track Selection (Primary Requested Feature) -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAudioTrack')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="mic"></i>
+                                        </span>
+                                        <span class="yt-item-label">Audio Track</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValAudioTrack">Default (Stereo)</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Quality -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubQuality')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="tv"></i>
+                                        </span>
+                                        <span class="yt-item-label">Quality</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValQuality">1080p HD</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Playback Speed -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubSpeed')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="play"></i>
+                                        </span>
+                                        <span class="yt-item-label">Playback Speed</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValSpeed">Normal</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Subtitles (CC) -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubSubtitles')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="captions"></i>
+                                        </span>
+                                        <span class="yt-item-label">Subtitles (CC)</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValSubtitles">Off</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Audio Booster & Equalizer -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAudioBoost')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="volume-2"></i>
+                                        </span>
+                                        <span class="yt-item-label">Audio Booster & EQ</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValAudioBoost">100%</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Visual Enhancements & Filters -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubVisuals')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="sun"></i>
+                                        </span>
+                                        <span class="yt-item-label">Visual Filters</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValVisuals">Standard</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Aspect Ratio & Screen Fit -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAspect')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="maximize"></i>
+                                        </span>
+                                        <span class="yt-item-label">Aspect Ratio / Fit</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValAspect">Fit Screen</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Ambient Cinema Glow -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAmbient')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="sparkles"></i>
+                                        </span>
+                                        <span class="yt-item-label">Ambient Cinema Glow</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValAmbient">Dynamic Sync</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Sleep Timer -->
+                                <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubSleep')">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon">
+                                            <i data-lucide="clock"></i>
+                                        </span>
+                                        <span class="yt-item-label">Sleep Timer</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-val" id="ytValSleep">Off</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Advanced Customization Studio Modal trigger -->
+                                <div class="yt-menu-item yt-menu-item-studio" onclick="closeYouTubeSettingsPopup(); openPlayerCustomModal();">
+                                    <div class="yt-item-left">
+                                        <span class="yt-item-icon" style="color: var(--primary);">
+                                            <i data-lucide="sliders"></i>
+                                        </span>
+                                        <span class="yt-item-label" style="font-weight: 700;">Customization Studio...</span>
+                                    </div>
+                                    <div class="yt-item-right">
+                                        <span class="yt-item-badge">Full Studio</span>
+                                        <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. SUBMENU: AUDIO TRACK SELECTION -->
+                        <div class="yt-menu-panel" id="ytSubAudioTrack">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Audio Track</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-group-label">STREAM AUDIO CHANNELS</div>
+                                
+                                <!-- Standard Stereo Full -->
+                                <div class="yt-submenu-item" data-audiomode="stereo" onclick="selectAudioTrackMode('stereo', 'Default (Stereo Full)')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Default Audio (Stereo Full)</span>
+                                        <span class="yt-opt-desc">Original multi-channel master audio</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+
+                                <!-- Dynamically Enumerated Native Stream Tracks (if embedded in container/HLS) -->
+                                <div id="ytNativeAudioTracksList"></div>
+
+                                <div class="yt-group-label">MULTI-AUDIO / DUAL DUB CHANNEL SEPARATION</div>
+
+                                <!-- Left Channel (Dub 1 / Main) -->
+                                <div class="yt-submenu-item" data-audiomode="left-channel" onclick="selectAudioTrackMode('left-channel', 'Left Channel (Track 1)')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Left Channel (Track 1 / Dub 1)</span>
+                                        <span class="yt-opt-desc">Routes Left audio channel to both ears (BDIX Dual Audio)</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+
+                                <!-- Right Channel (Dub 2 / Original) -->
+                                <div class="yt-submenu-item" data-audiomode="right-channel" onclick="selectAudioTrackMode('right-channel', 'Right Channel (Track 2)')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Right Channel (Track 2 / Dub 2)</span>
+                                        <span class="yt-opt-desc">Routes Right audio channel to both ears (BDIX Dual Audio)</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+
+                                <div class="yt-group-label">EXTERNAL SYNCED AUDIO TRACK</div>
+
+                                <!-- Load External Audio Stream -->
+                                <div class="yt-action-item" onclick="promptExternalAudioUrl()">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="link" style="color: var(--primary);"></i>
+                                        <span>Load External Audio URL...</span>
+                                    </div>
+                                </div>
+
+                                <!-- Load Local Audio File -->
+                                <input type="file" id="externalAudioFileInput" accept=".mp3,.m4a,.aac,.wav,.ogg,.opus,.flac" style="display: none;" onchange="handleExternalAudioFileSelect(event)">
+                                <div class="yt-action-item" onclick="openExternalAudioPicker()">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="upload" style="color: var(--primary);"></i>
+                                        <span>Load Local Audio File (.mp3 / .aac)...</span>
+                                    </div>
+                                </div>
+
+                                <!-- Audio Sync Delay Nudge -->
+                                <div class="yt-sync-block">
+                                    <div class="yt-sync-header">
+                                        <span>Audio Sync Delay Nudge:</span>
+                                        <span class="yt-sync-val" id="ytAudioSyncVal">0.0s</span>
+                                    </div>
+                                    <div class="yt-sync-buttons">
+                                        <button class="yt-sync-btn" onclick="nudgeAudioSync(-0.5)">-0.5s</button>
+                                        <button class="yt-sync-btn" onclick="nudgeAudioSync(-0.1)">-0.1s</button>
+                                        <button class="yt-sync-btn yt-sync-reset" onclick="resetAudioSync()">Reset Sync</button>
+                                        <button class="yt-sync-btn" onclick="nudgeAudioSync(0.1)">+0.1s</button>
+                                        <button class="yt-sync-btn" onclick="nudgeAudioSync(0.5)">+0.5s</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. SUBMENU: QUALITY -->
+                        <div class="yt-menu-panel" id="ytSubQuality">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Quality</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-submenu-item" data-quality="auto" onclick="selectVideoQuality('auto')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Auto (High Definition)</span>
+                                        <span class="yt-opt-desc">Auto-selects optimal bitrate</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item active" data-quality="1080p" onclick="selectVideoQuality('1080p')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">1080p Full HD</span>
+                                        <span class="yt-opt-desc">Direct BDIX Web-DL Original</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-quality="720p" onclick="selectVideoQuality('720p')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">720p HD</span>
+                                        <span class="yt-opt-desc">High Definition Data Saver</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-quality="480p" onclick="selectVideoQuality('480p')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">480p SD</span>
+                                        <span class="yt-opt-desc">Standard mobile quality</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-quality="360p" onclick="selectVideoQuality('360p')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">360p Low</span>
+                                        <span class="yt-opt-desc">Ultra low data consumption</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. SUBMENU: PLAYBACK SPEED -->
+                        <div class="yt-menu-panel" id="ytSubSpeed">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Playback Speed</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-submenu-item" data-speed="0.25" onclick="selectPlaybackSpeed(0.25)">
+                                    <span class="yt-opt-title">0.25x</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-speed="0.5" onclick="selectPlaybackSpeed(0.5)">
+                                    <span class="yt-opt-title">0.5x</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-speed="0.75" onclick="selectPlaybackSpeed(0.75)">
+                                    <span class="yt-opt-title">0.75x</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item active" data-speed="1.0" onclick="selectPlaybackSpeed(1.0)">
+                                    <span class="yt-opt-title">Normal (1.0x)</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-speed="1.25" onclick="selectPlaybackSpeed(1.25)">
+                                    <span class="yt-opt-title">1.25x</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-speed="1.5" onclick="selectPlaybackSpeed(1.5)">
+                                    <span class="yt-opt-title">1.5x</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-speed="1.75" onclick="selectPlaybackSpeed(1.75)">
+                                    <span class="yt-opt-title">1.75x</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-speed="2.0" onclick="selectPlaybackSpeed(2.0)">
+                                    <span class="yt-opt-title">2.0x (2x Fast)</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. SUBMENU: SUBTITLES (CC) -->
+                        <div class="yt-menu-panel" id="ytSubSubtitles">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Subtitles (CC)</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-submenu-item active" id="ytSubOptOff" onclick="selectSubtitleOption('off')">
+                                    <span class="yt-opt-title">Off</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" id="ytSubOptLoaded" style="display: none;" onclick="selectSubtitleOption('loaded')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title" id="ytSubLoadedTitle">English (Custom)</span>
+                                        <span class="yt-opt-desc">Loaded Subtitle Track</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+
+                                <div class="yt-action-item" onclick="openSubtitlePicker()">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="upload" style="color: var(--primary);"></i>
+                                        <span>Load .SRT / .VTT Subtitle File...</span>
+                                    </div>
+                                </div>
+
+                                <div class="yt-action-item" onclick="openYouTubeSubmenu('ytSubSubtitleConfig')">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <i data-lucide="settings" style="color: var(--primary);"></i>
+                                        <span>Subtitle Appearance & Timing...</span>
+                                    </div>
+                                    <i data-lucide="chevron-right" class="yt-chevron"></i>
+                                </div>
+
+                                <div class="yt-action-item" onclick="clearLoadedSubtitles()">
+                                    <div style="display: flex; align-items: center; gap: 8px; color: #ff5252;">
+                                        <i data-lucide="x"></i>
+                                        <span>Remove Subtitles</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. SUBMENU: SUBTITLE APPEARANCE & TIMING CONFIG -->
+                        <div class="yt-menu-panel" id="ytSubSubtitleConfig">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="openYouTubeSubmenu('ytSubSubtitles')" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Subtitle Styling & Sync</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-group-label">FONT SIZE</div>
+                                <div class="yt-chips-row">
+                                    <button class="yt-chip" data-subsize="14" onclick="setSubtitleSize(14)">14px</button>
+                                    <button class="yt-chip active" data-subsize="18" onclick="setSubtitleSize(18)">18px</button>
+                                    <button class="yt-chip" data-subsize="22" onclick="setSubtitleSize(22)">22px</button>
+                                    <button class="yt-chip" data-subsize="28" onclick="setSubtitleSize(28)">28px</button>
+                                    <button class="yt-chip" data-subsize="34" onclick="setSubtitleSize(34)">34px</button>
+                                </div>
+
+                                <div class="yt-group-label">COLOR HIGHLIGHT</div>
+                                <div class="yt-colors-row">
+                                    <button class="yt-color-dot active" style="background: #ffffff;" onclick="setSubtitleColor('#ffffff', 'White')" title="White"></button>
+                                    <button class="yt-color-dot" style="background: #ffeb3b;" onclick="setSubtitleColor('#ffeb3b', 'Yellow')" title="Yellow"></button>
+                                    <button class="yt-color-dot" style="background: #00e5ff;" onclick="setSubtitleColor('#00e5ff', 'Cyan')" title="Cyan"></button>
+                                    <button class="yt-color-dot" style="background: #00e676;" onclick="setSubtitleColor('#00e676', 'Green')" title="Green"></button>
+                                    <button class="yt-color-dot" style="background: #ffb800;" onclick="setSubtitleColor('#ffb800', 'Gold')" title="Gold"></button>
+                                    <button class="yt-color-dot" style="background: #ff4081;" onclick="setSubtitleColor('#ff4081', 'Pink')" title="Pink"></button>
+                                </div>
+
+                                <div class="yt-group-label">TIMING & SYNC NUDGE</div>
+                                <div class="yt-sync-block">
+                                    <div class="yt-sync-header">
+                                        <span>Subtitle Offset:</span>
+                                        <span class="yt-sync-val" id="ytSubSyncVal">0.0s</span>
+                                    </div>
+                                    <div class="yt-sync-buttons">
+                                        <button class="yt-sync-btn" onclick="nudgeSubtitleSync(-0.5)">-0.5s</button>
+                                        <button class="yt-sync-btn" onclick="nudgeSubtitleSync(-0.1)">-0.1s</button>
+                                        <button class="yt-sync-btn yt-sync-reset" onclick="resetSubtitleSync()">Reset</button>
+                                        <button class="yt-sync-btn" onclick="nudgeSubtitleSync(0.1)">+0.1s</button>
+                                        <button class="yt-sync-btn" onclick="nudgeSubtitleSync(0.5)">+0.5s</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 7. SUBMENU: AUDIO BOOSTER & EQ -->
+                        <div class="yt-menu-panel" id="ytSubAudioBoost">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Audio Booster & EQ</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-group-label">VOLUME AMPLIFICATION GAIN</div>
+                                <div class="yt-submenu-item active" data-audiogain="100" onclick="handleAudioBoostGain(100)">
+                                    <span class="yt-opt-title">100% Normal Volume</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-audiogain="150" onclick="handleAudioBoostGain(150)">
+                                    <span class="yt-opt-title">150% Boosted Gain</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-audiogain="200" onclick="handleAudioBoostGain(200)">
+                                    <span class="yt-opt-title">200% Super Boost (2x)</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-audiogain="300" onclick="handleAudioBoostGain(300)">
+                                    <span class="yt-opt-title">300% Maximum Boost (3x)</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+
+                                <div class="yt-group-label">EQUALIZER ACOUSTIC PROFILES</div>
+                                <div class="yt-submenu-item active" data-audioprofile="standard" onclick="setAudioProfile('standard')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Standard Reference</span>
+                                        <span class="yt-opt-desc">Untouched original acoustics</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-audioprofile="dialogue" onclick="setAudioProfile('dialogue')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Dialogue Clarifier</span>
+                                        <span class="yt-opt-desc">+6dB Vocal frequencies for quiet speech</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-audioprofile="bass" onclick="setAudioProfile('bass')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Movie Bass Rumble</span>
+                                        <span class="yt-opt-desc">Low-end cinematic punch</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-audioprofile="night" onclick="setAudioProfile('night')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Night Mode Compression</span>
+                                        <span class="yt-opt-desc">Compresses loud action & boosts speech</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 8. SUBMENU: VISUAL FILTERS -->
+                        <div class="yt-menu-panel" id="ytSubVisuals">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Visual Filters</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-submenu-item active" data-videofilter="normal" onclick="applyVideoFilterPreset('normal')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Standard (Original)</span>
+                                        <span class="yt-opt-desc">Untouched stream color balance</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-videofilter="vivid" onclick="applyVideoFilterPreset('vivid')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Vivid HDR</span>
+                                        <span class="yt-opt-desc">+35% Vibrance & dynamic contrast</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-videofilter="cinema" onclick="applyVideoFilterPreset('cinema')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Cinema Warm</span>
+                                        <span class="yt-opt-desc">3200K Rich filmic tone</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-videofilter="night" onclick="applyVideoFilterPreset('night')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Night Shield</span>
+                                        <span class="yt-opt-desc">Blue-light eye comfort filter</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-videofilter="crisp" onclick="applyVideoFilterPreset('crisp')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Crisp 4K Clarity</span>
+                                        <span class="yt-opt-desc">Enhanced edge definition</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-videofilter="oled" onclick="applyVideoFilterPreset('oled')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">OLED Pure Black</span>
+                                        <span class="yt-opt-desc">Deep ink shadows & specular highlights</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 9. SUBMENU: ASPECT RATIO & FIT -->
+                        <div class="yt-menu-panel" id="ytSubAspect">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Aspect Ratio / Fit</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-submenu-item active" data-aspect="contain" onclick="setPlayerAspectRatio('contain')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Fit Screen (Contain)</span>
+                                        <span class="yt-opt-desc">Original video dimensions without cropping</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-aspect="cover" onclick="setPlayerAspectRatio('cover')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Fill Screen (Crop Black Bars)</span>
+                                        <span class="yt-opt-desc">Expands video to eliminate black borders</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-aspect="16/9" onclick="setPlayerAspectRatio('16/9')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">16:9 Widescreen</span>
+                                        <span class="yt-opt-desc">Standard modern HD Cinema ratio</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-aspect="4/3" onclick="setPlayerAspectRatio('4/3')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">4:3 Retro Classic</span>
+                                        <span class="yt-opt-desc">Traditional television aspect ratio</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-aspect="21/9" onclick="setPlayerAspectRatio('21/9')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">21:9 Anamorphic Scope</span>
+                                        <span class="yt-opt-desc">Ultrawide theatrical anamorphic framing</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 10. SUBMENU: AMBIENT CINEMA GLOW -->
+                        <div class="yt-menu-panel" id="ytSubAmbient">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Ambient Glow</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-submenu-item active" data-ambient="sync" onclick="setAmbientGlowMode('sync')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Dynamic Sync</span>
+                                        <span class="yt-opt-desc">Real-time color sampling from playing video</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-ambient="accent" onclick="setAmbientGlowMode('accent')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Theme Accent Glow</span>
+                                        <span class="yt-opt-desc">Continuous soft glow of chosen UI theme</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-ambient="off" onclick="setAmbientGlowMode('off')">
+                                    <div class="yt-submenu-item-main">
+                                        <span class="yt-opt-title">Off (Disabled)</span>
+                                        <span class="yt-opt-desc">No ambient backlighting</span>
+                                    </div>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 11. SUBMENU: SLEEP TIMER -->
+                        <div class="yt-menu-panel" id="ytSubSleep">
+                            <div class="yt-submenu-header">
+                                <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <span class="yt-submenu-title">Sleep Timer</span>
+                            </div>
+                            <div class="yt-menu-list">
+                                <div class="yt-submenu-item active" data-sleep="0" onclick="setSleepTimer(0)">
+                                    <span class="yt-opt-title">Off</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-sleep="15" onclick="setSleepTimer(15)">
+                                    <span class="yt-opt-title">15 Minutes</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-sleep="30" onclick="setSleepTimer(30)">
+                                    <span class="yt-opt-title">30 Minutes</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-sleep="45" onclick="setSleepTimer(45)">
+                                    <span class="yt-opt-title">45 Minutes</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-sleep="60" onclick="setSleepTimer(60)">
+                                    <span class="yt-opt-title">60 Minutes</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                                <div class="yt-submenu-item" data-sleep="end" onclick="setSleepTimer('end')">
+                                    <span class="yt-opt-title">End of Video / Episode</span>
+                                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
                     <!-- ================================================= -->
                     <!--  CINEBOX CUSTOM PLAYER CONTROLS OVERLAY       -->
                     <!-- ================================================= -->
@@ -407,17 +1045,18 @@
                         <div class="cp-top-bar">
                             <div class="cp-title-wrap">
                                 <button class="cp-btn-icon" onclick="exitPlayerMode()" title="Back to Details (Esc)" aria-label="Back">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                    <i data-lucide="arrow-left"></i>
                                 </button>
                                 <span class="player-live-dot"></span>
                                 <span class="cp-title" id="cpMediaTitle">Playing Media</span>
                                 <span class="cp-badge" id="cpQualityBadge">1080p HD</span>
+                                <span class="cp-badge cp-badge-audio" id="cpAudioTrackBadge" style="display: none;">Audio: Stereo</span>
                             </div>
 
                             <div class="cp-top-actions">
                                 <!-- Screen Lock Toggle (Mobile friendly) -->
                                 <button class="cp-btn-icon" id="btnLockScreen" onclick="lockPlayerScreen()" title="Lock Screen Touches" aria-label="Lock screen">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                    <i data-lucide="lock"></i>
                                 </button>
                             </div>
                         </div>
@@ -445,40 +1084,32 @@
                                 <div class="cp-controls-left">
                                     <!-- Play/Pause Toggle -->
                                     <button class="cp-btn cp-btn-play" id="btnCustomPlayPause" onclick="togglePlayPause()" title="Play / Pause (Space / K)" aria-label="Play or pause">
-                                        <svg class="icon icon-play" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                        <svg class="icon icon-pause" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" style="display: none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                                        <i data-lucide="play" class="icon-play" style="fill: currentColor;"></i>
+                                        <i data-lucide="pause" class="icon-pause" style="display: none; fill: currentColor;"></i>
                                     </button>
 
                                     <!-- Rewind 10s (YouTube / Netflix Style) -->
                                     <button class="cp-btn" onclick="seekRelative(-10, 'left')" id="btnCustomRewind" title="Rewind 10s (J / ←)" aria-label="Rewind 10 seconds">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                                            <path d="M3 3v5h5"/>
-                                            <text x="12" y="15" text-anchor="middle" fill="currentColor" font-size="8" font-weight="800" font-family="system-ui, -apple-system, sans-serif" stroke="none">10</text>
-                                        </svg>
+                                        <i data-lucide="rotate-ccw"></i>
                                     </button>
 
                                     <!-- Forward 10s (YouTube / Netflix Style) -->
                                     <button class="cp-btn" onclick="seekRelative(10, 'right')" id="btnCustomForward" title="Forward 10s (L / →)" aria-label="Forward 10 seconds">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
-                                            <path d="M21 12a9 9 0 1 1-9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                                            <path d="M21 3v5h-5"/>
-                                            <text x="12" y="15" text-anchor="middle" fill="currentColor" font-size="8" font-weight="800" font-family="system-ui, -apple-system, sans-serif" stroke="none">10</text>
-                                        </svg>
+                                        <i data-lucide="rotate-cw"></i>
                                     </button>
 
                                     <!-- Next Episode Button (Netflix Style, Series Only) -->
                                     <div class="cp-series-nav" id="cpSeriesNav" style="display: none;">
                                         <button class="cp-btn" onclick="playNextEpisode()" title="Next Episode (N)" aria-label="Next episode">
-                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2.5"/></svg>
+                                            <i data-lucide="skip-forward" style="fill: currentColor;"></i>
                                         </button>
                                     </div>
 
                                     <!-- Volume Slider & Mute Toggle (YouTube Style) -->
                                     <div class="cp-volume-group" id="cpVolumeGroup">
                                         <button class="cp-btn" id="btnCustomMute" onclick="toggleMute()" title="Mute / Unmute (M)" aria-label="Mute or unmute">
-                                            <svg class="icon icon-vol-high" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-                                            <svg class="icon icon-vol-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="display: none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                                            <i data-lucide="volume-2" class="icon-vol-high"></i>
+                                            <i data-lucide="volume-x" class="icon-vol-mute" style="display: none;"></i>
                                         </button>
                                         <div class="cp-volume-slider-wrap">
                                             <input type="range" class="cp-volume-slider" id="customVolumeSlider" min="0" max="100" value="100" oninput="handleVolumeSlider(this.value)" aria-label="Volume slider">
@@ -498,23 +1129,23 @@
                                     <!-- Subtitle Toggle & File Picker -->
                                     <input type="file" id="subFileInput" accept=".srt,.vtt,.sub" style="display: none;" onchange="handleSubtitleFileSelect(event)">
                                     <button class="cp-btn" id="subBtn" onclick="toggleSubtitles()" title="Subtitles (C)" aria-label="Toggle subtitles">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect width="20" height="14" x="2" y="5" rx="3"/><path d="M7 10h2M7 14h2M15 10h2M15 14h2"/></svg>
+                                        <i data-lucide="captions"></i>
                                     </button>
 
-                                    <!-- Settings Gear (YouTube / Netflix Studio) -->
-                                    <button class="cp-btn" id="btnCustomSettings" onclick="openPlayerCustomModal()" title="Settings & Filters (S)" aria-label="Settings">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                    <!-- Settings Gear (YouTube Popup Trigger) -->
+                                    <button class="cp-btn" id="btnCustomSettings" onclick="toggleYouTubeSettingsPopup(event)" title="Settings & Audio Tracks (S)" aria-label="Settings">
+                                        <i data-lucide="settings"></i>
                                     </button>
 
                                     <!-- Picture-in-Picture (PiP) -->
                                     <button class="cp-btn" id="btnCustomPip" onclick="togglePictureInPicture()" title="Miniplayer (PiP)" aria-label="Miniplayer">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
+                                        <i data-lucide="picture-in-picture-2"></i>
                                     </button>
 
                                     <!-- Fullscreen Toggle (YouTube Style) -->
                                     <button class="cp-btn" onclick="togglePlayerFullscreen()" id="btnCustomFullscreen" title="Fullscreen (F)" aria-label="Toggle Fullscreen">
-                                        <svg class="icon icon-fullscreen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-                                        <svg class="icon icon-exit-fullscreen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="display: none;"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+                                        <i data-lucide="maximize" class="icon-fullscreen"></i>
+                                        <i data-lucide="minimize" class="icon-exit-fullscreen" style="display: none;"></i>
                                     </button>
                                 </div>
                             </div>
@@ -530,7 +1161,7 @@
             <div class="player-info-main">
                 <h2 class="player-heading-title" id="playerHeadingTitle">Media Title</h2>
                 <div class="player-heading-meta" id="playerHeadingMeta">
-                    <span style="color: #ffb800; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="12" height="12"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> 8.9</span>
+                    <span style="color: #ffb800; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="star" style="color: #ffb800; fill: #ffb800; width: 12px; height: 12px;"></i> 8.9</span>
                     <span>•</span>
                     <span id="playerQualityTag">1080p HD</span>
                     <span>•</span>
@@ -546,7 +1177,7 @@
         <div id="playerTvPlaylistWrap" class="player-tv-playlist-box" style="display: none;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                 <div style="font-size: 14px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+                    <i data-lucide="tv"></i>
                     <span>Switch Episode</span>
                 </div>
                 <div id="playerSeasonCountBadge" class="badge-count-static">Loading...</div>
@@ -572,10 +1203,10 @@
         <div class="modal-card" style="max-width: 820px; width: 95%; padding: 0; overflow: hidden;">
             <div class="modal-header" style="padding: 14px 18px; margin-bottom: 0;">
                 <div style="font-size: 15px; font-weight: 700; font-family: var(--font-display); display: flex; align-items: center; gap: 8px;">
-                    <span style="color: #ff0000; display: inline-flex; align-items: center;"><svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg></span>
+                    <span style="color: #ff0000; display: inline-flex; align-items: center;"><i data-lucide="play" style="color: #ff0000; fill: #ff0000; width: 16px; height: 16px;"></i></span>
                     <span id="trailerModalTitle">Official Trailer</span>
                 </div>
-                <button class="btn-close" onclick="closeTrailerModal()" aria-label="Close"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                <button class="btn-close" onclick="closeTrailerModal()" aria-label="Close"><i data-lucide="x"></i></button>
             </div>
             <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
                 <iframe id="trailerIframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -588,10 +1219,10 @@
         <div class="modal-card download-modal-card">
             <div class="modal-header">
                 <div style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: var(--primary);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <i data-lucide="download" style="color: var(--primary);"></i>
                     <span style="font-size: 16px; font-family: var(--font-display);" id="dlModalHeading">Download Hub</span>
                 </div>
-                <button class="btn-close" onclick="closeDownloadModal()" aria-label="Close"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                <button class="btn-close" onclick="closeDownloadModal()" aria-label="Close"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body" id="downloadModalBody">
                 <!-- Dynamically injected by openDownloadModal() -->
@@ -605,21 +1236,21 @@
             <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border); margin-bottom: 0;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--primary); box-shadow: 0 0 12px var(--primary-glow);">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                        <i data-lucide="play" style="fill: currentColor; width: 18px; height: 18px;"></i>
                     </div>
                     <div>
                         <div style="font-size: 16px; font-weight: 800; font-family: var(--font-display); color: #fff;">Play in External Player</div>
                         <div style="font-size: 11.5px; color: var(--text-muted);" id="extModalMediaTitle">Select your preferred media app for 1-tap direct stream</div>
                     </div>
                 </div>
-                <button class="btn-close" onclick="closeExternalPlayersModal()" aria-label="Close"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                <button class="btn-close" onclick="closeExternalPlayersModal()" aria-label="Close"><i data-lucide="x"></i></button>
             </div>
             <div class="modal-body" style="padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;">
                 <div class="ext-player-list" style="display: flex; flex-direction: column; gap: 10px;">
                     <!-- VLC Media Player -->
                     <div class="ext-player-card" onclick="openCurrentInVLC()">
                         <div class="ext-icon-badge" style="background: rgba(255, 107, 0, 0.15); border-color: rgba(255, 107, 0, 0.4); color: #ff6b00;">
-                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2L4 18h16L12 2zm0 4.2L16.5 15h-9L12 6.2zM2 20h20v2H2z"/></svg>
+                            <i data-lucide="cone"></i>
                         </div>
                         <div class="ext-details">
                             <div class="ext-title-row">
@@ -636,7 +1267,7 @@
                     <!-- MX Player -->
                     <div class="ext-player-card" onclick="openInMXPlayer()">
                         <div class="ext-icon-badge" style="background: rgba(0, 180, 216, 0.15); border-color: rgba(0, 180, 216, 0.4); color: #00b4d8;">
-                            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M24,2.5A21.5,21.5,0,1,0,45.5,24,21.51,21.51,0,0,0,24,2.5ZM18.07,13.14a1.42,1.42,0,0,1,.82.23l15.75,10.2a1.44,1.44,0,0,1,0,2.41L18.89,36.18A1.44,1.44,0,0,1,16.67,35V14.57a1.43,1.43,0,0,1,1.4-1.43Z"/></svg>
+                            <i data-lucide="play-circle"></i>
                         </div>
                         <div class="ext-details">
                             <div class="ext-title-row">
@@ -652,7 +1283,7 @@
                     <!-- PotPlayer -->
                     <div class="ext-player-card" onclick="openInPotPlayer()">
                         <div class="ext-icon-badge" style="background: rgba(255, 184, 0, 0.15); border-color: rgba(255, 184, 0, 0.4); color: var(--accent-gold);">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                            <i data-lucide="monitor-play"></i>
                         </div>
                         <div class="ext-details">
                             <div class="ext-title-row">
@@ -668,7 +1299,7 @@
                     <!-- System Video Player Chooser -->
                     <div class="ext-player-card" onclick="openInSystemChooser()">
                         <div class="ext-icon-badge" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                            <i data-lucide="share-2"></i>
                         </div>
                         <div class="ext-details">
                             <div class="ext-title-row">
@@ -684,7 +1315,7 @@
                     <!-- Direct Stream Link -->
                     <div class="ext-player-card" onclick="copyCurrentStreamUrl()">
                         <div class="ext-icon-badge" style="background: rgba(0, 229, 255, 0.15); border-color: rgba(0, 229, 255, 0.4); color: var(--primary);">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                            <i data-lucide="link"></i>
                         </div>
                         <div class="ext-details">
                             <div class="ext-title-row">
@@ -710,7 +1341,7 @@
     <div class="pwa-banner" id="pwaBanner" style="display: none;">
         <div class="pwa-banner-content">
             <div class="pwa-icon">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <i data-lucide="play" style="width: 20px; height: 20px;"></i>
             </div>
             <div>
                 <div style="font-size: 13.5px; font-weight: 700; color: #fff;">Install CineBox App</div>
@@ -719,7 +1350,7 @@
         </div>
         <div style="display: flex; gap: 8px;">
             <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="installPwaApp()">Install</button>
-            <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="dismissPwaBanner()" aria-label="Close"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="dismissPwaBanner()" aria-label="Close"><i data-lucide="x"></i></button>
         </div>
     </div>
 
@@ -732,7 +1363,7 @@
             <div class="modal-header custom-modal-header">
                 <div class="custom-modal-title">
                     <div class="modal-title-icon">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        <i data-lucide="sliders" style="width: 20px; height: 20px;"></i>
                     </div>
                     <div>
                         <div style="font-size: 16px; font-weight: 800; font-family: var(--font-display); color: #fff;">Player Customization Studio</div>
@@ -741,33 +1372,33 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button class="btn btn-ghost" onclick="resetPlayerSettingsToDefaults()" style="padding: 5px 12px; font-size: 11.5px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;" title="Reset all settings to factory default">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        <i data-lucide="rotate-ccw"></i>
                         <span>Reset Defaults</span>
                     </button>
-                    <button class="btn-close" onclick="closePlayerCustomModal()" aria-label="Close"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                    <button class="btn-close" onclick="closePlayerCustomModal()" aria-label="Close"><i data-lucide="x"></i></button>
                 </div>
             </div>
 
             <!-- Tab Buttons -->
             <div class="custom-nav-tabs">
                 <button class="custom-tab-btn active" id="tabBtnVisuals" onclick="switchCustomTab('tabVisuals')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <i data-lucide="sun"></i>
                     <span>Visuals & Filters</span>
                 </button>
                 <button class="custom-tab-btn" id="tabBtnAudio" onclick="switchCustomTab('tabAudio')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <i data-lucide="volume-2"></i>
                     <span>Audio Booster</span>
                 </button>
                 <button class="custom-tab-btn" id="tabBtnSubtitles" onclick="switchCustomTab('tabSubtitles')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 10h3M6 14h2M14 10h4M14 14h3"/></svg>
+                    <i data-lucide="captions"></i>
                     <span>Subtitles (CC)</span>
                 </button>
                 <button class="custom-tab-btn" id="tabBtnPlayback" onclick="switchCustomTab('tabPlayback')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <i data-lucide="touchpad"></i>
                     <span>Gestures & Touch</span>
                 </button>
                 <button class="custom-tab-btn" id="tabBtnThemes" onclick="switchCustomTab('tabThemes')">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2z"/></svg>
+                    <i data-lucide="palette"></i>
                     <span>Themes & Timer</span>
                 </button>
             </div>
@@ -789,42 +1420,42 @@
                         <div class="custom-presets-grid">
                             <button class="preset-card active" data-filter="normal" onclick="applyVideoFilterPreset('normal')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect width="20" height="15" x="2" y="7" rx="2"/><path d="m4 7 3-5 3 5 3-5 3 5 3-5 3 5"/></svg>
+                                    <i data-lucide="tv"></i>
                                 </div>
                                 <div class="preset-name">Standard</div>
                                 <div class="preset-desc">Original untouched stream</div>
                             </button>
                             <button class="preset-card" data-filter="vivid" onclick="applyVideoFilterPreset('vivid')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                                    <i data-lucide="sparkles"></i>
                                 </div>
                                 <div class="preset-name">Vivid HDR</div>
                                 <div class="preset-desc">+35% Vibrance & Dynamic Contrast</div>
                             </button>
                             <button class="preset-card" data-filter="cinema" onclick="applyVideoFilterPreset('cinema')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                                    <i data-lucide="film"></i>
                                 </div>
                                 <div class="preset-name">Cinema Warm</div>
                                 <div class="preset-desc">3200K Rich Filmic Look</div>
                             </button>
                             <button class="preset-card" data-filter="night" onclick="applyVideoFilterPreset('night')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                                    <i data-lucide="moon"></i>
                                 </div>
                                 <div class="preset-name">Night Shield</div>
                                 <div class="preset-desc">Blue-light filter for eye comfort</div>
                             </button>
                             <button class="preset-card" data-filter="crisp" onclick="applyVideoFilterPreset('crisp')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3 8 9l4 12 4-12-3-6"/><path d="M2 9h20"/></svg>
+                                    <i data-lucide="diamond"></i>
                                 </div>
                                 <div class="preset-name">Crisp 4K</div>
                                 <div class="preset-desc">Enhanced edge definition</div>
                             </button>
                             <button class="preset-card" data-filter="oled" onclick="applyVideoFilterPreset('oled')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+                                    <i data-lucide="square" style="fill: currentColor;"></i>
                                 </div>
                                 <div class="preset-name">OLED Black</div>
                                 <div class="preset-desc">Deep shadows & deep blacks</div>
@@ -842,7 +1473,7 @@
                             <div class="custom-slider-row">
                                 <div class="slider-header">
                                     <span class="slider-title" style="display: inline-flex; align-items: center; gap: 6px;">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                                        <i data-lucide="sun"></i>
                                         Brightness
                                     </span>
                                     <span class="slider-val" id="valSliderBrightness">100%</span>
@@ -852,7 +1483,7 @@
                             <div class="custom-slider-row">
                                 <div class="slider-header">
                                     <span class="slider-title" style="display: inline-flex; align-items: center; gap: 6px;">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12v12z" fill="currentColor"/></svg>
+                                        <i data-lucide="contrast"></i>
                                         Contrast
                                     </span>
                                     <span class="slider-val" id="valSliderContrast">100%</span>
@@ -862,7 +1493,7 @@
                             <div class="custom-slider-row">
                                 <div class="slider-header">
                                     <span class="slider-title" style="display: inline-flex; align-items: center; gap: 6px;">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z"/></svg>
+                                        <i data-lucide="palette"></i>
                                         Saturation
                                     </span>
                                     <span class="slider-val" id="valSliderSaturation">100%</span>
@@ -872,7 +1503,7 @@
                             <div class="custom-slider-row">
                                 <div class="slider-header">
                                     <span class="slider-title" style="display: inline-flex; align-items: center; gap: 6px;">
-                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 22a10 10 0 0 1-10-10"/></svg>
+                                        <i data-lucide="disc"></i>
                                         Hue Shift
                                     </span>
                                     <span class="slider-val" id="valSliderHue">0°</span>
@@ -957,28 +1588,28 @@
                         <div class="custom-presets-grid">
                             <button class="preset-card active" data-profile="standard" onclick="setAudioProfile('standard')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>
+                                    <i data-lucide="headphones"></i>
                                 </div>
                                 <div class="preset-name">Standard Reference</div>
                                 <div class="preset-desc">Original untouched acoustics</div>
                             </button>
                             <button class="preset-card" data-profile="dialogue" onclick="setAudioProfile('dialogue')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                                    <i data-lucide="mic"></i>
                                 </div>
                                 <div class="preset-name">Dialogue Clarifier</div>
                                 <div class="preset-desc">Boost vocal 2.5kHz frequencies</div>
                             </button>
                             <button class="preset-card" data-profile="bass" onclick="setAudioProfile('bass')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M2 10v4M6 6v12M10 3v18M14 8v8M18 5v14M22 10v4"/></svg>
+                                    <i data-lucide="activity"></i>
                                 </div>
                                 <div class="preset-name">Movie Bass Rumble</div>
                                 <div class="preset-desc">Enhanced low-end cinematic punch</div>
                             </button>
                             <button class="preset-card" data-profile="night" onclick="setAudioProfile('night')">
                                 <div class="preset-icon">
-                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                                    <i data-lucide="moon"></i>
                                 </div>
                                 <div class="preset-name">Night Mode Compression</div>
                                 <div class="preset-desc">Evens out explosions & quiet speech</div>
@@ -1001,11 +1632,11 @@
                         </div>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <button class="btn btn-primary" onclick="openSubtitlePicker()" style="padding: 7px 14px; font-size: 12px; border-radius: 8px;">
-                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <i data-lucide="upload"></i>
                                 <span>Load .SRT / .VTT File</span>
                             </button>
                             <button class="btn btn-ghost" onclick="clearLoadedSubtitles()" style="padding: 7px 12px; font-size: 12px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px;">
-                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                <i data-lucide="x"></i>
                                 <span>Remove Subtitle</span>
                             </button>
                         </div>
@@ -1296,23 +1927,23 @@
     <!-- Mobile Bottom Navigation Bar -->
     <nav class="mobile-bottom-nav">
         <a class="mobile-nav-btn" href="index.html">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <i data-lucide="house"></i>
             <span class="mob-nav-label">Home</span>
         </a>
         <a class="mobile-nav-btn" href="tv.html">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>
+            <i data-lucide="tv"></i>
             <span class="mob-nav-label">Shows</span>
         </a>
         <a class="mobile-nav-btn" href="movies.html">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            <i data-lucide="film"></i>
             <span class="mob-nav-label">Movies</span>
         </a>
         <a class="mobile-nav-btn" href="animation.html">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            <i data-lucide="sparkles"></i>
             <span class="mob-nav-label">Animation</span>
         </a>
         <a class="mobile-nav-btn" href="watchlist.html">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <i data-lucide="bookmark"></i>
             <span class="mob-nav-label">Watchlist</span>
             <span class="mobile-nav-badge" id="mobWatchlistNavCount" style="display:none;">0</span>
         </a>

@@ -30,6 +30,12 @@ const DEFAULT_PLAYER_SETTINGS = {
     ambientMode: 'sync', // sync, accent, off
     ambientIntensity: 75,
     aspectRatio: 'contain', // contain, cover, 16/9, 4/3, 21/9
+    audioTrackMode: 'stereo', // stereo, left-channel, right-channel, native-0, native-1, external
+    audioTrackTitle: 'Default (Stereo Full)',
+    externalAudioUrl: '',
+    externalAudioTitle: '',
+    externalAudioOffset: 0.0,
+    videoQuality: '1080p', // auto, 1080p, 720p, 480p, 360p
     audioBoostGain: 100, // 100 to 300%
     audioProfile: 'standard', // standard, dialogue, bass, night
     subSize: 18,
@@ -67,35 +73,22 @@ let isTimeRemainingMode = false;
 let controlsHideTimer = null;
 let sleepTimeoutId = null;
 let wakeLockSentinel = null;
+let isYouTubeSettingsOpen = false;
 
-// Audio Booster Web Audio API Nodes
+// Web Audio API & Multi-Audio Track Engine
 let audioCtx = null;
 let audioSourceNode = null;
 let audioGainNode = null;
 let audioFilterNode = null;
 let audioCompressorNode = null;
+let channelSplitterNode = null;
+let channelMergerNode = null;
 let isAudioEngineInitialized = false;
+let externalAudioPlayer = null;
 
-// Official VLC Cone SVG
-const VLC_ICON_SVG = `
-    <svg class="icon" viewBox="0 0 512 512" width="14" height="14" aria-label="VLC" style="vertical-align: middle;">
-        <g fill="#f7901e">
-            <path d="M437 400l-36-94c-3-10-13-16-23-16H134c-10 0-20 6-23 16l-36 94c-2 3-2 7-2 11 0 16 13 29 29 29h308a29 29 0 0 0 27-40z"/>
-            <path d="M299 109l-15-51c-3-11-13-18-24-18h-8c-11 0-21 7-24 18l-15 51a307 307 0 0 0 86 0zM256 183c-24 0-46-2-64-6l-19 65c20 8 49 13 83 13s63-5 83-13l-20-65c-17 4-39 6-63 6z"/>
-        </g>
-        <g fill="#ffffff">
-            <path d="M319 177l-20-68a307 307 0 0 1-86 0l-21 68c18 4 40 6 64 6s46-2 63-6z"/>
-            <path d="M173 242l-18 62c19 14 55 23 101 23s82-9 101-23l-18-62c-20 8-49 13-83 13s-63-5-83-13z"/>
-        </g>
-    </svg>
-`;
-
-// Official MX Player SVG from SVGRepo (518012/mx)
-const MX_ICON_SVG = `
-    <svg class="icon" viewBox="0 0 48 48" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-label="MX Player" style="vertical-align: middle;">
-        <path d="M24,2.5A21.5,21.5,0,1,0,45.5,24,21.51,21.51,0,0,0,24,2.5ZM18.07,13.14a1.42,1.42,0,0,1,.82.23l15.75,10.2a1.44,1.44,0,0,1,0,2.41L18.89,36.18A1.44,1.44,0,0,1,16.67,35V14.57a1.43,1.43,0,0,1,1.4-1.43Z"/>
-    </svg>
-`;
+// Official VLC & MX Player Lucide Icons
+const VLC_ICON_SVG = `<i data-lucide="cone" style="width: 14px; height: 14px; vertical-align: middle;"></i>`;
+const MX_ICON_SVG = `<i data-lucide="play-circle" style="width: 14px; height: 14px; vertical-align: middle;"></i>`;
 
 async function initWatch() {
     updateWatchlistNavBadge();
@@ -440,7 +433,7 @@ async function loadAndApplyOnlineMetadata(item) {
         if (meta.imdbRating && meta.imdbRating !== 'N/A') {
             const rateEl = document.getElementById('wRating');
             if (rateEl) {
-                rateEl.innerHTML = `<span style="color:#ffb800; font-size:14px; display:inline-flex; align-items:center;"><svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="13" height="13"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span> ${meta.imdbRating} / 10`;
+                rateEl.innerHTML = `<span style="color:#ffb800; font-size:14px; display:inline-flex; align-items:center;"><i data-lucide="star" style="color: #ffb800; fill: #ffb800; width: 13px; height: 13px;"></i></span> ${meta.imdbRating} / 10`;
                 rateEl.style.display = 'inline-flex';
             }
         }
@@ -503,7 +496,7 @@ async function loadAndApplyOnlineMetadata(item) {
                 genEl.innerHTML = meta.genres.map(g => `
                     <a class="mb-genre-pill" href="index.html?q=${encodeURIComponent(g)}"># ${g}</a>
                 `).join('') + `
-                    <span class="mb-genre-pill" style="border-color: rgba(255, 184, 0, 0.4); color: #ffb800; display: inline-flex; align-items: center; gap: 4px;"><svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="11" height="11"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Official IMDb</span>
+                    <span class="mb-genre-pill" style="border-color: rgba(255, 184, 0, 0.4); color: #ffb800; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="star" style="color: #ffb800; fill: #ffb800; width: 11px; height: 11px;"></i> Official IMDb</span>
                 `;
             }
         }
@@ -660,32 +653,32 @@ function renderWatchPage(item) {
     document.getElementById('wActions').innerHTML = `
         ${isSeries ? `
             <button class="mb-btn-primary" onclick="playFirstEpisodeOrScroll()">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
+                <i data-lucide="play" style="fill: currentColor; width: 16px; height: 16px;"></i>
                 <span>Watch Episode 1</span>
             </button>
         ` : `
             <button class="mb-btn-primary" onclick="enterPlayerMode('${item.url}', '${escapeQuotes(item.title)}')">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
+                <i data-lucide="play" style="fill: currentColor; width: 16px; height: 16px;"></i>
                 <span>Watch Online</span>
             </button>
         `}
         ${isSeries ? `
             <button class="mb-btn-action" onclick="openDownloadModal(null, null, true)">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <i data-lucide="download" style="width: 15px; height: 15px;"></i>
                 <span>Download Hub</span>
             </button>
         ` : `
             <button class="mb-btn-action" onclick="openDownloadModal('${item.url}', '${escapeQuotes(item.title)}')">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <i data-lucide="download" style="width: 15px; height: 15px;"></i>
                 <span>Download</span>
             </button>
         `}
         <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
-            <svg class="icon" id="wHeartIconAction" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            <i data-lucide="bookmark" id="wHeartIconAction" style="width: 15px; height: 15px; ${isInWatchlist(item.title) ? 'color: var(--accent); fill: var(--accent);' : ''}"></i>
             <span id="wWatchlistActionText">${isInWatchlist(item.title) ? 'Saved' : 'Watchlist'}</span>
         </button>
         <button class="mb-btn-action" onclick="shareCurrentMedia()">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            <i data-lucide="share-2" style="width: 15px; height: 15px;"></i>
             <span>Share</span>
         </button>
     `;
@@ -745,18 +738,19 @@ function enterPlayerMode(url, title) {
     if (qActions) {
         qActions.innerHTML = `
             <button class="mb-btn-action" onclick="openDownloadModal(currentActiveStreamUrl, currentActiveStreamTitle)">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <i data-lucide="download" style="width: 14px; height: 14px;"></i>
                 <span>Download</span>
             </button>
             <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
-                <svg class="icon" id="wHeartIconPlayer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+                <i data-lucide="bookmark" id="wHeartIconPlayer" style="width: 14px; height: 14px; ${isInWatchlist(currentItem ? currentItem.title : '') ? 'color: var(--accent); fill: var(--accent);' : ''}"></i>
                 <span id="wWatchlistPlayerText">${isInWatchlist(currentItem ? currentItem.title : '') ? 'Saved' : 'Save'}</span>
             </button>
             <button class="mb-btn-action" onclick="shareCurrentMedia()">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                <i data-lucide="share-2" style="width: 14px; height: 14px;"></i>
                 <span>Share</span>
             </button>
         `;
+        refreshLucideIcons();
     }
 
     // Apply player settings to current stream
@@ -913,6 +907,14 @@ function setupPlayerListeners() {
             );
         }
 
+        // Sync external audio if playing
+        if (externalAudioPlayer && !player.paused) {
+            const expectedTime = Math.max(0, player.currentTime + (playerSettings.externalAudioOffset || 0));
+            if (Math.abs(externalAudioPlayer.currentTime - expectedTime) > 0.35) {
+                externalAudioPlayer.currentTime = expectedTime;
+            }
+        }
+
         // Update custom scrubber & time text
         updateScrubberProgress();
 
@@ -939,6 +941,10 @@ function setupPlayerListeners() {
         if (isAudioEngineInitialized && audioCtx && audioCtx.state === 'suspended') {
             audioCtx.resume().catch(() => {});
         }
+        if (externalAudioPlayer) {
+            externalAudioPlayer.currentTime = Math.max(0, player.currentTime + (playerSettings.externalAudioOffset || 0));
+            externalAudioPlayer.play().catch(() => {});
+        }
         if (playerSettings.wakeLock) {
             acquireWakeLock();
         }
@@ -947,6 +953,9 @@ function setupPlayerListeners() {
 
     player.addEventListener('pause', () => {
         updatePlayPauseButtonUI(false);
+        if (externalAudioPlayer) {
+            externalAudioPlayer.pause();
+        }
         savePlaybackProgress(
             currentActiveStreamUrl,
             currentActiveStreamTitle,
@@ -956,8 +965,29 @@ function setupPlayerListeners() {
         );
     });
 
+    player.addEventListener('seeking', () => {
+        if (externalAudioPlayer) {
+            externalAudioPlayer.currentTime = Math.max(0, player.currentTime + (playerSettings.externalAudioOffset || 0));
+        }
+    });
+
+    player.addEventListener('seeked', () => {
+        if (externalAudioPlayer) {
+            externalAudioPlayer.currentTime = Math.max(0, player.currentTime + (playerSettings.externalAudioOffset || 0));
+        }
+    });
+
+    player.addEventListener('ratechange', () => {
+        if (externalAudioPlayer) {
+            externalAudioPlayer.playbackRate = player.playbackRate;
+        }
+    });
+
     player.addEventListener('ended', () => {
         updatePlayPauseButtonUI(false);
+        if (externalAudioPlayer) {
+            externalAudioPlayer.pause();
+        }
         savePlaybackProgress(
             currentActiveStreamUrl,
             currentActiveStreamTitle,
@@ -978,11 +1008,16 @@ function setupPlayerListeners() {
 
     player.addEventListener('volumechange', () => {
         updateVolumeUI();
+        if (externalAudioPlayer && playerSettings.audioTrackMode === 'external') {
+            externalAudioPlayer.volume = player.volume;
+        }
     });
 
     player.addEventListener('loadedmetadata', () => {
         updateScrubberProgress();
         applyAspectRatioCss();
+        detectNativeAudioTracks();
+        updateYouTubeMenuState();
         if (playerSettings.defaultSpeed && playerSettings.defaultSpeed !== 1.0) {
             player.playbackRate = playerSettings.defaultSpeed;
         }
@@ -1352,7 +1387,7 @@ function renderIndexedTvData(tvData, seriesTitle) {
         if (specials.length > 0) {
             tabsHtml += `
                 <button class="season-pill-btn specials-pill" onclick="selectSpecialsTab(this)" style="display: inline-flex; align-items: center; gap: 5px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="#ffb800" width="12" height="12"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    <i data-lucide="star" style="color: #ffb800; fill: #ffb800; width: 12px; height: 12px;"></i>
                     <span>Specials (${specials.length})</span>
                 </button>
             `;
@@ -1439,7 +1474,7 @@ function renderEpisodeListHtml(episodes) {
         html += `
             <div style="position: relative; margin-bottom: 6px;">
                 <input type="text" class="ep-filter-input" placeholder="Filter ${episodes.length} episodes..." value="${escapeQuotes(episodeFilterQuery)}" oninput="filterEpisodes(this.value)">
-                ${episodeFilterQuery ? `<button onclick="filterEpisodes('');" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" aria-label="Clear"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ''}
+                ${episodeFilterQuery ? `<button onclick="filterEpisodes('');" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer;" aria-label="Clear"><i data-lucide="x" style="width: 12px; height: 12px;"></i></button>` : ''}
             </div>
         `;
     }
@@ -1466,10 +1501,10 @@ function renderEpisodeListHtml(episodes) {
             </div>
             <div class="ep-action-btns" onclick="event.stopPropagation();">
                 <button class="ep-icon-btn ep-btn-stream" onclick="playSpecificEpisode(${originalIdx})" title="Stream Episode">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M8 5v14l11-7z"/></svg>
+                    <i data-lucide="play" style="fill: currentColor; width: 13px; height: 13px;"></i>
                 </button>
                 <button class="ep-icon-btn" onclick="openDownloadModal('${ep.url}', '${escapeQuotes(ep.name)}')" title="Download Episode">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <i data-lucide="download" style="width: 13px; height: 13px;"></i>
                 </button>
             </div>
         </div>
@@ -1509,14 +1544,15 @@ function renderPlayerEpisodeList(episodes) {
             </div>
             <div class="ep-action-btns" onclick="event.stopPropagation();">
                 <button class="ep-icon-btn ep-btn-stream" onclick="playSpecificEpisode(${originalIdx})" title="Stream Episode">
-                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><path d="M8 5v14l11-7z"/></svg>
+                    <i data-lucide="play" style="fill: currentColor; width: 13px; height: 13px;"></i>
                 </button>
                 <button class="ep-icon-btn" onclick="openDownloadModal('${ep.url}', '${escapeQuotes(ep.name)}')" title="Download Episode">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <i data-lucide="download" style="width: 13px; height: 13px;"></i>
                 </button>
             </div>
         </div>
     `;}).join('');
+    refreshLucideIcons();
 }
 
 function playSpecificEpisode(idx) {
@@ -1568,7 +1604,7 @@ function fallbackTvView(seriesUrl, seriesTitle) {
     if (sTabs) {
         sTabs.innerHTML = `
             <a class="btn btn-primary" style="font-size: 12px; padding: 8px 14px; border-radius: 20px;" href="${seriesUrl}" target="_blank">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <i data-lucide="folder" style="width: 14px; height: 14px;"></i>
                 <span>Browse All Seasons on Server</span>
             </a>
         `;
@@ -1581,6 +1617,7 @@ function fallbackTvView(seriesUrl, seriesTitle) {
             </div>
         `;
     }
+    refreshLucideIcons();
 }
 
 // ==========================================
@@ -1757,10 +1794,17 @@ function applyAllPlayerSettings() {
     // 4. Apply Subtitle Styles
     updateSubtitleStyleSheet();
 
-    // 5. Update UI Controls & Badges
+    // 5. Apply Audio Settings & Channel Routing
+    applyAudioSettings();
+    applyAudioChannelRouting();
+
+    // 6. Update UI Controls & Badges
     updateCustomizerUIState();
 
-    // 6. Update Seek labels
+    // 7. Update YouTube Settings Menu UI
+    updateYouTubeMenuState();
+
+    // 8. Update Seek labels
     const step = playerSettings.seekStep || 10;
     const l1 = document.getElementById('stepRewindLabel');
     const l2 = document.getElementById('stepForwardLabel');
@@ -2076,7 +2120,7 @@ function applyAspectRatioCss() {
 }
 
 // ==========================================
-//  Audio Booster & Web Audio API Engine
+//  Audio Booster, Multi-Audio Tracks & Web Audio API Engine
 // ==========================================
 function setupAudioBooster() {
     const player = document.getElementById('videoPlayer');
@@ -2088,12 +2132,17 @@ function setupAudioBooster() {
 
         audioCtx = new AudioContextClass();
         audioSourceNode = audioCtx.createMediaElementSource(player);
-        audioGainNode = audioCtx.createGain();
+        channelSplitterNode = audioCtx.createChannelSplitter(2);
+        channelMergerNode = audioCtx.createChannelMerger(2);
         audioFilterNode = audioCtx.createBiquadFilter();
         audioCompressorNode = audioCtx.createDynamicsCompressor();
+        audioGainNode = audioCtx.createGain();
 
-        // Connect chain: source -> filter -> compressor -> gain -> destination
-        audioSourceNode.connect(audioFilterNode);
+        // Connect chain: source -> splitter -> [routing] -> merger -> filter -> compressor -> gain -> destination
+        audioSourceNode.connect(channelSplitterNode);
+        applyAudioChannelRouting();
+
+        channelMergerNode.connect(audioFilterNode);
         audioFilterNode.connect(audioCompressorNode);
         audioCompressorNode.connect(audioGainNode);
         audioGainNode.connect(audioCtx.destination);
@@ -2105,20 +2154,197 @@ function setupAudioBooster() {
     }
 }
 
+function applyAudioChannelRouting() {
+    if (!channelSplitterNode || !channelMergerNode) return;
+
+    try {
+        channelSplitterNode.disconnect();
+    } catch (e) {}
+
+    const mode = playerSettings.audioTrackMode || 'stereo';
+
+    if (mode === 'left-channel') {
+        // Route Left input channel (0) to both Left (0) and Right (1) outputs (BDIX Dual Audio Track 1)
+        channelSplitterNode.connect(channelMergerNode, 0, 0);
+        channelSplitterNode.connect(channelMergerNode, 0, 1);
+    } else if (mode === 'right-channel') {
+        // Route Right input channel (1) to both Left (0) and Right (1) outputs (BDIX Dual Audio Track 2)
+        channelSplitterNode.connect(channelMergerNode, 1, 0);
+        channelSplitterNode.connect(channelMergerNode, 1, 1);
+    } else {
+        // Standard Stereo (0->0, 1->1)
+        channelSplitterNode.connect(channelMergerNode, 0, 0);
+        channelSplitterNode.connect(channelMergerNode, 1, 1);
+    }
+}
+
+function selectAudioTrackMode(mode, title, nativeTrackIdx = -1) {
+    const player = document.getElementById('videoPlayer');
+    if (!player) return;
+
+    playerSettings.audioTrackMode = mode;
+    playerSettings.audioTrackTitle = title || 'Default Audio';
+
+    // If native stream track selected:
+    if (nativeTrackIdx >= 0 && player.audioTracks && player.audioTracks.length > 0) {
+        for (let i = 0; i < player.audioTracks.length; i++) {
+            player.audioTracks[i].enabled = (i === nativeTrackIdx);
+        }
+        player.muted = false;
+        if (externalAudioPlayer) {
+            externalAudioPlayer.pause();
+            externalAudioPlayer = null;
+        }
+    } else if (mode === 'external') {
+        // Handled in loadExternalAudio
+    } else {
+        // Standard stereo or dual-channel mode
+        if (externalAudioPlayer) {
+            externalAudioPlayer.pause();
+            externalAudioPlayer = null;
+            player.muted = false;
+        }
+        setupAudioBooster();
+        applyAudioChannelRouting();
+    }
+
+    savePlayerSettings();
+    updateCustomizerUIState();
+    updateYouTubeMenuState();
+    showToast(`Audio Track: ${playerSettings.audioTrackTitle}`);
+}
+
+function detectNativeAudioTracks() {
+    const player = document.getElementById('videoPlayer');
+    const container = document.getElementById('ytNativeAudioTracksList');
+    if (!player || !container) return;
+
+    if (player.audioTracks && player.audioTracks.length > 0) {
+        let html = '';
+        for (let i = 0; i < player.audioTracks.length; i++) {
+            const tr = player.audioTracks[i];
+            const trackLabel = tr.label || tr.language || `Track ${i + 1}`;
+            const isSelected = playerSettings.audioTrackMode === `native-${i}` || (playerSettings.audioTrackMode === 'stereo' && i === 0 && tr.enabled);
+            html += `
+                <div class="yt-submenu-item ${isSelected ? 'active' : ''}" data-audiomode="native-${i}" onclick="selectAudioTrackMode('native-${i}', '${escapeQuotes(trackLabel)}', ${i})">
+                    <div class="yt-submenu-item-main">
+                        <span class="yt-opt-title">${trackLabel}</span>
+                        <span class="yt-opt-desc">Embedded Stream Audio Track ${i + 1} (${tr.language || 'Multi-channel'})</span>
+                    </div>
+                    <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+        refreshLucideIcons();
+    } else {
+        container.innerHTML = '';
+    }
+}
+
+function promptExternalAudioUrl() {
+    const defaultUrl = playerSettings.externalAudioUrl || '';
+    const url = prompt('Enter direct audio stream URL (e.g. .mp3, .m4a, .aac link):', defaultUrl);
+    if (url && url.trim()) {
+        const cleanUrl = url.trim();
+        const title = cleanUrl.split('/').pop().split('?')[0] || 'Custom Audio Track';
+        loadExternalAudio(cleanUrl, title);
+    }
+}
+
+function openExternalAudioPicker() {
+    const fileInput = document.getElementById('externalAudioFileInput');
+    if (fileInput) fileInput.click();
+}
+
+function handleExternalAudioFileSelect(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const blobUrl = URL.createObjectURL(file);
+    loadExternalAudio(blobUrl, file.name);
+    e.target.value = '';
+}
+
+function loadExternalAudio(url, title = 'External Audio Track') {
+    const player = document.getElementById('videoPlayer');
+    if (!player || !url) return;
+
+    if (externalAudioPlayer) {
+        externalAudioPlayer.pause();
+        externalAudioPlayer = null;
+    }
+
+    externalAudioPlayer = new Audio(url);
+    externalAudioPlayer.preload = 'auto';
+    externalAudioPlayer.volume = player.volume;
+    externalAudioPlayer.playbackRate = player.playbackRate;
+    externalAudioPlayer.currentTime = Math.max(0, player.currentTime + (playerSettings.externalAudioOffset || 0));
+
+    // Mute original video element so only the external track plays
+    player.muted = true;
+    updateVolumeUI();
+
+    if (!player.paused) {
+        externalAudioPlayer.play().catch(() => {});
+    }
+
+    playerSettings.audioTrackMode = 'external';
+    playerSettings.audioTrackTitle = `External: ${title}`;
+    playerSettings.externalAudioUrl = url;
+    playerSettings.externalAudioTitle = title;
+    savePlayerSettings();
+    updateCustomizerUIState();
+    updateYouTubeMenuState();
+    showToast(`Loaded external audio: ${title}`);
+}
+
+function nudgeAudioSync(delta) {
+    playerSettings.externalAudioOffset = Math.round(((playerSettings.externalAudioOffset || 0) + delta) * 10) / 10;
+    savePlayerSettings();
+
+    const valEl = document.getElementById('ytAudioSyncVal');
+    if (valEl) {
+        valEl.textContent = `${playerSettings.externalAudioOffset > 0 ? '+' : ''}${playerSettings.externalAudioOffset}s`;
+    }
+
+    const player = document.getElementById('videoPlayer');
+    if (externalAudioPlayer && player) {
+        externalAudioPlayer.currentTime = Math.max(0, player.currentTime + playerSettings.externalAudioOffset);
+    }
+
+    showToast(`Audio sync offset: ${playerSettings.externalAudioOffset > 0 ? '+' : ''}${playerSettings.externalAudioOffset}s`);
+}
+
+function resetAudioSync() {
+    playerSettings.externalAudioOffset = 0.0;
+    savePlayerSettings();
+    const valEl = document.getElementById('ytAudioSyncVal');
+    if (valEl) valEl.textContent = '0.0s';
+    const player = document.getElementById('videoPlayer');
+    if (externalAudioPlayer && player) {
+        externalAudioPlayer.currentTime = player.currentTime;
+    }
+    showToast('Audio sync offset reset to 0.0s');
+}
+
 function handleAudioBoostGain(val) {
     const gainNum = parseInt(val, 10);
     playerSettings.audioBoostGain = gainNum;
     savePlayerSettings();
+    setupAudioBooster();
     applyAudioSettings();
     updateCustomizerUIState();
+    updateYouTubeMenuState();
     showToast(`Volume Gain: ${gainNum}%`);
 }
 
 function setAudioProfile(profile) {
     playerSettings.audioProfile = profile;
     savePlayerSettings();
+    setupAudioBooster();
     applyAudioSettings();
     updateCustomizerUIState();
+    updateYouTubeMenuState();
     showToast(`Audio Profile: ${profile.toUpperCase()}`);
 }
 
@@ -2154,6 +2380,219 @@ function applyAudioSettings() {
             audioCompressorNode.ratio.value = 3;
         }
     }
+}
+
+// ==========================================
+//  YouTube-Style Settings Popup & Quick Controls
+// ==========================================
+function toggleYouTubeSettingsPopup(e) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    if (isYouTubeSettingsOpen) {
+        closeYouTubeSettingsPopup();
+    } else {
+        openYouTubeSettingsPopup();
+    }
+}
+
+function openYouTubeSettingsPopup() {
+    const popup = document.getElementById('ytSettingsPopup');
+    const backdrop = document.getElementById('ytSettingsBackdrop');
+    if (!popup) return;
+
+    isYouTubeSettingsOpen = true;
+    detectNativeAudioTracks();
+    updateYouTubeMenuState();
+    backToYouTubeMainMenu();
+
+    popup.style.display = 'flex';
+    if (backdrop && window.innerWidth <= 640) {
+        backdrop.style.display = 'block';
+    }
+
+    showCustomControls();
+}
+
+function closeYouTubeSettingsPopup() {
+    const popup = document.getElementById('ytSettingsPopup');
+    const backdrop = document.getElementById('ytSettingsBackdrop');
+    if (popup) popup.style.display = 'none';
+    if (backdrop) backdrop.style.display = 'none';
+    isYouTubeSettingsOpen = false;
+}
+
+function openYouTubeSubmenu(submenuId) {
+    document.querySelectorAll('.yt-menu-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    const target = document.getElementById(submenuId);
+    if (target) {
+        target.classList.add('active');
+    }
+}
+
+function backToYouTubeMainMenu() {
+    document.querySelectorAll('.yt-menu-panel').forEach(panel => {
+        panel.classList.remove('active');
+    });
+    const main = document.getElementById('ytMenuMain');
+    if (main) main.classList.add('active');
+}
+
+function updateYouTubeMenuState() {
+    // 1. Audio Track Label & Badge
+    const ytValAudio = document.getElementById('ytValAudioTrack');
+    let audioLabel = playerSettings.audioTrackTitle || 'Default (Stereo)';
+    if (playerSettings.audioTrackMode === 'left-channel') audioLabel = 'Left (Track 1)';
+    if (playerSettings.audioTrackMode === 'right-channel') audioLabel = 'Right (Track 2)';
+    if (ytValAudio) ytValAudio.textContent = audioLabel;
+
+    const cpAudioBadge = document.getElementById('cpAudioTrackBadge');
+    if (cpAudioBadge) {
+        if (playerSettings.audioTrackMode && playerSettings.audioTrackMode !== 'stereo') {
+            cpAudioBadge.style.display = 'inline-flex';
+            cpAudioBadge.textContent = `Audio: ${audioLabel}`;
+        } else {
+            cpAudioBadge.style.display = 'none';
+        }
+    }
+
+    // Active classes in Audio Submenu
+    document.querySelectorAll('#ytSubAudioTrack .yt-submenu-item').forEach(item => {
+        const mode = item.getAttribute('data-audiomode');
+        item.classList.toggle('active', mode === playerSettings.audioTrackMode);
+    });
+
+    const syncVal = document.getElementById('ytAudioSyncVal');
+    if (syncVal) syncVal.textContent = `${(playerSettings.externalAudioOffset || 0) > 0 ? '+' : ''}${playerSettings.externalAudioOffset || 0}s`;
+
+    // 2. Quality
+    const qLabel = (playerSettings.videoQuality || '1080p').toUpperCase();
+    const ytValQuality = document.getElementById('ytValQuality');
+    if (ytValQuality) ytValQuality.textContent = qLabel === 'AUTO' ? 'Auto' : `${qLabel} HD`;
+
+    document.querySelectorAll('#ytSubQuality .yt-submenu-item').forEach(item => {
+        const q = item.getAttribute('data-quality');
+        item.classList.toggle('active', q === (playerSettings.videoQuality || '1080p'));
+    });
+
+    // 3. Playback Speed
+    const sp = playerSettings.defaultSpeed || 1.0;
+    const spLabel = sp === 1.0 ? 'Normal' : `${sp}x`;
+    const ytValSpeed = document.getElementById('ytValSpeed');
+    if (ytValSpeed) ytValSpeed.textContent = spLabel;
+
+    document.querySelectorAll('#ytSubSpeed .yt-submenu-item').forEach(item => {
+        const speedVal = parseFloat(item.getAttribute('data-speed'));
+        item.classList.toggle('active', speedVal === sp);
+    });
+
+    // 4. Subtitles
+    const ytValSub = document.getElementById('ytValSubtitles');
+    const isSubActive = currentSubtitleTrack !== null;
+    if (ytValSub) ytValSub.textContent = isSubActive ? (currentSubtitleTrack.label || 'English (Custom)') : 'Off';
+
+    const subOff = document.getElementById('ytSubOptOff');
+    const subLoaded = document.getElementById('ytSubOptLoaded');
+    if (subOff) subOff.classList.toggle('active', !isSubActive);
+    if (subLoaded) {
+        subLoaded.style.display = isSubActive ? 'flex' : 'none';
+        subLoaded.classList.toggle('active', isSubActive);
+    }
+    const subSyncVal = document.getElementById('ytSubSyncVal');
+    if (subSyncVal) subSyncVal.textContent = `${(playerSettings.subSyncOffset || 0) > 0 ? '+' : ''}${playerSettings.subSyncOffset || 0}s`;
+
+    // Subtitle chips active state in subtitle styling config
+    document.querySelectorAll('.yt-chip[data-subsize]').forEach(chip => {
+        chip.classList.toggle('active', parseInt(chip.getAttribute('data-subsize'), 10) === (playerSettings.subSize || 18));
+    });
+
+    // 5. Audio Booster & EQ
+    const ytValBoost = document.getElementById('ytValAudioBoost');
+    if (ytValBoost) {
+        if (playerSettings.audioBoostGain > 100) {
+            ytValBoost.textContent = `${playerSettings.audioBoostGain}% (Boost)`;
+        } else {
+            ytValBoost.textContent = `${playerSettings.audioProfile.charAt(0).toUpperCase() + playerSettings.audioProfile.slice(1)}`;
+        }
+    }
+    document.querySelectorAll('#ytSubAudioBoost .yt-submenu-item[data-audiogain]').forEach(item => {
+        const gain = parseInt(item.getAttribute('data-audiogain'), 10);
+        item.classList.toggle('active', gain === (playerSettings.audioBoostGain || 100));
+    });
+    document.querySelectorAll('#ytSubAudioBoost .yt-submenu-item[data-audioprofile]').forEach(item => {
+        const prof = item.getAttribute('data-audioprofile');
+        item.classList.toggle('active', prof === (playerSettings.audioProfile || 'standard'));
+    });
+
+    // 6. Visual Filters
+    const filterName = playerSettings.videoFilter.charAt(0).toUpperCase() + playerSettings.videoFilter.slice(1);
+    const ytValVisuals = document.getElementById('ytValVisuals');
+    if (ytValVisuals) ytValVisuals.textContent = filterName;
+    document.querySelectorAll('#ytSubVisuals .yt-submenu-item').forEach(item => {
+        const f = item.getAttribute('data-videofilter');
+        item.classList.toggle('active', f === playerSettings.videoFilter);
+    });
+
+    // 7. Aspect Ratio
+    const ytValAspect = document.getElementById('ytValAspect');
+    let aspName = 'Fit Screen';
+    if (playerSettings.aspectRatio === 'cover') aspName = 'Fill Screen';
+    if (playerSettings.aspectRatio === '16/9') aspName = '16:9 Cinema';
+    if (playerSettings.aspectRatio === '4/3') aspName = '4:3 Retro';
+    if (playerSettings.aspectRatio === '21/9') aspName = '21:9 Ultrawide';
+    if (ytValAspect) ytValAspect.textContent = aspName;
+    document.querySelectorAll('#ytSubAspect .yt-submenu-item').forEach(item => {
+        const asp = item.getAttribute('data-aspect');
+        item.classList.toggle('active', asp === playerSettings.aspectRatio);
+    });
+
+    // 8. Ambient Glow
+    const ytValAmbient = document.getElementById('ytValAmbient');
+    let ambLabel = 'Dynamic Sync';
+    if (playerSettings.ambientMode === 'accent') ambLabel = 'Theme Glow';
+    if (playerSettings.ambientMode === 'off') ambLabel = 'Off';
+    if (ytValAmbient) ytValAmbient.textContent = ambLabel;
+    document.querySelectorAll('#ytSubAmbient .yt-submenu-item').forEach(item => {
+        const amb = item.getAttribute('data-ambient');
+        item.classList.toggle('active', amb === playerSettings.ambientMode);
+    });
+
+    // 9. Sleep Timer
+    const ytValSleep = document.getElementById('ytValSleep');
+    let sleepLabel = 'Off';
+    if (playerSettings.sleepTimer === 'end') sleepLabel = 'End of Video';
+    else if (playerSettings.sleepTimer > 0) sleepLabel = `${playerSettings.sleepTimer} Min`;
+    if (ytValSleep) ytValSleep.textContent = sleepLabel;
+    document.querySelectorAll('#ytSubSleep .yt-submenu-item').forEach(item => {
+        const sl = item.getAttribute('data-sleep');
+        item.classList.toggle('active', String(sl) === String(playerSettings.sleepTimer));
+    });
+}
+
+function selectVideoQuality(qualityKey) {
+    playerSettings.videoQuality = qualityKey;
+    savePlayerSettings();
+    const tag = qualityKey === 'auto' ? 'Auto (1080p)' : (qualityKey.toUpperCase() + ' HD');
+    const cpQ = document.getElementById('cpQualityBadge');
+    if (cpQ) cpQ.textContent = tag;
+    const pQ = document.getElementById('playerQualityTag');
+    if (pQ) pQ.textContent = tag;
+    updateYouTubeMenuState();
+    showToast(`Streaming Quality: ${tag}`);
+}
+
+function selectPlaybackSpeed(speed) {
+    setDefaultPlaybackSpeed(speed);
+    updateYouTubeMenuState();
+}
+
+function selectSubtitleOption(opt) {
+    if (opt === 'off') {
+        clearLoadedSubtitles();
+    } else if (opt === 'loaded') {
+        toggleSubtitles();
+    }
+    updateYouTubeMenuState();
 }
 
 // ==========================================
@@ -2506,6 +2945,22 @@ function togglePlayerFullscreen() {
     }
 }
 
+function togglePictureInPicture() {
+    const player = document.getElementById('videoPlayer');
+    if (!player) return;
+
+    if (document.pictureInPictureElement) {
+        document.exitPictureInPicture().catch(() => {});
+    } else if (player.requestPictureInPicture) {
+        player.requestPictureInPicture().catch((e) => {
+            console.warn('PiP request failed:', e);
+            showToast('Picture-in-Picture not available for this stream');
+        });
+    } else {
+        showToast('Picture-in-Picture is not supported by your browser');
+    }
+}
+
 function lockPlayerScreen() {
     isControlsLocked = true;
     const shield = document.getElementById('screenLockShield');
@@ -2779,7 +3234,7 @@ function setupSearchKeybindings() {
             toggleTheaterMode();
         } else if (e.key === 's' || e.key === 'S') {
             e.preventDefault();
-            openPlayerCustomModal();
+            toggleYouTubeSettingsPopup();
         } else if (e.key === 'm' || e.key === 'M') {
             toggleMute();
         } else if (e.key === 'v' || e.key === 'V') {
@@ -2793,12 +3248,15 @@ function setupSearchKeybindings() {
         } else if (e.key === 'c' || e.key === 'C') {
             toggleSubtitles();
         } else if (e.key === 'Escape') {
+            const ytPopup = document.getElementById('ytSettingsPopup');
             const customModal = document.getElementById('playerCustomModal');
             const extModal = document.getElementById('externalPlayersModal');
             const dlModal = document.getElementById('downloadModal');
             const trModal = document.getElementById('trailerModal');
 
-            if (customModal && customModal.style.display === 'flex') {
+            if (ytPopup && ytPopup.style.display !== 'none') {
+                closeYouTubeSettingsPopup();
+            } else if (customModal && customModal.style.display === 'flex') {
                 closePlayerCustomModal();
             } else if (extModal && extModal.style.display === 'flex') {
                 closeExternalPlayersModal();
@@ -2813,6 +3271,14 @@ function setupSearchKeybindings() {
     });
 
     document.addEventListener('click', (e) => {
+        const ytPopup = document.getElementById('ytSettingsPopup');
+        const settingsBtn = document.getElementById('btnCustomSettings');
+        if (ytPopup && ytPopup.style.display !== 'none') {
+            if (!ytPopup.contains(e.target) && settingsBtn && !settingsBtn.contains(e.target)) {
+                closeYouTubeSettingsPopup();
+            }
+        }
+
         const customModal = document.getElementById('playerCustomModal');
         if (customModal && e.target === customModal) {
             closePlayerCustomModal();
@@ -2886,16 +3352,13 @@ async function loadRelatedMedia(tag, currentTitle) {
                         <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="cover-fallback" style="display: none;">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="28" height="28"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                            <i data-lucide="film" style="width: 28px; height: 28px;"></i>
                             <div style="font-size: 11px; font-weight: 600;">${obj.title}</div>
                         </div>
                         <div class="tag-badge">${obj.tag || 'HD'}</div>
                         <div class="cover-overlay">
                             <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
-                                ${isSeries ? 
-                                    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="#07090e" stroke-width="2.2" width="18" height="18"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"/><polyline points="17 2 12 7 7 2"/></svg>' : 
-                                    '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>'
-                                }
+                                <i data-lucide="${isSeries ? 'tv' : 'play'}" style="width: 16px; height: 16px; fill: ${isSeries ? 'none' : 'currentColor'};"></i>
                             </div>
                             <span style="font-size: 10.5px; font-weight: 700; color: #fff;">${isSeries ? 'View Series' : 'Watch Now'}</span>
                         </div>
@@ -2913,6 +3376,7 @@ async function loadRelatedMedia(tag, currentTitle) {
 
         if (slider) slider.innerHTML = cardsHtml;
         if (playerSlider) playerSlider.innerHTML = cardsHtml;
+        refreshLucideIcons();
     }
 }
 
@@ -2993,6 +3457,7 @@ function handleLiveSearch(val) {
             `;
             dropdown.style.display = 'block';
         }
+        refreshLucideIcons();
     }, 150);
 }
 
@@ -3002,7 +3467,7 @@ function showRecentSearchesDropdown(dropdown) {
         dropdown.innerHTML = `
             <div style="padding: 12px; font-size: 11.5px; color: var(--text-muted);">
                 <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i>
                     <span>Popular Searches</span>
                 </div>
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
@@ -3015,13 +3480,14 @@ function showRecentSearchesDropdown(dropdown) {
             </div>
         `;
         dropdown.style.display = 'block';
+        refreshLucideIcons();
         return;
     }
 
     dropdown.innerHTML = `
         <div style="padding: 6px 10px 4px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);">
             <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 5px;">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <i data-lucide="clock" style="width: 13px; height: 13px;"></i>
                 <span>Recent Searches</span>
             </span>
             <button onclick="clearRecentSearches(event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; font-size: 10.5px; color: var(--accent); cursor: pointer; font-weight: 600;">Clear All</button>
@@ -3030,15 +3496,16 @@ function showRecentSearchesDropdown(dropdown) {
             ${recent.map(q => `
                 <div class="search-dropdown-item" style="justify-content: space-between;" onclick="fillAndSearch('${escapeQuotes(q)}')">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color: var(--text-dim);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <i data-lucide="clock" style="color: var(--text-dim); width: 13px; height: 13px;"></i>
                         <span style="font-size: 12.5px; font-weight: 600;">${q}</span>
                     </div>
-                    <button onclick="removeRecentSearch('${escapeQuotes(q)}', event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 6px; font-size: 13px;" title="Remove" aria-label="Remove"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+                    <button onclick="removeRecentSearch('${escapeQuotes(q)}', event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 6px; font-size: 13px;" title="Remove" aria-label="Remove"><i data-lucide="x" style="width: 11px; height: 11px;"></i></button>
                 </div>
             `).join('')}
         </div>
     `;
     dropdown.style.display = 'block';
+    refreshLucideIcons();
 }
 
 function fillAndSearch(query) {
@@ -3106,7 +3573,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             <!-- 1. Direct Browser / Native Download -->
             <a class="dl-action-card primary-dl" href="${url}" download="${cleanFileName}.mp4" onclick="showToast('Starting high-speed download...');">
                 <div class="dl-action-icon" style="background: rgba(0, 229, 255, 0.2); color: var(--primary);">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <i data-lucide="download" style="width: 18px; height: 18px;"></i>
                 </div>
                 <div class="dl-action-text">
                     <span class="dl-action-title">Direct Download</span>
@@ -3117,7 +3584,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             <!-- 2. 1DM / IDM for Android -->
             <button class="dl-action-card" onclick="downloadVia1DM('${url}', '${escapeQuotes(title)}')">
                 <div class="dl-action-icon" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                    <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
                 </div>
                 <div class="dl-action-text">
                     <span class="dl-action-title">1DM / IDM Android</span>
@@ -3128,7 +3595,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             <!-- 3. ADM (Advanced Download Manager) -->
             <button class="dl-action-card" onclick="downloadViaADM('${url}', '${escapeQuotes(title)}')">
                 <div class="dl-action-icon" style="background: rgba(255, 42, 95, 0.15); color: var(--accent);">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <i data-lucide="download-cloud" style="width: 18px; height: 18px;"></i>
                 </div>
                 <div class="dl-action-text">
                     <span class="dl-action-title">ADM Downloader</span>
@@ -3139,7 +3606,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             <!-- 4. Copy Direct Stream Link -->
             <button class="dl-action-card" onclick="copySpecificUrl('${url}')">
                 <div class="dl-action-icon" style="background: rgba(255, 184, 0, 0.15); color: var(--accent-gold);">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    <i data-lucide="link" style="width: 18px; height: 18px;"></i>
                 </div>
                 <div class="dl-action-text">
                     <span class="dl-action-title">Copy Direct Link</span>
@@ -3155,18 +3622,18 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             <div class="dl-batch-box">
                 <div class="dl-batch-header">
                     <span style="display: inline-flex; align-items: center; gap: 6px;">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        <i data-lucide="layers" style="width: 15px; height: 15px;"></i>
                         <span>${currentSeasonName || 'Season'} Batch Downloader</span>
                     </span>
                     <span style="font-size: 11px; color: var(--primary);">${currentSeasonEpisodes.length} Episodes</span>
                 </div>
                 <div class="dl-batch-buttons">
                     <button class="dl-batch-btn" onclick="downloadSeasonM3u()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                        <i data-lucide="list-music" style="width: 14px; height: 14px;"></i>
                         <span>Export Playlist (.m3u)</span>
                     </button>
                     <button class="dl-batch-btn" onclick="exportSeasonLinksTxt()">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        <i data-lucide="file-text" style="width: 14px; height: 14px;"></i>
                         <span>Export Links (.txt)</span>
                     </button>
                 </div>
@@ -3188,6 +3655,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
 
     body.innerHTML = html;
     modal.style.display = 'flex';
+    refreshLucideIcons();
 }
 
 function closeDownloadModal() {

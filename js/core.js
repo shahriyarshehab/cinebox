@@ -387,13 +387,37 @@ function dismissPwaBanner() {
 // ==========================================
 // Lucide Icons Integration Engine
 // ==========================================
+function getLucideSvg(iconName, options = {}) {
+    if (!window.lucide || !window.lucide.icons) {
+        return `<i data-lucide="${iconName}"></i>`;
+    }
+    const pascal = iconName.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
+    const iconDef = window.lucide.icons[pascal] || window.lucide.icons[iconName];
+    if (!iconDef) {
+        return `<i data-lucide="${iconName}"></i>`;
+    }
+    const cls = options.class || 'icon lucide-icon';
+    const width = options.width || 18;
+    const height = options.height || 18;
+    const strokeWidth = options.strokeWidth || 2;
+    const fill = options.fill || 'none';
+    const stroke = options.stroke || 'currentColor';
+    
+    const children = iconDef.map(([tag, attrs]) => {
+        const attrStr = Object.entries(attrs).map(([k, v]) => `${k}="${v}"`).join(' ');
+        return `<${tag} ${attrStr}></${tag}>`;
+    }).join('');
+    
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${children}</svg>`;
+}
+
 function refreshLucideIcons() {
     if (window.lucide && typeof window.lucide.createIcons === 'function') {
         try {
             window.lucide.createIcons({
                 attrs: {
                     'stroke-width': 2,
-                    class: 'lucide-icon'
+                    class: 'icon lucide-icon'
                 }
             });
         } catch (e) {}
