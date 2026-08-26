@@ -469,6 +469,7 @@ function renderHomeRowsFromPayload(categoriesMap) {
             title: item[0], poster: item[1], url: item[2], tag: item[3], category: item[4], size: item[5], date: item[6]
         } : item);
 
+        const sixItems = items.slice(0, 6);
         const rowSliderId = `rowSlider_${catIdx}`;
 
         html += `
@@ -484,21 +485,40 @@ function renderHomeRowsFromPayload(categoriesMap) {
                         <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
                         </button>
-                        <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
-                            <span>Show All</span>
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </button>
                     </div>
                 </div>
 
                 <div class="row-slider" id="${rowSliderId}">
-                    ${items.map((item) => renderMovieCardHtml(item)).join('')}
+                    ${sixItems.map((item) => renderMovieCardHtml(item)).join('')}
+                    ${renderShowAllCardHtml(cat)}
                 </div>
             </div>
         `;
     });
 
     container.innerHTML = html;
+}
+
+function renderShowAllCardHtml(cat, count) {
+    const countText = count ? `${count.toLocaleString()} Titles` : 'Full Collection';
+    return `
+        <div class="movie-card show-all-card" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
+            <div class="show-all-card-inner">
+                <div class="show-all-glow-orb"></div>
+                <div class="show-all-icon-circle">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </div>
+                <div class="show-all-card-title">Show All</div>
+                <div class="show-all-card-cat">${cat.name}</div>
+                <div class="show-all-card-btn">
+                    <span>${countText}</span>
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </div>
+        </div>
+    `;
 }
 
 function renderHomeRows(container) {
@@ -522,7 +542,7 @@ function renderHomeRows(container) {
         const catMovies = allMovies.filter(m => m.tag === cat.tag || (m.category && m.category.includes(cat.tag)));
         if (catMovies.length === 0) return;
 
-        const topSlice = catMovies.slice(0, 16);
+        const sixItems = catMovies.slice(0, 6);
         const rowSliderId = `rowSlider_${catIdx}`;
 
         html += `
@@ -539,15 +559,12 @@ function renderHomeRows(container) {
                         <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
                             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M9 18l6-6-6-6"/></svg>
                         </button>
-                        <button class="btn-see-all" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
-                            <span>Show All</span>
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="11" height="11"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                        </button>
                     </div>
                 </div>
 
                 <div class="row-slider" id="${rowSliderId}">
-                    ${topSlice.map((item) => renderMovieCardHtml(item)).join('')}
+                    ${sixItems.map((item) => renderMovieCardHtml(item)).join('')}
+                    ${renderShowAllCardHtml(cat, catMovies.length)}
                 </div>
             </div>
         `;
