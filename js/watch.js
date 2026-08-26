@@ -220,18 +220,29 @@ async function fetchOnlineMetadata(rawTitle, fallbackCategory = '') {
             if (res.ok) {
                 const data = await res.json();
                 if (data.Response === 'True') {
+                    const ratings = data.Ratings || [];
+                    const imdbObj = ratings.find(r => r.Source.includes('Internet Movie') || r.Source.includes('IMDb'));
+                    const rtObj = ratings.find(r => r.Source.includes('Rotten Tomatoes'));
+                    const metaObj = ratings.find(r => r.Source.includes('Metacritic'));
+
                     meta = {
                         title: data.Title,
                         year: data.Year,
-                        rating: data.imdbRating && data.imdbRating !== 'N/A' ? data.imdbRating : null,
+                        releaseDate: data.Released && data.Released !== 'N/A' ? data.Released : null,
                         runtime: data.Runtime && data.Runtime !== 'N/A' ? data.Runtime : null,
                         rated: data.Rated && data.Rated !== 'N/A' ? data.Rated : null,
                         genres: data.Genre && data.Genre !== 'N/A' ? data.Genre.split(',').map(g => g.trim()) : [],
                         director: data.Director && data.Director !== 'N/A' ? data.Director : null,
-                        actors: data.Actors && data.Actors !== 'N/A' ? data.Actors : null,
+                        writer: data.Writer && data.Writer !== 'N/A' ? data.Writer : null,
+                        actors: data.Actors && data.Actors !== 'N/A' ? data.Actors.split(',').map(a => a.trim()) : [],
                         synopsis: data.Plot && data.Plot !== 'N/A' ? data.Plot : null,
                         awards: data.Awards && data.Awards !== 'N/A' ? data.Awards : null,
+                        boxOffice: data.BoxOffice && data.BoxOffice !== 'N/A' ? data.BoxOffice : null,
+                        country: data.Country && data.Country !== 'N/A' ? data.Country : null,
                         language: data.Language && data.Language !== 'N/A' ? data.Language : null,
+                        imdbRating: data.imdbRating && data.imdbRating !== 'N/A' ? data.imdbRating : (imdbObj ? imdbObj.Value.split('/')[0] : null),
+                        rottenTomatoes: rtObj ? rtObj.Value : null,
+                        metascore: data.Metascore && data.Metascore !== 'N/A' ? data.Metascore : (metaObj ? metaObj.Value.split('/')[0] : null),
                         poster: data.Poster && data.Poster !== 'N/A' ? data.Poster : null
                     };
                     break;
@@ -250,8 +261,9 @@ async function fetchOnlineMetadata(rawTitle, fallbackCategory = '') {
                 meta = {
                     title: data.name,
                     year: data.premiered ? data.premiered.slice(0, 4) : year,
-                    rating: data.rating && data.rating.average ? data.rating.average.toString() : null,
-                    runtime: data.averageRuntime ? `${data.averageRuntime} min/ep` : null,
+                    releaseDate: data.premiered || null,
+                    imdbRating: data.rating && data.rating.average ? data.rating.average.toString() : null,
+                    runtime: data.averageRuntime ? `${data.averageRuntime} min` : null,
                     genres: data.genres || [],
                     synopsis: summary,
                     network: data.network ? data.network.name : (data.webChannel ? data.webChannel.name : null),
@@ -289,39 +301,111 @@ async function fetchOnlineMetadata(rawTitle, fallbackCategory = '') {
     return meta;
 }
 
+let currentTrailerQuery = '';
+
+function openTrailerModal(customQuery) {
+    const q = customQuery || currentTrailerQuery || (currentItem ? currentItem.title : 'Trailer');
+    const modal = document.getElementById('trailerModal');
+    const iframe = document.getElementById('trailerIframe');
+    const titleEl = document.getElementById('trailerModalTitle');
+
+    if (titleEl) titleEl.textContent = `${q} — Official Trailer`;
+    if (iframe) {
+        // Embed official YouTube search player
+        iframe.src = `https://www.youtube-nocookie.com/embed?listType=search&list=${encodeURIComponent(q + ' official trailer')}&autoplay=1`;
+    }
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeTrailerModal() {
+    const modal = document.getElementById('trailerModal');
+    const iframe = document.getElementById('trailerIframe');
+    if (iframe) iframe.src = '';
+    if (modal) modal.style.display = 'none';
+}
+
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('trailerModal');
+    if (modal && e.target === modal) {
+        closeTrailerModal();
+    }
+});
+
 async function loadAndApplyOnlineMetadata(item) {
     if (!item || !item.title) return;
     try {
         const meta = await fetchOnlineMetadata(item.title, item.category || item.tag);
         if (!meta) return;
 
-        // Apply synopsis
+        const { cleanName, year } = parseCleanMediaInfo(item.title);
+        currentTrailerQuery = `${meta.title || cleanName} ${meta.year || year || ''}`;
+
+        // 1. Plot Synopsis
         if (meta.synopsis) {
             const synEl = document.getElementById('wSynopsis');
             if (synEl) synEl.textContent = meta.synopsis;
         }
 
-        // Apply IMDb rating
-        if (meta.rating) {
+        // 2. IMDb Rating
+        if (meta.imdbRating) {
             const rateEl = document.getElementById('wRating');
             if (rateEl) {
-                rateEl.innerHTML = `<span style="color:#ffb800; font-size:14px;">★</span> ${meta.rating} / 10`;
+                rateEl.innerHTML = `<span style="color:#ffb800; font-size:14px;">★</span> ${meta.imdbRating} / 10`;
             }
         }
 
-        // Apply runtime
-        if (meta.runtime) {
-            const durEl = document.getElementById('wDuration');
-            if (durEl) durEl.textContent = meta.runtime;
+        // 3. Rotten Tomatoes Score
+        if (meta.rottenTomatoes) {
+            const rtBadge = document.getElementById('wRtBadge');
+            const rtVal = document.getElementById('wRtVal');
+            if (rtBadge && rtVal) {
+                rtVal.textContent = meta.rottenTomatoes;
+                rtBadge.style.display = 'inline-flex';
+            }
         }
 
-        // Apply year
+        // 4. Metascore
+        if (meta.metascore) {
+            const metaBadge = document.getElementById('wMetaBadge');
+            const metaVal = document.getElementById('wMetaVal');
+            if (metaBadge && metaVal) {
+                metaVal.textContent = meta.metascore;
+                metaBadge.style.display = 'inline-flex';
+            }
+        }
+
+        // 5. Age Rated (PG-13, R, TV-MA)
+        if (meta.rated) {
+            const ratedBadge = document.getElementById('wRatedBadge');
+            if (ratedBadge) {
+                ratedBadge.textContent = meta.rated;
+                ratedBadge.style.display = 'inline-block';
+            }
+        }
+
+        // 6. Runtime (format minutes to Xh Ym)
+        if (meta.runtime) {
+            const durEl = document.getElementById('wDuration');
+            if (durEl) {
+                const minMatch = meta.runtime.match(/(\d+)\s*min/i);
+                if (minMatch) {
+                    const totalMin = parseInt(minMatch[1], 10);
+                    const hrs = Math.floor(totalMin / 60);
+                    const mins = totalMin % 60;
+                    durEl.textContent = hrs > 0 ? `${hrs}h ${mins}m` : `${mins}m`;
+                } else {
+                    durEl.textContent = meta.runtime;
+                }
+            }
+        }
+
+        // 7. Year
         if (meta.year) {
             const yearEl = document.getElementById('wYear');
             if (yearEl) yearEl.textContent = meta.year;
         }
 
-        // Apply Genres
+        // 8. Official Genre Pills
         if (meta.genres && meta.genres.length > 0) {
             const genEl = document.getElementById('wGenres');
             if (genEl) {
@@ -333,37 +417,69 @@ async function loadAndApplyOnlineMetadata(item) {
             }
         }
 
-        // Apply Director
+        // 9. Top Cast & Characters Section
+        if (meta.actors && meta.actors.length > 0) {
+            const castSection = document.getElementById('wCastSection');
+            const castGrid = document.getElementById('wCastGrid');
+            const dirHeadline = document.getElementById('wDirectorHeadline');
+
+            if (dirHeadline && meta.director) {
+                dirHeadline.textContent = `Directed by ${meta.director}`;
+            }
+
+            if (castSection && castGrid) {
+                castGrid.innerHTML = meta.actors.map(actor => {
+                    const initials = actor.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                    return `
+                        <a class="mb-cast-card" href="https://www.google.com/search?q=${encodeURIComponent(actor + ' actor')}" target="_blank" title="Search ${escapeQuotes(actor)}">
+                            <div class="mb-cast-avatar">${initials}</div>
+                            <div class="mb-cast-info">
+                                <span class="mb-cast-name">${actor}</span>
+                                <span class="mb-cast-role">Cast Member</span>
+                            </div>
+                        </a>
+                    `;
+                }).join('');
+                castSection.style.display = 'flex';
+            }
+        }
+
+        // 10. Technical Media Info Grid
+        if (meta.releaseDate) {
+            const el = document.getElementById('wReleaseWrap');
+            const val = document.getElementById('wReleaseVal');
+            if (el && val) { val.textContent = meta.releaseDate; el.style.display = 'flex'; }
+        }
         if (meta.director) {
-            const dirWrap = document.getElementById('wDirectorWrap');
-            const dirVal = document.getElementById('wDirectorVal');
-            if (dirWrap && dirVal) {
-                dirVal.textContent = meta.director;
-                dirWrap.style.display = 'flex';
+            const el = document.getElementById('wDirectorWrap');
+            const val = document.getElementById('wDirectorVal');
+            if (el && val) { val.textContent = meta.director; el.style.display = 'flex'; }
+        }
+        if (meta.writer) {
+            const el = document.getElementById('wWriterWrap');
+            const val = document.getElementById('wWriterVal');
+            if (el && val) { val.textContent = meta.writer; el.style.display = 'flex'; }
+        }
+        if (meta.boxOffice) {
+            const el = document.getElementById('wBoxOfficeWrap');
+            const val = document.getElementById('wBoxOfficeVal');
+            if (el && val) { val.textContent = `${meta.boxOffice} (Worldwide)`; el.style.display = 'flex'; }
+        }
+        if (meta.country || meta.language) {
+            const el = document.getElementById('wCountryWrap');
+            const val = document.getElementById('wCountryVal');
+            if (el && val) {
+                val.textContent = [meta.country, meta.language].filter(Boolean).join(' • ');
+                el.style.display = 'flex';
             }
         }
-
-        // Apply Cast
-        if (meta.actors) {
-            const actWrap = document.getElementById('wActorsWrap');
-            const actVal = document.getElementById('wActorsVal');
-            if (actWrap && actVal) {
-                actVal.textContent = meta.actors;
-                actWrap.style.display = 'flex';
-            }
-        }
-
-        // Apply Awards
         if (meta.awards) {
-            const awWrap = document.getElementById('wAwardsWrap');
-            const awVal = document.getElementById('wAwardsVal');
-            if (awWrap && awVal) {
-                awVal.textContent = meta.awards;
-                awWrap.style.display = 'flex';
-            }
+            const el = document.getElementById('wAwardsWrap');
+            const val = document.getElementById('wAwardsVal');
+            if (el && val) { val.textContent = meta.awards; el.style.display = 'flex'; }
         }
 
-        // High-res backdrop
+        // 11. High-Res Cinematic Backdrop
         if (meta.backdrop || meta.poster) {
             const bg = meta.backdrop || meta.poster;
             const bEl = document.getElementById('mbBackdrop');
@@ -393,7 +509,6 @@ function renderWatchPage(item) {
     document.getElementById('wYear').textContent = item.date || '2024';
     document.getElementById('wType').textContent = isSeries ? 'TV Series' : 'Movie';
     document.getElementById('wDuration').textContent = isSeries ? 'Multiple Seasons' : 'Full HD';
-    document.getElementById('wSize').textContent = item.size || 'HD Cinema';
 
     // Technical info card
     document.getElementById('wQualityVal').textContent = `${item.tag || '1080p Full HD'} (Web-DL)`;
@@ -410,6 +525,9 @@ function renderWatchPage(item) {
 
     updateWatchlistButtonState();
 
+    const { cleanName, year } = parseCleanMediaInfo(item.title);
+    currentTrailerQuery = `${cleanName} ${year || ''}`;
+
     // MovieBox Action Buttons (On Details View)
     document.getElementById('wActions').innerHTML = `
         ${isSeries ? `
@@ -423,6 +541,10 @@ function renderWatchPage(item) {
                 <span>▶ Watch Online</span>
             </button>
         `}
+        <button class="mb-btn-action mb-btn-trailer" onclick="openTrailerModal('${escapeQuotes(cleanName + ' ' + (year || ''))}')" title="Watch official HD trailer">
+            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span>Trailer</span>
+        </button>
         <button class="mb-btn-action mb-btn-vlc" onclick="openCurrentInVLC()">
             ${VLC_ICON_SVG}
             <span>Play in VLC</span>
@@ -446,10 +568,6 @@ function renderWatchPage(item) {
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
             <span>Share</span>
         </button>
-        <a class="mb-btn-action" href="${item.url}" target="_blank">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            <span>Server Folder</span>
-        </a>
     `;
 
     const relatedTag = item.tag || 'Top Rated';
@@ -463,7 +581,7 @@ function renderWatchPage(item) {
         loadTvSeriesSeasons(item.url, item.title);
     }
 
-    // Retrieve & apply rich real-time metadata (IMDb rating, Plot synopsis, Director, Cast, Awards, Genres)
+    // Retrieve & apply rich real-time metadata (IMDb rating, Rotten Tomatoes, Cast, Director, Box office, Awards)
     loadAndApplyOnlineMetadata(item);
 }
 

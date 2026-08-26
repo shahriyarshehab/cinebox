@@ -3253,4 +3253,154 @@ kbd {
     color: #0c121e;
 }
 
+/* ==========================================
+   🎬 Google Knowledge Panel / Rich Media Styles
+   ========================================== */
+.mb-ratings-strip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.rating-pill-imdb {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(245, 197, 24, 0.15);
+    border: 1px solid rgba(245, 197, 24, 0.35);
+    color: #f5c518;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.rating-pill-rt {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(250, 50, 10, 0.15);
+    border: 1px solid rgba(250, 50, 10, 0.35);
+    color: #fa320a;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.rating-pill-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0, 206, 125, 0.15);
+    border: 1px solid rgba(0, 206, 125, 0.35);
+    color: #00ce7d;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.mb-btn-trailer {
+    background: rgba(255, 0, 0, 0.12) !important;
+    border-color: rgba(255, 0, 0, 0.35) !important;
+    color: #ff4d4d !important;
+}
+
+.mb-btn-trailer:hover {
+    background: #ff0000 !important;
+    color: #fff !important;
+    border-color: #ff0000 !important;
+    box-shadow: 0 0 16px rgba(255, 0, 0, 0.4) !important;
+}
+
+/* Cast Section & Cards */
+.mb-cast-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    backdrop-filter: blur(16px);
+}
+
+.mb-cast-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.mb-cast-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    transition: all 0.22s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.mb-cast-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(0, 229, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.mb-cast-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0, 229, 255, 0.3), rgba(123, 97, 255, 0.4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    color: #fff;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(0, 229, 255, 0.4);
+}
+
+.mb-cast-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.mb-cast-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mb-cast-role {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+    .mb-cast-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .mb-cast-card {
+        padding: 8px 10px;
+    }
+}
+
+
 
