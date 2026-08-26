@@ -9,11 +9,7 @@
   "orientation": "any",
   "background_color": "#07090e",
   "theme_color": "#07090e",
-  "categories": [
-    "entertainment",
-    "movies",
-    "video"
-  ],
+  "categories": ["entertainment", "movies", "video"],
   "icons": [
     {
       "src": "icons/icon-192.png",
