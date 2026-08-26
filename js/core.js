@@ -400,6 +400,7 @@ const CINEBOX_ICON_PATHS = {
   'tv': '<rect width="20" height="15" x="2" y="7" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline>',
   'film': '<rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M7 3v18"></path><path d="M17 3v18"></path><path d="M3 7.5h4"></path><path d="M3 12h18"></path><path d="M3 16.5h4"></path><path d="M17 16.5h4"></path><path d="M17 7.5h4"></path>',
   'sparkles': '<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>',
+  'animation': '<path d="M2.43642 7.06155L3.06914 7.29671C3.18173 6.99376 3.06378 6.65351 2.78785 6.48525L2.43642 7.06155ZM1.40192 2.99999L1.98649 3.33749L1.40192 2.99999ZM15.5635 7.06124L15.212 6.48495C14.9361 6.65322 14.8182 6.99348 14.9308 7.29643L15.5635 7.06124ZM16.5981 3L16.0135 3.3375V3.3375L16.5981 3ZM12.4996 1.9013L12.1621 1.31674L12.1621 1.31674L12.4996 1.9013ZM11.4384 2.93639L11.2032 3.56911C11.5063 3.68176 11.8468 3.56363 12.0149 3.28744L11.4384 2.93639ZM6.56186 2.9363L5.98529 3.28729C6.15344 3.56351 6.49386 3.68167 6.79699 3.56903L6.56186 2.9363ZM5.50052 1.90101L5.16302 2.48557L5.16302 2.48557L5.50052 1.90101ZM2.78785 6.48525C1.7141 5.83049 1.35361 4.43367 1.98649 3.33749L0.817356 2.66249C-0.182679 4.3946 0.3866 6.60219 2.085 7.63786L2.78785 6.48525ZM2.675 9.5C2.675 8.7239 2.81448 7.98191 3.06914 7.29671L1.80371 6.8264C1.49395 7.65984 1.325 8.56095 1.325 9.5H2.675ZM9 15.825C5.5068 15.825 2.675 12.9932 2.675 9.5H1.325C1.325 13.7388 4.76122 17.175 9 17.175V15.825ZM15.325 9.5C15.325 12.9932 12.4932 15.825 9 15.825V17.175C13.2388 17.175 16.675 13.7388 16.675 9.5H15.325ZM14.9308 7.29643C15.1855 7.98171 15.325 8.72379 15.325 9.5H16.675C16.675 8.56083 16.506 7.65959 16.1962 6.82606L14.9308 7.29643ZM16.0135 3.3375C16.6463 4.43345 16.2858 5.83014 15.212 6.48495L15.9149 7.63754C17.6132 6.6019 18.1826 4.3945 17.1826 2.6625L16.0135 3.3375ZM12.8371 2.48587C13.949 1.84392 15.3712 2.225 16.0135 3.3375L17.1826 2.6625C16.1677 0.904566 13.92 0.301837 12.1621 1.31674L12.8371 2.48587ZM12.0149 3.28744C12.2104 2.96635 12.4868 2.68812 12.8371 2.48587L12.1621 1.31674C11.611 1.63495 11.1721 2.07584 10.8619 2.58534L12.0149 3.28744ZM9 3.175C9.77609 3.175 10.5181 3.31446 11.2032 3.56911L11.6735 2.30368C10.8401 1.99394 9.93902 1.825 9 1.825V3.175ZM6.79699 3.56903C7.48211 3.31443 8.224 3.175 9 3.175V1.825C8.06108 1.825 7.16008 1.9939 6.32674 2.30358L6.79699 3.56903ZM5.16302 2.48557C5.51336 2.68784 5.78978 2.96613 5.98529 3.28729L7.13843 2.58532C6.8282 2.0757 6.38928 1.63471 5.83802 1.31644L5.16302 2.48557ZM1.98649 3.33749C2.62892 2.22477 4.05119 1.84365 5.16302 2.48557L5.83802 1.31644C4.08011 0.301505 1.83236 0.904456 0.817356 2.66249L1.98649 3.33749Z" fill="currentColor"/><circle cx="6.25" cy="7.75" r="0.75" fill="currentColor"/><circle cx="11.75" cy="7.75" r="0.75" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M8.65 11.0479L8.01119 11.6441C7.86988 11.776 7.86224 11.9975 7.99413 12.1388C8.12602 12.2801 8.3475 12.2878 8.48881 12.1559L9 11.6788L9.51119 12.1559C9.6525 12.2878 9.87398 12.2801 10.0059 12.1388C10.1378 11.9975 10.1301 11.776 9.98881 11.6441L9.35 11.0479V10.937C9.72967 10.7952 10 10.4292 10 10H8C8 10.4292 8.27033 10.7952 8.65 10.937V11.0479Z" fill="currentColor"/>',
   'bookmark': '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>',
   'search': '<circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>',
   'chevron-left': '<path d="m15 18-6-6 6-6"></path>',
@@ -416,6 +417,10 @@ function getLucideSvg(iconName, options = {}) {
   const strokeWidth = options.strokeWidth || 2;
   const fill = options.fill || 'none';
   const stroke = options.stroke || 'currentColor';
+
+  if (iconName === 'animation') {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 18 18" fill="none" class="${cls}">${CINEBOX_ICON_PATHS['animation']}</svg>`;
+  }
 
   if (window.lucide) {
     const pascal = iconName
@@ -439,7 +444,8 @@ function getLucideSvg(iconName, options = {}) {
   }
 
   if (CINEBOX_ICON_PATHS[iconName]) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${CINEBOX_ICON_PATHS[iconName]}</svg>`;
+    const viewBox = (iconName === 'animation' || iconName === 'sparkles') ? '0 0 18 18' : '0 0 24 24';
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="${viewBox}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${CINEBOX_ICON_PATHS[iconName]}</svg>`;
   }
 
   return `<i data-lucide="${iconName}" style="width:${width}px;height:${height}px;"></i>`;
