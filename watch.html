@@ -311,14 +311,6 @@
                     <span id="playerMediaBadgeText">Now Playing</span>
                 </div>
             </div>
-
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <!-- Quick Customize Button on Top Bar -->
-                <button class="btn btn-custom-accent" onclick="openPlayerCustomModal()" title="Customize Video Player Screen (S)">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    <span>⚙️ Customize Player</span>
-                </button>
-            </div>
         </div>
 
         <!-- Ambient Cinema Glow Layer behind video -->
@@ -338,13 +330,17 @@
                     <div class="touch-seek-overlay" id="touchSeekOverlay">
                         <div class="seek-touch-zone left" id="seekTouchLeft">
                             <div class="seek-ripple" id="seekRippleLeft">
-                                <span class="seek-icon">⏪</span>
+                                <div class="seek-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+                                </div>
                                 <span class="seek-text" id="seekLeftText">-10s</span>
                             </div>
                         </div>
                         <div class="seek-touch-zone right" id="seekTouchRight">
                             <div class="seek-ripple" id="seekRippleRight">
-                                <span class="seek-icon">⏩</span>
+                                <div class="seek-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+                                </div>
                                 <span class="seek-text" id="seekRightText">+10s</span>
                             </div>
                         </div>
@@ -354,7 +350,9 @@
                     <div class="gesture-hud-container" id="gestureHudContainer">
                         <!-- Brightness HUD -->
                         <div class="gesture-hud" id="hudBrightness" style="display: none;">
-                            <div class="hud-icon">☀️</div>
+                            <div class="hud-icon">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                            </div>
                             <div class="hud-bar-wrap">
                                 <div class="hud-bar-fill" id="hudBrightnessFill" style="height: 70%;"></div>
                             </div>
@@ -363,7 +361,9 @@
 
                         <!-- Volume / Audio Boost HUD -->
                         <div class="gesture-hud" id="hudVolume" style="display: none;">
-                            <div class="hud-icon" id="hudVolumeIcon">🔊</div>
+                            <div class="hud-icon" id="hudVolumeIcon">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                            </div>
                             <div class="hud-bar-wrap">
                                 <div class="hud-bar-fill" id="hudVolumeFill" style="height: 100%;"></div>
                             </div>
