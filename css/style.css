@@ -2027,15 +2027,16 @@ header {
     border-color: var(--primary);
 }
 
-.ep-icon-btn.btn-vlc-sm {
-    background: rgba(255, 119, 0, 0.15);
-    border-color: rgba(255, 119, 0, 0.35);
-    color: #ff8800;
+.ep-icon-btn.ep-btn-stream {
+    background: rgba(0, 229, 255, 0.1);
+    border-color: rgba(0, 229, 255, 0.3);
+    color: var(--primary);
 }
 
-.ep-icon-btn.btn-vlc-sm:hover {
-    background: #ff8800;
-    color: #fff;
+.ep-icon-btn.ep-btn-stream:hover {
+    background: var(--primary);
+    color: #07090e;
+    box-shadow: 0 0 10px var(--primary-glow);
 }
 [data-theme="light"] .season-pill-btn {
     background: #f1f5f9;
