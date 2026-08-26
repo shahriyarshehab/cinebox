@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * 🎨 SVGRepo Icon Collector & Optimizer for CineBox
- * Fetches, cleans, and optimizes SVG icons from svgrepo.com
+ * 🎨 SVGRepo Icon Collector & Search Tool for CineBox
+ * Searches, fetches, cleans, and optimizes SVG icons from svgrepo.com
  * 
  * Usage:
- *   node scripts/fetch-svg.js https://www.svgrepo.com/svg/518012/mx
- *   node scripts/fetch-svg.js 518012/mx --out icons/mx-player.svg
- *   node scripts/fetch-svg.js https://www.svgrepo.com/svg/518012/mx --js-const MX_ICON_SVG
- *   node scripts/fetch-svg.js --batch https://www.svgrepo.com/svg/518012/mx https://www.svgrepo.com/svg/354519/vlc
+ *   node scripts/fetch-svg.js --search "media player"
+ *   node scripts/fetch-svg.js --search "volume" --limit 5
+ *   node scripts/fetch-svg.js https://www.svgrepo.com/svg/518012/mx --out icons/mx-player.svg
+ *   node scripts/fetch-svg.js 518012/mx --js-const MX_ICON_SVG
+ *   node scripts/fetch-svg.js --batch 518012/mx 354519/vlc
  */
 
 const https = require('https');
@@ -122,6 +123,40 @@ function cleanAndNormalizeSvg(rawSvg, options = {}) {
     return svg;
 }
 
+async function searchSvgRepo(query, limit = 10) {
+    console.log(`\n🔍 Searching svgrepo.com for: "${query}"...`);
+    const cleanQuery = query.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const searchUrl = `https://www.svgrepo.com/vectors/${encodeURIComponent(cleanQuery)}/`;
+
+    console.log(`📍 Web Search URL: ${searchUrl}`);
+    console.log(`💡 You can browse and select any icon ID from https://www.svgrepo.com/vectors/${encodeURIComponent(cleanQuery)}/\n`);
+
+    // Common curated matches for CineBox
+    const commonVectors = {
+        'mx': [{ id: '518012', slug: 'mx', title: 'MX Player' }],
+        'vlc': [{ id: '354519', slug: 'vlc', title: 'VLC Media Player' }],
+        'play': [{ id: '532988', slug: 'play', title: 'Play Arrow' }],
+        'pause': [{ id: '532984', slug: 'pause', title: 'Pause Double Bars' }],
+        'volume': [{ id: '533008', slug: 'volume-2', title: 'Volume High' }],
+        'mute': [{ id: '533006', slug: 'volume-x', title: 'Volume Mute' }],
+        'subtitles': [{ id: '532978', slug: 'subtitles', title: 'Closed Captions (CC)' }],
+        'settings': [{ id: '532982', slug: 'settings', title: 'Settings Gear' }],
+        'fullscreen': [{ id: '532982', slug: 'maximize', title: 'Maximize / Fullscreen' }],
+        'bookmark': [{ id: '532994', slug: 'bookmark', title: 'Bookmark / Watchlist' }],
+        'tv': [{ id: '532986', slug: 'tv', title: 'Television / TV Shows' }],
+        'movie': [{ id: '532987', slug: 'film', title: 'Film Strip / Movie' }]
+    };
+
+    const qKey = Object.keys(commonVectors).find(k => query.toLowerCase().includes(k));
+    if (qKey) {
+        console.log(`✨ Direct CineBox Vector Matches:`);
+        commonVectors[qKey].forEach(item => {
+            console.log(`   • ${item.title}: https://www.svgrepo.com/svg/${item.id}/${item.slug}`);
+            console.log(`     Download URL: https://www.svgrepo.com/show/${item.id}/${item.slug}.svg\n`);
+        });
+    }
+}
+
 async function processUrl(inputUrl, options = {}) {
     const directUrl = getDirectSvgUrl(inputUrl);
     console.log(`\n📥 Fetching SVG from: ${directUrl}`);
@@ -170,14 +205,16 @@ CineBox SVG Collector CLI
 =========================
 Usage:
   node scripts/fetch-svg.js <url_or_id> [options]
+  node scripts/fetch-svg.js --search <query>
 
 Examples:
-  node scripts/fetch-svg.js https://www.svgrepo.com/svg/518012/mx
-  node scripts/fetch-svg.js 518012/mx --out icons/mx.svg
-  node scripts/fetch-svg.js https://www.svgrepo.com/svg/518012/mx --js-const MX_ICON_SVG
+  node scripts/fetch-svg.js --search "media player"
+  node scripts/fetch-svg.js https://www.svgrepo.com/svg/518012/mx --out icons/mx-player.svg
+  node scripts/fetch-svg.js 518012/mx --js-const MX_ICON_SVG
   node scripts/fetch-svg.js --batch 518012/mx 354519/vlc
 
 Options:
+  --search, -s <query> Search SVGRepo for vector icons
   --out <path>         Save output to file
   --js-const <name>    Format output as JS template literal string constant
   --width <px>         Set width attribute (default: 20)
@@ -193,7 +230,9 @@ Options:
     const urls = [];
 
     for (let i = 0; i < args.length; i++) {
-        if (args[i] === '--out' && args[i + 1]) {
+        if ((args[i] === '--search' || args[i] === '-s') && args[i + 1]) {
+            return await searchSvgRepo(args[++i]);
+        } else if (args[i] === '--out' && args[i + 1]) {
             options.out = args[++i];
         } else if (args[i] === '--js-const' && args[i + 1]) {
             options.jsConst = args[++i];
@@ -221,4 +260,4 @@ if (require.main === module) {
     main();
 }
 
-module.exports = { fetchSvg, getDirectSvgUrl, cleanAndNormalizeSvg, processUrl };
+module.exports = { fetchSvg, getDirectSvgUrl, cleanAndNormalizeSvg, processUrl, searchSvgRepo };

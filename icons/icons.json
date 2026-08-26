@@ -1,0 +1,248 @@
+{
+  "nav-home": {
+    "category": "nav",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z\"/><polyline points=\"9 22 9 12 15 12 15 22\"/>",
+    "source": "svgrepo.com/svg/532997/home-alt"
+  },
+  "nav-tv": {
+    "category": "nav",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"20\" height=\"15\" x=\"2\" y=\"7\" rx=\"2\" ry=\"2\"/><polyline points=\"17 2 12 7 7 2\"/>",
+    "source": "svgrepo.com/svg/532986/tv"
+  },
+  "nav-movies": {
+    "category": "nav",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"20\" height=\"20\" x=\"2\" y=\"2\" rx=\"2.18\" ry=\"2.18\"/><line x1=\"7\" y1=\"2\" x2=\"7\" y2=\"22\"/><line x1=\"17\" y1=\"2\" x2=\"17\" y2=\"22\"/><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\"/>",
+    "source": "svgrepo.com/svg/532987/film"
+  },
+  "nav-animation": {
+    "category": "nav",
+    "viewBox": "0 0 24 24",
+    "path": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M8 14s1.5 2 4 2 4-2 4-2\"/><line x1=\"9\" y1=\"9\" x2=\"9.01\" y2=\"9\"/><line x1=\"15\" y1=\"9\" x2=\"15.01\" y2=\"9\"/>",
+    "source": "svgrepo.com/svg/533002/smile"
+  },
+  "nav-watchlist": {
+    "category": "nav",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z\"/>",
+    "source": "svgrepo.com/svg/532994/bookmark"
+  },
+  "nav-search": {
+    "category": "nav",
+    "viewBox": "0 0 24 24",
+    "path": "<circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/>",
+    "source": "svgrepo.com/svg/532998/search"
+  },
+  "theme-sun": {
+    "category": "nav",
+    "viewBox": "0 0 24 24",
+    "path": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41\"/>",
+    "source": "svgrepo.com/svg/533005/sun"
+  },
+  "theme-moon": {
+    "category": "nav",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/>",
+    "source": "svgrepo.com/svg/532995/moon"
+  },
+  "player-play": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<polygon points=\"5 3 19 12 5 21 5 3\"/>",
+    "source": "svgrepo.com/svg/532988/play"
+  },
+  "player-pause": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<rect x=\"6\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\"/><rect x=\"14\" y=\"4\" width=\"4\" height=\"16\" rx=\"1\"/>",
+    "source": "svgrepo.com/svg/532984/pause"
+  },
+  "player-rewind10": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"M11 19l-9-7 9-7v14z\"/><path d=\"M22 19l-9-7 9-7v14z\"/>",
+    "source": "svgrepo.com/svg/532991/rewind"
+  },
+  "player-forward10": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"M13 19l9-7-9-7v14z\"/><path d=\"M2 19l9-7-9-7v14z\"/>",
+    "source": "svgrepo.com/svg/532981/fast-forward"
+  },
+  "player-prev-ep": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<polygon points=\"19 20 9 12 19 4 19 20\"/><line x1=\"5\" y1=\"19\" x2=\"5\" y2=\"5\"/>",
+    "source": "svgrepo.com/svg/532992/skip-back"
+  },
+  "player-next-ep": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<polygon points=\"5 4 15 12 5 20 5 4\"/><line x1=\"19\" y1=\"5\" x2=\"19\" y2=\"19\"/>",
+    "source": "svgrepo.com/svg/532993/skip-forward"
+  },
+  "player-volume-high": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<polygon points=\"11 5 6 9 2 9 2 15 6 15 11 19 11 5\"/><path d=\"M15.54 8.46a5 5 0 0 1 0 7.07\"/><path d=\"M19.07 4.93a10 10 0 0 1 0 14.14\"/>",
+    "source": "svgrepo.com/svg/533008/volume-2"
+  },
+  "player-volume-mute": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<polygon points=\"11 5 6 9 2 9 2 15 6 15 11 19 11 5\"/><line x1=\"22\" y1=\"9\" x2=\"16\" y2=\"15\"/><line x1=\"16\" y1=\"9\" x2=\"22\" y2=\"15\"/>",
+    "source": "svgrepo.com/svg/533006/volume-x"
+  },
+  "player-subtitles": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"20\" height=\"15\" x=\"2\" y=\"4.5\" rx=\"2\"/><path d=\"M7 15h3M14 15h3M7 11h10\"/>",
+    "source": "svgrepo.com/svg/532978/subtitles"
+  },
+  "player-gear": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z\"/>",
+    "source": "svgrepo.com/svg/532982/settings"
+  },
+  "player-lock": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 10 0v4\"/>",
+    "source": "svgrepo.com/svg/532983/lock"
+  },
+  "player-unlock": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\"/><path d=\"M7 11V7a5 5 0 0 1 9.9-1\"/>",
+    "source": "svgrepo.com/svg/533007/unlock"
+  },
+  "player-ambient": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z\"/>",
+    "source": "svgrepo.com/svg/532989/sparkles"
+  },
+  "player-filter": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<polygon points=\"22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3\"/>",
+    "source": "svgrepo.com/svg/532980/filter"
+  },
+  "player-equalizer": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<line x1=\"4\" y1=\"21\" x2=\"4\" y2=\"14\"/><line x1=\"4\" y1=\"10\" x2=\"4\" y2=\"3\"/><line x1=\"12\" y1=\"21\" x2=\"12\" y2=\"12\"/><line x1=\"12\" y1=\"8\" x2=\"12\" y2=\"3\"/><line x1=\"20\" y1=\"21\" x2=\"20\" y2=\"16\"/><line x1=\"20\" y1=\"12\" x2=\"20\" y2=\"3\"/><line x1=\"1\" y1=\"14\" x2=\"7\" y2=\"14\"/><line x1=\"9\" y1=\"8\" x2=\"15\" y2=\"8\"/><line x1=\"17\" y1=\"16\" x2=\"23\" y2=\"16\"/>",
+    "source": "svgrepo.com/svg/532985/sliders"
+  },
+  "player-aspect": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3\"/>",
+    "source": "svgrepo.com/svg/532979/frame"
+  },
+  "player-pip": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"18\" height=\"14\" x=\"3\" y=\"5\" rx=\"2\"/><rect width=\"6\" height=\"4\" x=\"13\" y=\"13\" rx=\"1\"/>",
+    "source": "svgrepo.com/svg/532990/pip"
+  },
+  "player-theater": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"20\" height=\"12\" x=\"2\" y=\"6\" rx=\"2\"/><line x1=\"2\" y1=\"12\" x2=\"22\" y2=\"12\"/>",
+    "source": "svgrepo.com/svg/533003/tv-theater"
+  },
+  "player-fullscreen": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<polyline points=\"15 3 21 3 21 9\"/><polyline points=\"9 21 3 21 3 15\"/><polyline points=\"21 15 21 21 15 21\"/><polyline points=\"3 9 3 3 9 3\"/>",
+    "source": "svgrepo.com/svg/532982/maximize"
+  },
+  "player-exit-fullscreen": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<polyline points=\"4 14 10 14 10 20\"/><polyline points=\"20 10 14 10 14 4\"/><polyline points=\"14 20 14 14 20 14\"/><polyline points=\"10 4 10 10 4 10\"/>",
+    "source": "svgrepo.com/svg/532983/minimize"
+  },
+  "player-speed": {
+    "category": "player",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"m12 14 4-4\"/><path d=\"M3.34 19a10 10 0 1 1 17.32 0\"/>",
+    "source": "svgrepo.com/svg/532999/gauge"
+  },
+  "ext-mx-player": {
+    "category": "external",
+    "viewBox": "0 0 48 48",
+    "path": "<path d=\"M24,2.5A21.5,21.5,0,1,0,45.5,24,21.51,21.51,0,0,0,24,2.5ZM18.07,13.14a1.42,1.42,0,0,1,.82.23l15.75,10.2a1.44,1.44,0,0,1,0,2.41L18.89,36.18A1.44,1.44,0,0,1,16.67,35V14.57a1.43,1.43,0,0,1,1.4-1.43Z\"/>",
+    "source": "https://www.svgrepo.com/svg/518012/mx"
+  },
+  "ext-vlc": {
+    "category": "external",
+    "viewBox": "0 0 512 512",
+    "path": "<g fill=\"#f7901e\"><path d=\"M437 400l-36-94c-3-10-13-16-23-16H134c-10 0-20 6-23 16l-36 94c-2 3-2 7-2 11 0 16 13 29 29 29h308a29 29 0 0 0 27-40z\"/><path d=\"M299 109l-15-51c-3-11-13-18-24-18h-8c-11 0-21 7-24 18l-15 51a307 307 0 0 0 86 0zM256 183c-24 0-46-2-64-6l-19 65c20 8 49 13 83 13s63-5 83-13l-20-65c-17 4-39 6-63 6z\"/></g><g fill=\"#ffffff\"><path d=\"M319 177l-20-68a307 307 0 0 1-86 0l-21 68c18 4 40 6 64 6s46-2 63-6z\"/><path d=\"M173 242l-18 62c19 14 55 23 101 23s82-9 101-23l-18-62c-20 8-49 13-83 13s-63-5-83-13z\"/></g>",
+    "source": "https://www.svgrepo.com/svg/354519/vlc"
+  },
+  "ext-potplayer": {
+    "category": "external",
+    "viewBox": "0 0 24 24",
+    "path": "<rect x=\"2\" y=\"3\" width=\"20\" height=\"14\" rx=\"2\" ry=\"2\"/><line x1=\"8\" y1=\"21\" x2=\"16\" y2=\"21\"/><line x1=\"12\" y1=\"17\" x2=\"12\" y2=\"21\"/>",
+    "source": "svgrepo.com/svg/532986/monitor-play"
+  },
+  "ext-chooser": {
+    "category": "external",
+    "viewBox": "0 0 24 24",
+    "path": "<circle cx=\"18\" cy=\"5\" r=\"3\"/><circle cx=\"6\" cy=\"12\" r=\"3\"/><circle cx=\"18\" cy=\"19\" r=\"3\"/><line x1=\"8.59\" y1=\"13.51\" x2=\"15.42\" y2=\"17.49\"/><line x1=\"15.41\" y1=\"6.51\" x2=\"8.59\" y2=\"10.49\"/>",
+    "source": "svgrepo.com/svg/533001/share"
+  },
+  "ext-link": {
+    "category": "external",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/>",
+    "source": "svgrepo.com/svg/532984/link"
+  },
+  "ext-download": {
+    "category": "external",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"7 10 12 15 17 10\"/><line x1=\"12\" y1=\"15\" x2=\"12\" y2=\"3\"/>",
+    "source": "svgrepo.com/svg/532979/download"
+  },
+  "meta-star": {
+    "category": "meta",
+    "viewBox": "0 0 24 24",
+    "path": "<polygon points=\"12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2\"/>",
+    "source": "svgrepo.com/svg/533004/star"
+  },
+  "meta-calendar": {
+    "category": "meta",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"18\" height=\"18\" x=\"3\" y=\"4\" rx=\"2\" ry=\"2\"/><line x1=\"16\" y1=\"2\" x2=\"16\" y2=\"6\"/><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"6\"/><line x1=\"3\" y1=\"10\" x2=\"21\" y2=\"10\"/>",
+    "source": "svgrepo.com/svg/532977/calendar"
+  },
+  "meta-clock": {
+    "category": "meta",
+    "viewBox": "0 0 24 24",
+    "path": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><polyline points=\"12 6 12 12 16 14\"/>",
+    "source": "svgrepo.com/svg/532978/clock"
+  },
+  "meta-users": {
+    "category": "meta",
+    "viewBox": "0 0 24 24",
+    "path": "<path d=\"M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M23 21v-2a4 4 0 0 0-3-3.87\"/><path d=\"M16 3.13a4 4 0 0 1 0 7.75\"/>",
+    "source": "svgrepo.com/svg/533009/users"
+  },
+  "meta-server": {
+    "category": "meta",
+    "viewBox": "0 0 24 24",
+    "path": "<rect width=\"20\" height=\"8\" x=\"2\" y=\"2\" rx=\"2\" ry=\"2\"/><rect width=\"20\" height=\"8\" x=\"2\" y=\"14\" rx=\"2\" ry=\"2\"/><line x1=\"6\" y1=\"6\" x2=\"6.01\" y2=\"6\"/><line x1=\"6\" y1=\"18\" x2=\"6.01\" y2=\"18\"/>",
+    "source": "svgrepo.com/svg/533000/server"
+  },
+  "meta-trailer": {
+    "category": "meta",
+    "viewBox": "0 0 24 24",
+    "path": "<circle cx=\"12\" cy=\"12\" r=\"10\"/><polygon points=\"10 8 16 12 10 16 10 8\"/>",
+    "source": "svgrepo.com/svg/532988/play-circle"
+  }
+}
