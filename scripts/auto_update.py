@@ -187,6 +187,7 @@ def run_auto_update():
 
     # 1. Load existing database
     existing_map = {}
+    existing_folders = set()
     if os.path.exists(MOVIES_FILE):
         try:
             with open(MOVIES_FILE, "r", encoding="utf-8") as f:
@@ -195,6 +196,12 @@ def run_auto_update():
                     if isinstance(item, list):
                         url = item[2]
                         existing_map[url] = item
+                        if url:
+                            existing_folders.add(url)
+                            existing_folders.add(url.rsplit('/', 1)[0] + '/')
+                            existing_folders.add(url.rstrip('/'))
+                        if len(item) > 1 and item[1]:
+                            existing_folders.add(item[1].rsplit('/', 1)[0] + '/')
                     elif isinstance(item, dict):
                         url = item.get('url')
                         if url:
@@ -207,16 +214,19 @@ def run_auto_update():
                                 item.get('size', ''),
                                 item.get('date', '')
                             ]
-            print(f"[*] Loaded {len(existing_map)} existing movies from catalog.")
+                            existing_folders.add(url)
+                            existing_folders.add(url.rsplit('/', 1)[0] + '/')
+                            existing_folders.add(url.rstrip('/'))
+            print(f"[*] Loaded {len(existing_map)} existing titles from catalog.", flush=True)
         except Exception as e:
-            print(f"[!] Warning reading movies.json: {e}")
+            print(f"[!] Warning reading movies.json: {e}", flush=True)
 
     # 2. Scrape mother servers
     new_items = []
     seen_urls = set(existing_map.keys())
 
     for src in SOURCES:
-        print(f"[*] Checking source: {src['name']} ({src['tag']})...")
+        print(f"\n[*] Scanning: {src['name']} ({src['tag']})...", flush=True)
         movie_dirs = []
         try:
             if src["type"] == "direct":
@@ -226,29 +236,35 @@ def run_auto_update():
                         movie_dirs.append(it)
             else:
                 subs = fetch_folder(src["url"])
-                for sub in subs:
-                    if sub["is_dir"] and "parent directory" not in sub["name"].lower():
-                        sub_items = fetch_folder(sub["url"])
-                        for sm in sub_items:
-                            if sm["is_dir"] and "parent directory" not in sm["name"].lower():
-                                movie_dirs.append(sm)
+                valid_subs = [s for s in subs if s["is_dir"] and "parent directory" not in s["name"].lower()]
+                with ThreadPoolExecutor(max_workers=20) as sub_exec:
+                    sub_results = list(sub_exec.map(lambda s: fetch_folder(s["url"]), valid_subs))
+                for sm_list in sub_results:
+                    for sm in sm_list:
+                        if sm["is_dir"] and "parent directory" not in sm["name"].lower():
+                            movie_dirs.append(sm)
         except Exception as e:
-            print(f"   [!] Failed to connect to {src['url']}: {e}")
+            print(f"   [!] Failed to connect to {src['url']}: {e}", flush=True)
             continue
 
-        with ThreadPoolExecutor(max_workers=12) as executor:
-            futures = [executor.submit(process_movie_folder, md, src['name'], src['tag']) for md in movie_dirs]
-            for f in futures:
-                try:
-                    res = f.result()
-                    if res and res[2] not in seen_urls:
-                        seen_urls.add(res[2])
-                        new_items.append(res)
-                        existing_map[res[2]] = res
-                except Exception:
-                    pass
+        unprocessed = [md for md in movie_dirs if md['url'] not in existing_folders and md['url'].rstrip('/') not in existing_folders]
+        print(f"   -> Found {len(movie_dirs)} total directories ({len(unprocessed)} new to process)", flush=True)
 
-    print(f"\n[+] Newly added titles harvested: {len(new_items)}")
+        if unprocessed:
+            with ThreadPoolExecutor(max_workers=30) as executor:
+                futures = [executor.submit(process_movie_folder, md, src['name'], src['tag']) for md in unprocessed]
+                for f in futures:
+                    try:
+                        res = f.result()
+                        if res and res[2] not in seen_urls:
+                            seen_urls.add(res[2])
+                            existing_folders.add(res[2])
+                            new_items.append(res)
+                            existing_map[res[2]] = res
+                    except Exception:
+                        pass
+
+    print(f"\n[+] Newly added titles harvested: {len(new_items)}", flush=True)
 
     # 3. Compile full updated catalog
     all_movies = list(existing_map.values())
@@ -264,32 +280,36 @@ def run_auto_update():
     # 4. Save movies.json
     with open(MOVIES_FILE, "w", encoding="utf-8") as f:
         json.dump(all_movies, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"[+] Total Catalog Size: {len(all_movies)} items -> movies.json")
+    print(f"[+] Total Catalog Size: {len(all_movies)} items -> movies.json", flush=True)
 
     # 5. Build data/latest.json (Top 300 newest items)
     latest_300 = [m for m in all_movies_sorted if get_sort_date(m)][:300]
     with open(LATEST_FILE, "w", encoding="utf-8") as f:
         json.dump(latest_300, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"[+] Created data/latest.json with {len(latest_300)} newest items")
+    print(f"[+] Created data/latest.json with {len(latest_300)} newest items", flush=True)
 
     # 6. Build data/today.json (Items uploaded on actual today's date or latest single date)
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     today_items = [m for m in all_movies_sorted if (m[6] if len(m) > 6 else '').startswith(today_str)]
-    if not today_items and latest_300:
-        # Find latest single date in database
-        latest_date = latest_300[0][6][:10] if len(latest_300[0]) > 6 else ''
-        if latest_date:
-            today_items = [m for m in latest_300 if (m[6] if len(m) > 6 else '').startswith(latest_date)]
-        else:
-            today_items = latest_300[:20]
+    
+    # If today has few/no uploads, populate with latest available updates
+    if len(today_items) < 14 and latest_300:
+        existing_today_urls = set(m[2] for m in today_items)
+        for m in latest_300:
+            if m[2] not in existing_today_urls:
+                today_items.append(m)
+                existing_today_urls.add(m[2])
+            if len(today_items) >= 28:
+                break
 
     with open(TODAY_FILE, "w", encoding="utf-8") as f:
         json.dump(today_items, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"[+] Created data/today.json with {len(today_items)} items for {today_str}")
+    print(f"[+] Created data/today.json with {len(today_items)} items for {today_str}", flush=True)
 
     # 7. Split into category files
     home_categories = {
-        "Today's Updates": today_items[:16] if today_items else latest_300[:16]
+        "Today's Updates": today_items[:16],
+        "Today": today_items[:16]
     }
 
     for cat_key, cat_info in CATEGORY_FILES.items():
@@ -297,7 +317,7 @@ def run_auto_update():
         out_path = os.path.join(DATA_DIR, cat_info["file"])
         with open(out_path, "w", encoding="utf-8") as f:
             json.dump(matched, f, ensure_ascii=False, separators=(",", ":"))
-        print(f"   -> data/{cat_info['file']} ({cat_info['name']}): {len(matched)} items")
+        print(f"   -> data/{cat_info['file']} ({cat_info['name']}): {len(matched)} items", flush=True)
         home_categories[cat_info["tag"]] = matched[:16]
 
     # 8. Update home_data.json
@@ -314,7 +334,7 @@ def run_auto_update():
 
     with open(HOME_FILE, "w", encoding="utf-8") as f:
         json.dump(home_data, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"[+] Updated home_data.json with Today's Updates!")
+    print(f"[+] Updated home_data.json with Today's Updates!", flush=True)
 
 if __name__ == "__main__":
     run_auto_update()

@@ -114,6 +114,20 @@ const server = http.createServer((req, res) => {
 });
 
 function startServer(port) {
+  server.removeAllListeners('error');
+  server.once('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+      console.log(`Port ${port} in use, attempting port ${port + 1}...`);
+      server.close(() => {
+        startServer(port + 1);
+      });
+      // In case server was not listening yet
+      setTimeout(() => startServer(port + 1), 100);
+    } else {
+      console.error('Server error:', err);
+    }
+  });
+
   server.listen(port, () => {
     console.log(`\n==============================================`);
     console.log(`  🎬 CineBox Local Development Server Running`);
@@ -121,15 +135,6 @@ function startServer(port) {
     console.log(`  > Local URL:   http://localhost:${port}`);
     console.log(`  > Network URL: http://127.0.0.1:${port}`);
     console.log(`\n  Press Ctrl + C to stop the server.\n`);
-  });
-
-  server.on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.log(`Port ${port} in use, attempting port ${port + 1}...`);
-      startServer(port + 1);
-    } else {
-      console.error('Server error:', err);
-    }
   });
 }
 

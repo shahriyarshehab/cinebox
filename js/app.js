@@ -142,23 +142,28 @@ async function init() {
   const page = detectPageType();
 
   // 1. Check client cached home_data or fetch home_data.json immediately for 0ms instant render
-  const cachedHome = sessionStorage.getItem('cinebox_home_v2');
+  const cachedHome = sessionStorage.getItem('cinebox_home_v3');
   if (cachedHome) {
     try {
       homeData = JSON.parse(cachedHome);
     } catch (e) {}
   }
 
-  if (!homeData) {
-    try {
-      const res = await fetch('./home_data.json?v=' + Date.now());
-      if (res.ok) {
-        homeData = await res.json();
-        sessionStorage.setItem('cinebox_home_v2', JSON.stringify(homeData));
+  const freshPromise = fetch('./home_data.json?v=' + Date.now())
+    .then((res) => (res.ok ? res.json() : null))
+    .then((fresh) => {
+      if (fresh) {
+        homeData = fresh;
+        sessionStorage.setItem('cinebox_home_v3', JSON.stringify(fresh));
+        if (currentView === 'home' && page === 'home') {
+          applyHomeData(fresh);
+        }
       }
-    } catch (e) {
-      console.warn('Home data load notice:', e);
-    }
+    })
+    .catch((e) => console.warn('Home data load notice:', e));
+
+  if (!homeData) {
+    await freshPromise;
   }
 
   // 2. Check URL parameters
@@ -600,7 +605,11 @@ function renderHomeRowsFromPayload(categoriesMap) {
     `;
 
   CATEGORY_ROWS.forEach((cat, catIdx) => {
-    const rawItems = categoriesMap[cat.tag] || [];
+    const rawItems =
+      categoriesMap[cat.tag] ||
+      categoriesMap[cat.name] ||
+      (cat.tag === 'Today' ? (categoriesMap["Today's Updates"] || categoriesMap['Today']) : []) ||
+      [];
     if (rawItems.length === 0) return;
 
     const items = rawItems.map((item) =>
@@ -684,7 +693,14 @@ function renderHomeRows(container) {
     `;
 
   CATEGORY_ROWS.forEach((cat, catIdx) => {
-    const catMovies = allMovies.filter((m) => m.tag === cat.tag || (m.category && m.category.includes(cat.tag)));
+    let catMovies;
+    if (cat.tag === 'Today' || cat.tag === "Today's Updates") {
+      catMovies = (categoryCache['Today'] && categoryCache['Today'].length > 0)
+        ? categoryCache['Today']
+        : allMovies.filter((m) => matchesCategory(m, 'Today'));
+    } else {
+      catMovies = allMovies.filter((m) => m.tag === cat.tag || (m.category && m.category.includes(cat.tag)));
+    }
     if (catMovies.length === 0) return;
 
     const rowItems = catMovies.slice(0, 7);
@@ -720,11 +736,12 @@ function renderHomeRows(container) {
 }
 
 async function fetchCategoryData(tag) {
-  if (categoryCache[tag]) return categoryCache[tag];
-  const file = CATEGORY_JSON_MAP[tag];
+  const normTag = (tag === "Today's Updates" || tag === "Today's Releases") ? 'Today' : tag;
+  if (categoryCache[normTag] && categoryCache[normTag].length > 0) return categoryCache[normTag];
+  const file = CATEGORY_JSON_MAP[normTag] || CATEGORY_JSON_MAP[tag];
   if (file) {
     try {
-      const res = await fetch(`./${file}`);
+      const res = await fetch(`./${file}?v=` + Date.now());
       if (res.ok) {
         const data = await res.json();
         const clean = data.map((item) =>
@@ -740,14 +757,14 @@ async function fetchCategoryData(tag) {
               }
             : item
         );
-        categoryCache[tag] = clean;
+        categoryCache[normTag] = clean;
         return clean;
       }
     } catch (e) {
       console.warn('Category fetch notice:', e);
     }
   }
-  return allMovies.filter((m) => matchesCategory(m, tag));
+  return allMovies.filter((m) => matchesCategory(m, normTag));
 }
 
 let activeNavTab = 'home';
@@ -1069,7 +1086,8 @@ function matchesCategory(m, tag) {
   if (!m) return false;
   if (tag === 'All') return true;
   if (tag === 'Today' || tag === "Today's Updates" || tag === "Today's Releases") {
-    return m.date && m.date.trim().length > 0;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    return (m.date && m.date.startsWith(todayStr)) || (m.date && m.date.startsWith('2026-'));
   }
   if (tag === 'K-Drama') {
     return (
@@ -1143,8 +1161,21 @@ async function selectFilterPill(tag, label) {
       await loadFullCatalogInBackground();
     }
     rawCategoryPool = [...allMovies];
-  } else if (tag === 'Today' || tag === "Today's Updates") {
-    rawCategoryPool = await fetchCategoryData('Today');
+  } else if (tag === 'Today' || tag === "Today's Updates" || tag === "Today's Releases") {
+    const page = detectPageType();
+    const todayPool = await fetchCategoryData('Today');
+    if (page === 'tv') {
+      const tvOnly = todayPool.filter((m) => m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.category && m.category.toLowerCase().includes('series')));
+      rawCategoryPool = tvOnly.length > 0 ? tvOnly : todayPool;
+    } else if (page === 'movies') {
+      const moviesOnly = todayPool.filter((m) => !(m.tag === 'TV Series' || m.tag === 'K-Drama'));
+      rawCategoryPool = moviesOnly.length > 0 ? moviesOnly : todayPool;
+    } else if (page === 'animation') {
+      const animOnly = todayPool.filter((m) => matchesCategory(m, 'Animation'));
+      rawCategoryPool = animOnly.length > 0 ? animOnly : todayPool;
+    } else {
+      rawCategoryPool = todayPool;
+    }
   } else if (tag === 'All_TV') {
     const [tv, kdrama] = await Promise.all([fetchCategoryData('TV Series'), fetchCategoryData('K-Drama')]);
     rawCategoryPool = [...tv, ...kdrama];
