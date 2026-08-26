@@ -870,21 +870,21 @@ function renderCategoryFullGrid(container) {
     container.innerHTML = `
         <!-- MovieBox Filter Bar with Horizontal Pills & Facets -->
         <div class="filter-bar-wrap">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <a class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px; text-decoration: none;" href="index.html">
+            <div class="category-bar-top">
+                <div class="category-bar-left">
+                    <a class="btn btn-ghost btn-home-link" style="padding: 5px 10px; font-size: 11.5px; text-decoration: none;" href="index.html">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Home</span>
                     </a>
-                    <h1 class="row-heading" style="font-size: 18px;">${currentCategoryName}</h1>
+                    <h1 class="category-bar-title">${currentCategoryName}</h1>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 11.5px; color: var(--text-muted);">${filteredMovies.length.toLocaleString()} titles</span>
-                    <select class="sort-select" onchange="handleSortChange(this.value)">
-                        <option value="latest" ${currentSort === 'latest' ? 'selected' : ''}>Latest</option>
-                        <option value="title" ${currentSort === 'title' ? 'selected' : ''}>Name A-Z</option>
-                        <option value="rating" ${currentSort === 'rating' ? 'selected' : ''}>Top Rated ★</option>
+                <div class="category-bar-controls">
+                    <span class="category-bar-count">${filteredMovies.length.toLocaleString()} titles</span>
+                    <select class="sort-select" onchange="handleSortChange(this.value)" aria-label="Sort media list">
+                        <option value="latest" ${currentSort === 'latest' ? 'selected' : ''}>Latest Uploads</option>
+                        <option value="title" ${currentSort === 'title' ? 'selected' : ''}>Alphabetical (A-Z)</option>
+                        <option value="rating" ${currentSort === 'rating' ? 'selected' : ''}>IMDb Top Rated</option>
                     </select>
                 </div>
             </div>
@@ -993,22 +993,55 @@ function applyAllFilters() {
 function matchesCategory(m, tag) {
     if (!m) return false;
     if (tag === 'All') return true;
-    if (tag === 'Today' || tag === "Today's Updates" || tag === "🔥 Today's Updates") {
+    if (tag === 'Today' || tag === "Today's Updates" || tag === "Today's Releases") {
         return (m.date && m.date.trim().length > 0);
     }
-    if (m.tag === tag) return true;
-    if (tag === 'K-Drama' && (m.tag === 'K-Drama' || (m.category && m.category.includes('Korean')) || (m.url && m.url.includes('KOREAN')))) return true;
-    if (tag === 'TV Series' && (m.tag === 'TV Series' || (m.category && m.category.includes('Series')) || (m.url && m.url.includes('TV-WEB-Series')))) return true;
-    if (tag === 'Hollywood 1080p' && (m.tag === 'Hollywood 1080p' || (m.category && m.category.includes('English Movies (1080p)')))) return true;
-    if (tag === 'Bollywood' && (m.tag === 'Bollywood' || (m.category && m.category.includes('Hindi')))) return true;
-    if (tag === 'South Action' && (m.tag === 'South Action' || (m.category && m.category.includes('South Movies (Hindi Dubbed)')))) return true;
-    if (tag === 'South Original' && (m.tag === 'South Original' || (m.category && m.category.includes('South Indian Movies')))) return true;
-    if (tag === 'Animation' && (m.tag === 'Animation' || (m.category && m.category.includes('Animation')))) return true;
-    if (tag === 'Bangla' && (m.tag === 'Bangla' || (m.category && m.category.includes('Bangla')))) return true;
-    if (tag === 'Foreign Movies' && (m.tag === 'Foreign Movies' || (m.category && m.category.includes('Foreign')))) return true;
-    if (tag === '3D Movies' && (m.tag === '3D Movies' || (m.category && m.category.includes('3D')))) return true;
-    if (tag === 'English Movies' && (m.tag === 'English Movies' || (m.category && m.category.includes('English')))) return true;
-    if (tag === 'Top Rated' && (m.tag === 'Top Rated' || (m.category && m.category.includes('Top 250')))) return true;
+    if (tag === 'K-Drama') {
+        return m.tag === 'K-Drama' || 
+               (m.url && m.url.includes('KOREAN')) || 
+               (m.category && m.category.toLowerCase().includes('korean'));
+    }
+    if (tag === 'TV Series') {
+        // Strictly exclude K-Drama to eliminate overlap
+        if (m.tag === 'K-Drama' || (m.url && m.url.includes('KOREAN')) || (m.category && m.category.toLowerCase().includes('korean'))) {
+            return false;
+        }
+        return m.tag === 'TV Series' || 
+               (m.url && m.url.includes('TV-WEB-Series')) || 
+               (m.category && m.category.toLowerCase().includes('series'));
+    }
+    if (tag === 'Hollywood 1080p') {
+        return m.tag === 'Hollywood 1080p' || (m.category && m.category.includes('English Movies (1080p)'));
+    }
+    if (tag === 'English Movies') {
+        // Strictly exclude Hollywood 1080p
+        if (m.tag === 'Hollywood 1080p' || (m.category && m.category.includes('1080p'))) return false;
+        return m.tag === 'English Movies' || (m.category && m.category.includes('English Movies'));
+    }
+    if (tag === 'Bollywood') {
+        return m.tag === 'Bollywood' || (m.category && m.category.toLowerCase().includes('hindi'));
+    }
+    if (tag === 'South Action') {
+        return m.tag === 'South Action' || (m.category && m.category.toLowerCase().includes('dubbed'));
+    }
+    if (tag === 'South Original') {
+        return m.tag === 'South Original' || ((m.category && m.category.includes('South Movies')) && !m.category.includes('Dubbed'));
+    }
+    if (tag === 'Animation') {
+        return m.tag === 'Animation' || (m.category && m.category.toLowerCase().includes('animation'));
+    }
+    if (tag === 'Bangla') {
+        return m.tag === 'Bangla' || (m.category && m.category.toLowerCase().includes('bangla'));
+    }
+    if (tag === 'Foreign Movies') {
+        return m.tag === 'Foreign Movies' || (m.category && m.category.toLowerCase().includes('foreign'));
+    }
+    if (tag === '3D Movies') {
+        return m.tag === '3D Movies' || (m.category && m.category.includes('3D'));
+    }
+    if (tag === 'Top Rated') {
+        return m.tag === 'Top Rated' || (m.category && m.category.includes('Top 250')) || (m.url && m.url.includes('Top-250'));
+    }
     return m.category && m.category.toLowerCase().includes(tag.toLowerCase());
 }
 
@@ -1425,16 +1458,22 @@ function setupGlobalShortcuts() {
     });
 }
 
-function isItemNew(dateStr) {
-    if (!dateStr || typeof dateStr !== 'string') return false;
+function getMediaReleaseMarker(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return '';
     const clean = dateStr.trim();
     const match = clean.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (!match) return false;
+    if (!match) return '';
     const itemDate = new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10));
-    if (isNaN(itemDate.getTime())) return false;
+    if (isNaN(itemDate.getTime())) return '';
     const diffMs = Date.now() - itemDate.getTime();
     const diffDays = diffMs / (1000 * 60 * 60 * 24);
-    return diffDays >= 0 && diffDays <= 90;
+    
+    if (diffDays >= 0 && diffDays <= 2) {
+        return '<div class="media-marker marker-today">TODAY</div>';
+    } else if (diffDays > 2 && diffDays <= 90) {
+        return '<div class="media-marker marker-new">NEW</div>';
+    }
+    return '';
 }
 
 function renderMovieCardHtml(item) {
@@ -1443,7 +1482,8 @@ function renderMovieCardHtml(item) {
     const itemData = encodeURIComponent(JSON.stringify(item));
     const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
     const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
-    const isNew = isItemNew(item.date);
+    const markerHtml = getMediaReleaseMarker(item.date);
+    const isRecent = markerHtml.length > 0;
 
     return `
         <a class="movie-card" href="${linkUrl}">
@@ -1454,7 +1494,7 @@ function renderMovieCardHtml(item) {
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
                     <div style="font-size: 10px; font-weight: 600;">${item.title}</div>
                 </div>
-                ${isNew ? '<div class="new-release-badge">NEW</div>' : ''}
+                ${markerHtml}
                 <div class="tag-badge">${item.tag || 'HD'}</div>
                 <div class="cover-overlay">
                     <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
@@ -1470,7 +1510,7 @@ function renderMovieCardHtml(item) {
                 <div class="card-title" title="${item.title}">${item.title}</div>
                 <div class="card-meta">
                     <span>${item.size || 'HD'}</span>
-                    <span style="${isNew ? 'color: var(--primary); font-weight: 700;' : ''}">${item.date || ''}</span>
+                    <span style="${isRecent ? 'color: var(--primary); font-weight: 700;' : ''}">${item.date || ''}</span>
                 </div>
             </div>
         </a>

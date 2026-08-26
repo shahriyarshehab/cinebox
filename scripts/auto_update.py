@@ -51,19 +51,19 @@ CATEGORY_FILES = {
         "file": "kdrama.json",
         "name": "Korean Drama",
         "tag": "K-Drama",
-        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "K-Drama" or "KOREAN" in ((m[2] if isinstance(m, list) else m.get("url")) or "")
+        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "K-Drama" or "KOREAN" in ((m[2] if isinstance(m, list) else m.get("url")) or "") or "korean" in ((m[4] if isinstance(m, list) else m.get("category")) or "").lower()
     },
     "tv_series": {
         "file": "tv_series.json",
         "name": "TV & Web Series",
         "tag": "TV Series",
-        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "TV Series" or ("TV-WEB-Series" in ((m[2] if isinstance(m, list) else m.get("url")) or "") and (m[3] if isinstance(m, list) else m.get("tag")) != "K-Drama")
+        "filter": lambda m: ((m[3] if isinstance(m, list) else m.get("tag")) == "TV Series" or "TV-WEB-Series" in ((m[2] if isinstance(m, list) else m.get("url")) or "")) and (m[3] if isinstance(m, list) else m.get("tag")) != "K-Drama" and "KOREAN" not in ((m[2] if isinstance(m, list) else m.get("url")) or "") and "korean" not in ((m[4] if isinstance(m, list) else m.get("category")) or "").lower()
     },
     "hollywood": {
         "file": "hollywood.json",
         "name": "Hollywood 1080p",
         "tag": "Hollywood 1080p",
-        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "Hollywood 1080p"
+        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "Hollywood 1080p" or "English Movies (1080p)" in ((m[4] if isinstance(m, list) else m.get("category")) or "")
     },
     "bollywood": {
         "file": "bollywood.json",
@@ -81,7 +81,7 @@ CATEGORY_FILES = {
         "file": "south_original.json",
         "name": "South Original",
         "tag": "South Original",
-        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "South Original"
+        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "South Original" or ("South Movies" in ((m[4] if isinstance(m, list) else m.get("category")) or "") and "Dubbed" not in ((m[4] if isinstance(m, list) else m.get("category")) or ""))
     },
     "animation": {
         "file": "animation.json",
@@ -111,13 +111,13 @@ CATEGORY_FILES = {
         "file": "english.json",
         "name": "English Classic",
         "tag": "English Movies",
-        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "English Movies"
+        "filter": lambda m: ((m[3] if isinstance(m, list) else m.get("tag")) == "English Movies" or "English Movies" in ((m[4] if isinstance(m, list) else m.get("category")) or "")) and (m[3] if isinstance(m, list) else m.get("tag")) != "Hollywood 1080p" and "1080p" not in ((m[4] if isinstance(m, list) else m.get("category")) or "")
     },
     "top_rated": {
         "file": "top_rated.json",
         "name": "IMDb Top 250",
         "tag": "Top Rated",
-        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "Top Rated"
+        "filter": lambda m: (m[3] if isinstance(m, list) else m.get("tag")) == "Top Rated" or "Top-250" in ((m[2] if isinstance(m, list) else m.get("url")) or "")
     }
 }
 
