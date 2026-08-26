@@ -24,7 +24,7 @@ let carouselTimer = null;
 let isFullCatalogLoaded = false;
 
 const CATEGORY_ROWS = [
-    { name: "🔥 Today's Updates", tag: "Today", limit: 14 },
+    { name: "Today's Updates", tag: "Today", limit: 14 },
     { name: 'IMDb Top 250', tag: 'Top Rated', limit: 14 },
     { name: 'Animation & Anime', tag: 'Animation', limit: 14 },
     { name: 'Hollywood 1080p', tag: 'Hollywood 1080p', limit: 14 },
@@ -41,7 +41,7 @@ const CATEGORY_ROWS = [
 
 const ALL_CATEGORY_PILLS = [
     { label: 'All Categories', tag: 'All' },
-    { label: "🔥 Today's Updates", tag: 'Today' },
+    { label: "Today's Updates", tag: 'Today' },
     { label: 'IMDb Top 250', tag: 'Top Rated' },
     { label: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
     { label: 'Animation & Anime', tag: 'Animation' },
@@ -58,7 +58,7 @@ const ALL_CATEGORY_PILLS = [
 
 const TV_CATEGORY_PILLS = [
     { label: 'All TV & K-Drama', tag: 'All_TV' },
-    { label: "🔥 Today's New Series", tag: 'Today' },
+    { label: "Today's Releases", tag: 'Today' },
     { label: 'TV & Web Series', tag: 'TV Series' },
     { label: 'Korean Drama (K-Drama)', tag: 'K-Drama' },
     { label: 'Animation & Anime Series', tag: 'Animation' }
@@ -66,7 +66,7 @@ const TV_CATEGORY_PILLS = [
 
 const MOVIES_CATEGORY_PILLS = [
     { label: 'All 36,000+ Movies', tag: 'All_Movies' },
-    { label: "🔥 Today's New Movies", tag: 'Today' },
+    { label: "Today's Releases", tag: 'Today' },
     { label: 'Hollywood 1080p', tag: 'Hollywood 1080p' },
     { label: 'Bollywood (Hindi)', tag: 'Bollywood' },
     { label: 'South Action (Dubbed)', tag: 'South Action' },
@@ -80,7 +80,7 @@ const MOVIES_CATEGORY_PILLS = [
 
 const ANIMATION_CATEGORY_PILLS = [
     { label: 'All Animation & Anime', tag: 'All_Animation' },
-    { label: "🔥 Today's Anime", tag: 'Today' },
+    { label: "Today's Releases", tag: 'Today' },
     { label: 'Anime & TV Series', tag: 'TV Series' },
     { label: 'Animated Movies', tag: 'Hollywood 1080p' }
 ];
@@ -104,9 +104,8 @@ function getActivePagePills() {
 }
 
 const CATEGORY_JSON_MAP = {
-    'Today': 'data/latest.json',
-    "Today's Updates": 'data/latest.json',
-    "🔥 Today's Updates": 'data/latest.json',
+    'Today': 'data/today.json',
+    "Today's Updates": 'data/today.json',
     'K-Drama': 'data/kdrama.json',
     'TV Series': 'data/tv_series.json',
     'Hollywood 1080p': 'data/hollywood.json',
@@ -567,9 +566,8 @@ function renderHomeRowsFromPayload(categoriesMap) {
         <!-- MovieBox Quick-Category Filter Bar -->
         <div class="home-category-pills-bar">
             <div class="filter-pills-row">
-                <button class="filter-pill active" onclick="showHomeView()">🔥 All Categories</button>
                 ${ALL_CATEGORY_PILLS.map(p => `
-                    <button class="filter-pill" onclick="openCategoryView('${p.tag}', '${escapeQuotes(p.label)}')">
+                    <button class="filter-pill ${p.tag === 'All' ? 'active' : ''}" onclick="${p.tag === 'All' ? 'showHomeView()' : `openCategoryView('${p.tag}', '${escapeQuotes(p.label)}')`}">
                         ${p.label}
                     </button>
                 `).join('')}
@@ -639,9 +637,8 @@ function renderHomeRows(container) {
         <!-- MovieBox Quick-Category Filter Bar -->
         <div class="home-category-pills-bar">
             <div class="filter-pills-row">
-                <button class="filter-pill active" onclick="showHomeView()">🔥 All Categories</button>
                 ${ALL_CATEGORY_PILLS.map(p => `
-                    <button class="filter-pill" onclick="openCategoryView('${p.tag}', '${escapeQuotes(p.label)}')">
+                    <button class="filter-pill ${p.tag === 'All' ? 'active' : ''}" onclick="${p.tag === 'All' ? 'showHomeView()' : `openCategoryView('${p.tag}', '${escapeQuotes(p.label)}')`}">
                         ${p.label}
                     </button>
                 `).join('')}
@@ -1208,7 +1205,7 @@ function showRecentSearchesDropdown(dropdown) {
     if (recent.length === 0) {
         dropdown.innerHTML = `
             <div style="padding: 12px; font-size: 11.5px; color: var(--text-muted);">
-                <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">🔥 Popular Searches</div>
+                <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Trending Searches</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                     <span class="search-pill-suggestion" onclick="fillAndSearchHome('Oppenheimer')">Oppenheimer</span>
                     <span class="search-pill-suggestion" onclick="fillAndSearchHome('Solo Leveling')">Solo Leveling</span>
@@ -1224,17 +1221,17 @@ function showRecentSearchesDropdown(dropdown) {
 
     dropdown.innerHTML = `
         <div style="padding: 6px 10px 4px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border);">
-            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">🕒 Recent Searches</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Recent Searches</span>
             <button onclick="clearRecentSearches(event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; font-size: 10.5px; color: var(--accent); cursor: pointer; font-weight: 600;">Clear All</button>
         </div>
         <div style="padding: 4px 0;">
             ${recent.map(q => `
                 <div class="search-dropdown-item" style="justify-content: space-between;" onclick="fillAndSearchHome('${escapeQuotes(q)}')">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color: var(--text-dim);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        <span style="font-size: 12.5px; font-weight: 600;">${q}</span>
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13" style="color:var(--text-muted);"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <span>${escapeQuotes(q)}</span>
                     </div>
-                    <button onclick="removeRecentSearch('${escapeQuotes(q)}', event); showRecentSearchesDropdown(document.getElementById('searchDropdown'));" style="background: none; border: none; color: var(--text-dim); cursor: pointer; padding: 2px 6px; font-size: 13px;" title="Remove">✕</button>
+                    <button class="remove-search-btn" onclick="removeSingleRecentSearch(event, '${escapeQuotes(q)}')" title="Remove">✕</button>
                 </div>
             `).join('')}
         </div>
@@ -1242,12 +1239,29 @@ function showRecentSearchesDropdown(dropdown) {
     dropdown.style.display = 'block';
 }
 
-function fillAndSearchHome(query) {
+function clearRecentSearches(e) {
+    if (e) e.stopPropagation();
+    try {
+        localStorage.removeItem('cinebox_recent_searches');
+    } catch (e) {}
+}
+
+function removeSingleRecentSearch(e, query) {
+    if (e) e.stopPropagation();
+    const recent = getRecentSearches().filter(q => q.toLowerCase() !== query.toLowerCase());
+    try {
+        localStorage.setItem('cinebox_recent_searches', JSON.stringify(recent));
+    } catch (e) {}
+    showRecentSearchesDropdown(document.getElementById('searchDropdown'));
+}
+
+function fillAndSearchHome(term) {
     const input = document.getElementById('searchInput');
     if (input) {
-        input.value = query;
+        input.value = term;
         handleSearch();
     }
+    hideSearchDropdown();
 }
 
 function hideSearchDropdown() {
@@ -1325,8 +1339,10 @@ async function openSurpriseModal() {
 
     body.innerHTML = `
         <div class="surprise-loader">
-            <div class="surprise-spinner">🎲</div>
-            <div style="font-size: 14px; font-weight: 600; color: var(--primary);">Rolling the cinema dice...</div>
+            <div class="surprise-spinner">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 8h.01M8 8h.01M8 16h.01M16 16h.01M12 12h.01"/></svg>
+            </div>
+            <div style="font-size: 14px; font-weight: 600; color: var(--primary);">Discovering a recommended title...</div>
         </div>
     `;
 
@@ -1359,7 +1375,7 @@ async function openSurpriseModal() {
                     <div class="slide-tag">${randomPick.tag || 'HD Cinema'}</div>
                     <h3 style="font-size: 16px; font-weight: 800; color: #fff; line-height: 1.3;">${randomPick.title}</h3>
                     <div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 11px; color: var(--text-muted);">
-                        <span>📁 ${randomPick.category || 'Cinema'}</span>
+                        <span>${randomPick.category || 'Cinema'}</span>
                         <span>•</span>
                         <span style="color: var(--accent-gold); font-weight: 700;">★ 9.0</span>
                     </div>
@@ -1369,7 +1385,7 @@ async function openSurpriseModal() {
                             <span>${isSeries ? 'View Series' : 'Watch Now'}</span>
                         </a>
                         <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="openSurpriseModal()">
-                            <span>🎲 Roll Again</span>
+                            <span>Pick Another</span>
                         </button>
                     </div>
                 </div>
@@ -1409,13 +1425,25 @@ function setupGlobalShortcuts() {
     });
 }
 
+function isItemNew(dateStr) {
+    if (!dateStr || typeof dateStr !== 'string') return false;
+    const clean = dateStr.trim();
+    const match = clean.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!match) return false;
+    const itemDate = new Date(parseInt(match[1], 10), parseInt(match[2], 10) - 1, parseInt(match[3], 10));
+    if (isNaN(itemDate.getTime())) return false;
+    const diffMs = Date.now() - itemDate.getTime();
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+    return diffDays >= 0 && diffDays <= 90;
+}
+
 function renderMovieCardHtml(item) {
     const rawTitle = item.title || '';
     const safeTitle = escapeQuotes(rawTitle);
     const itemData = encodeURIComponent(JSON.stringify(item));
     const isSeries = item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
     const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
-    const isNew = item.date && (item.date.startsWith('2026') || item.date.startsWith('2025-11') || item.date.startsWith('2025-12'));
+    const isNew = isItemNew(item.date);
 
     return `
         <a class="movie-card" href="${linkUrl}">
@@ -1426,7 +1454,7 @@ function renderMovieCardHtml(item) {
                     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="24" height="24"><rect width="20" height="20" x="2" y="2" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
                     <div style="font-size: 10px; font-weight: 600;">${item.title}</div>
                 </div>
-                ${isNew ? '<div class="new-release-badge">🔥 NEW</div>' : ''}
+                ${isNew ? '<div class="new-release-badge">NEW</div>' : ''}
                 <div class="tag-badge">${item.tag || 'HD'}</div>
                 <div class="cover-overlay">
                     <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
@@ -1442,7 +1470,7 @@ function renderMovieCardHtml(item) {
                 <div class="card-title" title="${item.title}">${item.title}</div>
                 <div class="card-meta">
                     <span>${item.size || 'HD'}</span>
-                    <span style="${isNew ? 'color: #ff5252; font-weight: 700;' : ''}">${item.date || ''}</span>
+                    <span style="${isNew ? 'color: var(--primary); font-weight: 700;' : ''}">${item.date || ''}</span>
                 </div>
             </div>
         </a>

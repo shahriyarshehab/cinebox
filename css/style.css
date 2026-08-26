@@ -3412,38 +3412,22 @@ kbd {
 }
 
 /* ==========================================
-   🔥 Today's Updates & New Release Badges
+   New Release Badges (Past 3 Months)
    ========================================== */
 .new-release-badge {
     position: absolute;
     top: 8px;
     left: 8px;
-    background: linear-gradient(135deg, #ff0844 0%, #ffb199 100%);
-    color: #fff;
-    font-size: 9.5px;
+    background: linear-gradient(135deg, #e50914 0%, #ff3b30 100%);
+    color: #ffffff;
+    font-size: 9px;
     font-weight: 800;
-    padding: 3.5px 7.5px;
-    border-radius: 6px;
+    padding: 2.5px 6.5px;
+    border-radius: 4px;
     z-index: 4;
-    box-shadow: 0 0 12px rgba(255, 8, 68, 0.7);
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
-    animation: pulseFire 2.2s infinite ease-in-out;
-}
-
-@keyframes pulseFire {
-    0% {
-        box-shadow: 0 0 8px rgba(255, 8, 68, 0.6);
-        transform: scale(1);
-    }
-    50% {
-        box-shadow: 0 0 16px rgba(255, 8, 68, 0.9), 0 0 24px rgba(255, 177, 153, 0.5);
-        transform: scale(1.05);
-    }
-    100% {
-        box-shadow: 0 0 8px rgba(255, 8, 68, 0.6);
-        transform: scale(1);
-    }
+    box-shadow: 0 2px 8px rgba(229, 9, 20, 0.45);
 }
 
 

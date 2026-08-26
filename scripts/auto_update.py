@@ -272,18 +272,24 @@ def run_auto_update():
         json.dump(latest_300, f, ensure_ascii=False, separators=(",", ":"))
     print(f"[+] Created data/latest.json with {len(latest_300)} newest items")
 
-    # 6. Build data/today.json (Items uploaded today or newest date)
+    # 6. Build data/today.json (Items uploaded on actual today's date or latest single date)
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     today_items = [m for m in all_movies_sorted if (m[6] if len(m) > 6 else '').startswith(today_str)]
     if not today_items and latest_300:
-        today_items = latest_300[:40]
+        # Find latest single date in database
+        latest_date = latest_300[0][6][:10] if len(latest_300[0]) > 6 else ''
+        if latest_date:
+            today_items = [m for m in latest_300 if (m[6] if len(m) > 6 else '').startswith(latest_date)]
+        else:
+            today_items = latest_300[:20]
+
     with open(TODAY_FILE, "w", encoding="utf-8") as f:
         json.dump(today_items, f, ensure_ascii=False, separators=(",", ":"))
-    print(f"[+] Created data/today.json with {len(today_items)} Today's Update items")
+    print(f"[+] Created data/today.json with {len(today_items)} items for {today_str}")
 
     # 7. Split into category files
     home_categories = {
-        "🔥 Today's Updates": latest_300[:16]
+        "Today's Updates": today_items[:16] if today_items else latest_300[:16]
     }
 
     for cat_key, cat_info in CATEGORY_FILES.items():

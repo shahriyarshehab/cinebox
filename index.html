@@ -67,7 +67,7 @@
         <div class="header-actions">
             <!-- Surprise Me Button -->
             <button class="btn-surprise" onclick="openSurpriseModal()" title="Random movie pick">
-                <span class="dice-icon">🎲</span>
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 8h.01M8 8h.01M8 16h.01M16 16h.01M12 12h.01"/></svg>
                 <span class="surprise-text">Surprise Me</span>
             </button>
 
@@ -141,16 +141,18 @@
     <div class="modal" id="surpriseModal">
         <div class="modal-card surprise-modal-card">
             <div class="modal-header">
-                <div style="display: flex; align-items: center; gap: 10px; font-weight: 700;">
-                    <span style="font-size: 20px;">🎲</span>
-                    <span style="font-size: 16px; font-family: var(--font-display);">Surprise Movie Pick</span>
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: var(--primary);"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 8h.01M8 8h.01M8 16h.01M16 16h.01M12 12h.01"/></svg>
+                    <span style="font-size: 16px; font-family: var(--font-display);">Surprise Pick</span>
                 </div>
                 <button class="btn-close" onclick="closeSurpriseModal()">✕</button>
             </div>
             <div class="modal-body" id="surpriseModalBody">
                 <div class="surprise-loader">
-                    <div class="surprise-spinner">🎲</div>
-                    <div style="font-size: 14px; font-weight: 600; color: var(--primary);">Rolling the cinema dice...</div>
+                    <div class="surprise-spinner">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 8h.01M8 8h.01M8 16h.01M16 16h.01M12 12h.01"/></svg>
+                    </div>
+                    <div style="font-size: 14px; font-weight: 600; color: var(--primary);">Discovering a recommended title...</div>
                 </div>
             </div>
         </div>
@@ -160,7 +162,10 @@
     <div class="modal" id="shortcutsModal">
         <div class="modal-card" style="max-width: 520px;">
             <div class="modal-header">
-                <div style="font-size: 16px; font-weight: 700; font-family: var(--font-display);">⌨️ Keyboard Shortcuts</div>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; font-family: var(--font-display);">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18" style="color: var(--primary);"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M8 12h.01M12 12h.01M16 12h.01M7 16h10"/></svg>
+                    <span>Keyboard Shortcuts</span>
+                </div>
                 <button class="btn-close" onclick="toggleShortcutsModal()">✕</button>
             </div>
             <div class="modal-body" style="gap: 12px;">
@@ -178,7 +183,9 @@
     <!-- PWA Install Banner -->
     <div class="pwa-banner" id="pwaBanner" style="display: none;">
         <div class="pwa-banner-content">
-            <div class="pwa-icon">🎬</div>
+            <div class="pwa-icon">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
             <div>
                 <div style="font-size: 13.5px; font-weight: 700; color: #fff;">Install CineBox App</div>
                 <div style="font-size: 11px; color: var(--text-muted);">Instant streaming & standalone app</div>
