@@ -235,7 +235,7 @@
                         <span>VLC Player</span>
                     </button>
                     <button class="btn btn-ghost" onclick="openInMXPlayer()" style="border-color: rgba(0, 180, 216, 0.4); color: #00b4d8;">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                        <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><path d="M24,2.5A21.5,21.5,0,1,0,45.5,24,21.51,21.51,0,0,0,24,2.5ZM18.07,13.14a1.42,1.42,0,0,1,.82.23l15.75,10.2a1.44,1.44,0,0,1,0,2.41L18.89,36.18A1.44,1.44,0,0,1,16.67,35V14.57a1.43,1.43,0,0,1,1.4-1.43Z"/></svg>
                         <span>MX Player</span>
                     </button>
                     <button class="btn btn-ghost" onclick="openInPotPlayer()" style="border-color: rgba(255, 184, 0, 0.4); color: var(--accent-gold);">
@@ -267,90 +267,267 @@
     <!-- ================================================================= -->
     <!-- 📺 2. FOCUSED ONLINE PLAYER VIEW (Opened on "Watch Online" Click) -->
     <!-- ================================================================= -->
+    <!-- ================================================================= -->
+    <!-- 📺 2. FOCUSED ONLINE PLAYER VIEW (Opened on "Watch Online" Click) -->
+    <!-- ================================================================= -->
     <main class="player-fullscreen-layout" id="playerView" style="display: none;">
         
         <!-- Player Top Navigation Bar -->
         <div class="player-top-bar">
-            <button class="btn btn-ghost" onclick="exitPlayerMode()" style="padding: 7px 14px; font-size: 12.5px; border-radius: 20px;">
-                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back to Details</span>
-            </button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button class="btn btn-ghost" onclick="exitPlayerMode()" style="padding: 7px 14px; font-size: 12.5px; border-radius: 20px;">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <span>Back to Details</span>
+                </button>
+                <div class="player-view-badge" id="playerMediaTypeBadge">
+                    <span class="player-live-dot"></span>
+                    <span id="playerMediaBadgeText">Now Playing</span>
+                </div>
+            </div>
 
-            <div class="player-view-badge" id="playerMediaTypeBadge">
-                <span class="player-live-dot"></span>
-                <span id="playerMediaBadgeText">Now Playing</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <!-- Quick Customize Button on Top Bar -->
+                <button class="btn btn-custom-accent" onclick="openPlayerCustomModal()" title="Customize Video Player Screen (S)">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <span>⚙️ Customize Player</span>
+                </button>
             </div>
         </div>
 
-        <!-- Video Player Section -->
-        <div class="player-cinema-box">
-            <div class="player-bar">
-                <div class="player-title-wrap">
-                    <span class="player-live-dot"></span>
-                    <span id="playerCurrentTitle">Playing Media</span>
-                </div>
+        <!-- Ambient Cinema Glow Layer behind video -->
+        <div class="player-stage-wrap">
+            <div class="player-ambient-glow" id="playerAmbientGlow"></div>
 
-                <div class="player-controls-right">
-                    <!-- Subtitles (CC) Button & Hidden File Picker -->
-                    <input type="file" id="subFileInput" accept=".srt,.vtt,.sub" style="display: none;" onchange="handleSubtitleFileSelect(event)">
-                    <button class="player-mini-btn" id="subBtn" onclick="toggleSubtitles()" title="Subtitles (CC) / Load .srt file">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 10h3M6 14h2M14 10h4M14 14h3"/></svg>
-                        <span>CC</span>
-                    </button>
+            <!-- Video Player Box Container -->
+            <div class="player-cinema-box" id="playerCinemaBox">
+                <!-- Video Container with Custom Layering & Overlay Controls -->
+                <div class="video-container" id="videoContainer">
+                    <video id="videoPlayer" playsinline preload="metadata" style="width: 100%; aspect-ratio: 16/9; max-height: 580px; outline: none; background: #000;"></video>
+                    
+                    <!-- Dynamic Subtitle Rendering Layer -->
+                    <div class="custom-subtitle-layer" id="customSubtitleLayer" style="display: none;"></div>
 
-                    <!-- Speed Selector -->
-                    <button class="player-mini-btn" id="speedBtn" onclick="cyclePlaybackSpeed()" title="Playback Speed">
-                        <span id="speedLabel">1.0x</span>
-                    </button>
-
-                    <!-- Aspect Ratio Selector -->
-                    <button class="player-mini-btn" id="aspectBtn" onclick="cycleAspectRatio()" title="Aspect Ratio">
-                        <span id="aspectLabel">Fit</span>
-                    </button>
-
-                    <!-- PiP Toggle -->
-                    <button class="player-mini-btn" onclick="togglePictureInPicture()" title="Picture-in-Picture">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
-                    </button>
-
-                    <!-- Prev/Next Episode buttons -->
-                    <div id="playerNavBtns" style="display: none; gap: 4px;">
-                        <button class="btn btn-ghost" style="padding: 3px 8px; font-size: 11px;" onclick="playPrevEpisode()" title="Previous Episode (P)">◀</button>
-                        <button class="btn btn-primary" style="padding: 3px 8px; font-size: 11px;" onclick="playNextEpisode()" title="Next Episode (N)">Next ▶</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Video Player Element with Double-Tap Seek Zones -->
-            <div class="video-container" id="videoContainer">
-                <video id="videoPlayer" controls playsinline preload="metadata" style="width: 100%; aspect-ratio: 16/9; max-height: 580px; outline: none; background: #000;"></video>
-                
-                <!-- Double-Tap Touch Seek Overlay -->
-                <div class="touch-seek-overlay" id="touchSeekOverlay">
-                    <div class="seek-touch-zone left" id="seekTouchLeft">
-                        <div class="seek-ripple" id="seekRippleLeft">
-                            <span style="font-size: 16px;">⏪</span>
-                            <span>-10s</span>
+                    <!-- Double-Tap Touch Seek Overlay (Left / Right) -->
+                    <div class="touch-seek-overlay" id="touchSeekOverlay">
+                        <div class="seek-touch-zone left" id="seekTouchLeft">
+                            <div class="seek-ripple" id="seekRippleLeft">
+                                <span class="seek-icon">⏪</span>
+                                <span class="seek-text" id="seekLeftText">-10s</span>
+                            </div>
+                        </div>
+                        <div class="seek-touch-zone right" id="seekTouchRight">
+                            <div class="seek-ripple" id="seekRippleRight">
+                                <span class="seek-icon">⏩</span>
+                                <span class="seek-text" id="seekRightText">+10s</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="seek-touch-zone right" id="seekTouchRight">
-                        <div class="seek-ripple" id="seekRippleRight">
-                            <span style="font-size: 16px;">⏩</span>
-                            <span>+10s</span>
+
+                    <!-- On-Screen Gesture HUD Indicators -->
+                    <div class="gesture-hud-container" id="gestureHudContainer">
+                        <!-- Brightness HUD -->
+                        <div class="gesture-hud" id="hudBrightness" style="display: none;">
+                            <div class="hud-icon">☀️</div>
+                            <div class="hud-bar-wrap">
+                                <div class="hud-bar-fill" id="hudBrightnessFill" style="height: 70%;"></div>
+                            </div>
+                            <div class="hud-value" id="hudBrightnessVal">100%</div>
+                        </div>
+
+                        <!-- Volume / Audio Boost HUD -->
+                        <div class="gesture-hud" id="hudVolume" style="display: none;">
+                            <div class="hud-icon" id="hudVolumeIcon">🔊</div>
+                            <div class="hud-bar-wrap">
+                                <div class="hud-bar-fill" id="hudVolumeFill" style="height: 100%;"></div>
+                            </div>
+                            <div class="hud-value" id="hudVolumeVal">100%</div>
+                        </div>
+
+                        <!-- Seek HUD Indicator -->
+                        <div class="gesture-seek-hud" id="hudSeek" style="display: none;">
+                            <div class="seek-hud-title" id="hudSeekTitle">Seeking</div>
+                            <div class="seek-hud-time" id="hudSeekTime">00:00</div>
+                            <div class="seek-hud-diff" id="hudSeekDiff">+0s</div>
+                        </div>
+
+                        <!-- Center Play/Pause Animated Ripple -->
+                        <div class="center-play-ripple" id="centerPlayRipple">
+                            <svg class="center-icon icon" viewBox="0 0 24 24" fill="currentColor" width="36" height="36" id="centerPlayIcon"><path d="M8 5v14l11-7z"/></svg>
                         </div>
                     </div>
-                </div>
 
-                <!-- Next Episode Countdown Overlay -->
-                <div class="next-ep-countdown" id="nextEpCountdown" style="display: none;">
-                    <div class="next-ep-box">
-                        <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Up Next</div>
-                        <div class="next-ep-title" id="nextEpTitle">Next Episode</div>
-                        <div class="next-ep-timer">Playing in <span id="countdownSecs">8</span>s</div>
-                        <div style="display: flex; gap: 8px; margin-top: 8px;">
-                            <button class="btn btn-primary" style="padding: 5px 12px; font-size: 11.5px;" onclick="confirmNextEpisode()">Play Now</button>
-                            <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="cancelNextEpisode()">Cancel</button>
+                    <!-- Mobile Screen Lock Shield -->
+                    <div class="screen-lock-shield" id="screenLockShield" style="display: none;">
+                        <button class="btn-unlock-pill" onclick="unlockPlayerScreen()">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <span>Screen Locked • Tap to Unlock</span>
+                        </button>
+                    </div>
+
+                    <!-- Next Episode Countdown Overlay -->
+                    <div class="next-ep-countdown" id="nextEpCountdown" style="display: none;">
+                        <div class="next-ep-box">
+                            <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px;">Up Next</div>
+                            <div class="next-ep-title" id="nextEpTitle">Next Episode</div>
+                            <div class="next-ep-timer">Playing in <span id="countdownSecs">8</span>s</div>
+                            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                                <button class="btn btn-primary" style="padding: 5px 12px; font-size: 11.5px;" onclick="confirmNextEpisode()">Play Now</button>
+                                <button class="btn btn-ghost" style="padding: 5px 10px; font-size: 11.5px;" onclick="cancelNextEpisode()">Cancel</button>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- ================================================= -->
+                    <!-- 🎛️ CINEBOX CUSTOM PLAYER CONTROLS OVERLAY       -->
+                    <!-- ================================================= -->
+                    <div class="custom-player-controls" id="customPlayerControls">
+                        
+                        <!-- Top Controls Bar -->
+                        <div class="cp-top-bar">
+                            <div class="cp-title-wrap">
+                                <span class="player-live-dot"></span>
+                                <span class="cp-title" id="cpMediaTitle">Playing Media</span>
+                                <span class="cp-badge" id="cpQualityBadge">1080p HD</span>
+                                <span class="cp-badge cp-badge-accent" id="cpFilterBadge" style="display: none;">HDR</span>
+                                <span class="cp-badge cp-badge-boost" id="cpBoostBadge" style="display: none;">Boost 150%</span>
+                            </div>
+
+                            <div class="cp-top-actions">
+                                <!-- Screen Lock Toggle (Mobile friendly) -->
+                                <button class="cp-btn-icon" id="btnLockScreen" onclick="lockPlayerScreen()" title="Lock Screen Touches">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                </button>
+
+                                <!-- Ambient Glow Toggle -->
+                                <button class="cp-btn-icon" id="btnAmbientToggle" onclick="toggleAmbientGlow()" title="Toggle Ambient Cinema Glow">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                                </button>
+
+                                <!-- Open Player Customizer -->
+                                <button class="cp-btn-pill cp-btn-customizer" onclick="openPlayerCustomModal()" title="Customize Video Player Settings (S)">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                    <span>Customize</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Center Tap / Click Area -->
+                        <div class="cp-center-area" id="cpCenterArea"></div>
+
+                        <!-- Bottom Controls Area -->
+                        <div class="cp-bottom-bar">
+                            
+                            <!-- Custom Scrubber / Progress Bar -->
+                            <div class="cp-scrubber-container" id="customScrubberWrap">
+                                <div class="cp-scrubber-track">
+                                    <div class="cp-scrubber-buffered" id="scrubberBuffer" style="width: 0%;"></div>
+                                    <div class="cp-scrubber-played" id="scrubberProgress" style="width: 0%;">
+                                        <div class="cp-scrubber-thumb" id="scrubberThumb"></div>
+                                    </div>
+                                </div>
+                                <div class="cp-scrubber-tooltip" id="scrubberTooltip">00:00</div>
+                            </div>
+
+                            <!-- Controls Row -->
+                            <div class="cp-controls-row">
+                                <!-- Left Control Group -->
+                                <div class="cp-controls-left">
+                                    <!-- Play/Pause Toggle -->
+                                    <button class="cp-btn cp-btn-play" id="btnCustomPlayPause" onclick="togglePlayPause()" title="Play / Pause (Space / K)">
+                                        <svg class="icon icon-play" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                        <svg class="icon icon-pause" viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="display: none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                                    </button>
+
+                                    <!-- Rewind / Step Back -->
+                                    <button class="cp-btn cp-btn-step" onclick="seekRelative(-10, 'left')" id="btnCustomRewind" title="Rewind 10s (J / Left Arrow)">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg>
+                                        <span class="cp-step-label" id="stepRewindLabel">10</span>
+                                    </button>
+
+                                    <!-- Forward / Step Forward -->
+                                    <button class="cp-btn cp-btn-step" onclick="seekRelative(10, 'right')" id="btnCustomForward" title="Forward 10s (L / Right Arrow)">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg>
+                                        <span class="cp-step-label" id="stepForwardLabel">10</span>
+                                    </button>
+
+                                    <!-- Prev / Next Episode Buttons (If TV Series) -->
+                                    <div class="cp-series-nav" id="cpSeriesNav" style="display: none;">
+                                        <button class="cp-btn" onclick="playPrevEpisode()" title="Previous Episode (P)">
+                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+                                        </button>
+                                        <button class="cp-btn" onclick="playNextEpisode()" title="Next Episode (N)">
+                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="13" height="13"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Volume Slider & Mute Toggle -->
+                                    <div class="cp-volume-group" id="cpVolumeGroup">
+                                        <button class="cp-btn" id="btnCustomMute" onclick="toggleMute()" title="Mute / Unmute (M)">
+                                            <svg class="icon icon-vol-high" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                                            <svg class="icon icon-vol-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15" style="display: none;"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+                                        </button>
+                                        <div class="cp-volume-slider-wrap">
+                                            <input type="range" class="cp-volume-slider" id="customVolumeSlider" min="0" max="100" value="100" oninput="handleVolumeSlider(this.value)">
+                                        </div>
+                                    </div>
+
+                                    <!-- Time Display (Click to toggle Remaining Time) -->
+                                    <div class="cp-time-display" id="customTimeDisplay" onclick="toggleTimeRemainingMode()" title="Click to toggle Elapsed / Remaining time">
+                                        <span id="cpCurrentTime">00:00</span>
+                                        <span class="cp-time-divider">/</span>
+                                        <span id="cpTotalDuration">00:00</span>
+                                    </div>
+                                </div>
+
+                                <!-- Right Control Group -->
+                                <div class="cp-controls-right">
+                                    
+                                    <!-- Subtitle Toggle & File Picker -->
+                                    <input type="file" id="subFileInput" accept=".srt,.vtt,.sub" style="display: none;" onchange="handleSubtitleFileSelect(event)">
+                                    <button class="cp-btn cp-btn-badge" id="subBtn" onclick="toggleSubtitles()" title="Subtitles (CC) / Load File (C)">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 10h3M6 14h2M14 10h4M14 14h3"/></svg>
+                                        <span>CC</span>
+                                    </button>
+
+                                    <!-- Speed Selector -->
+                                    <button class="cp-btn cp-btn-badge" id="speedBtn" onclick="cyclePlaybackSpeed()" title="Playback Speed">
+                                        <span id="speedLabel">1.0x</span>
+                                    </button>
+
+                                    <!-- Aspect Ratio Selector -->
+                                    <button class="cp-btn cp-btn-badge" id="aspectBtn" onclick="cycleAspectRatio()" title="Aspect Ratio Fit Mode">
+                                        <span id="aspectLabel">Fit</span>
+                                    </button>
+
+                                    <!-- Video Filter Quick Toggle -->
+                                    <button class="cp-btn cp-btn-badge" id="filterBtn" onclick="cycleVideoFilter()" title="Video Color Filter Preset (HDR/Warm/Night)">
+                                        <span id="filterLabel">Filter</span>
+                                    </button>
+
+                                    <!-- Picture-in-Picture -->
+                                    <button class="cp-btn" onclick="togglePictureInPicture()" title="Picture-in-Picture (PiP)">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="18" height="12" x="3" y="6" rx="2"/><rect width="7" height="5" x="12" y="11" rx="1"/></svg>
+                                    </button>
+
+                                    <!-- Theater Mode Toggle -->
+                                    <button class="cp-btn" onclick="toggleTheaterMode()" id="btnTheaterMode" title="Theater Mode (T)">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="20" height="16" x="2" y="4" rx="2"/><line x1="2" y1="8" x2="22" y2="8"/></svg>
+                                    </button>
+
+                                    <!-- Player Customizer Studio Settings Trigger -->
+                                    <button class="cp-btn cp-btn-settings" onclick="openPlayerCustomModal()" title="Open Player Customizer Studio (S)">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                                    </button>
+
+                                    <!-- Fullscreen Toggle -->
+                                    <button class="cp-btn" onclick="togglePlayerFullscreen()" id="btnCustomFullscreen" title="Toggle Fullscreen (F)">
+                                        <svg class="icon icon-fullscreen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                                        <svg class="icon icon-exit-fullscreen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" style="display: none;"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -455,6 +632,113 @@
         </div>
     </div>
 
+    <!-- 🎬 External Players Hub Modal -->
+    <div class="modal" id="externalPlayersModal">
+        <div class="modal-card" style="max-width: 580px; width: 95%; padding: 0; overflow: hidden; border-radius: var(--radius-lg); background: var(--bg-surface); border: 1px solid var(--border); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.95);">
+            <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border); margin-bottom: 0;">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(0, 229, 255, 0.12); border: 1px solid rgba(0, 229, 255, 0.3); display: flex; align-items: center; justify-content: center; color: var(--primary); box-shadow: 0 0 12px var(--primary-glow);">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size: 16px; font-weight: 800; font-family: var(--font-display); color: #fff;">Play in External Player</div>
+                        <div style="font-size: 11.5px; color: var(--text-muted);" id="extModalMediaTitle">Select your preferred media app for 1-tap direct stream</div>
+                    </div>
+                </div>
+                <button class="btn-close" onclick="closeExternalPlayersModal()">✕</button>
+            </div>
+            <div class="modal-body" style="padding: 18px 20px; display: flex; flex-direction: column; gap: 12px;">
+                <div class="ext-player-list" style="display: flex; flex-direction: column; gap: 10px;">
+                    <!-- VLC Media Player -->
+                    <div class="ext-player-card" onclick="openCurrentInVLC()">
+                        <div class="ext-icon-badge" style="background: rgba(255, 107, 0, 0.15); border-color: rgba(255, 107, 0, 0.4); color: #ff6b00;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 2L4 18h16L12 2zm0 4.2L16.5 15h-9L12 6.2zM2 20h20v2H2z"/></svg>
+                        </div>
+                        <div class="ext-details">
+                            <div class="ext-title-row">
+                                <span class="ext-name">VLC Media Player</span>
+                                <span class="ext-pill-rec">Recommended</span>
+                            </div>
+                            <div class="ext-desc">Direct stream playback on Mobile (Android Intent) and Web/Desktop without downloading any files.</div>
+                        </div>
+                        <button class="btn btn-vlc" style="padding: 7px 14px; font-size: 12px; border-radius: 20px;">
+                            <span>Launch VLC</span>
+                        </button>
+                    </div>
+
+                    <!-- MX Player -->
+                    <div class="ext-player-card" onclick="openInMXPlayer()">
+                        <div class="ext-icon-badge" style="background: rgba(0, 180, 216, 0.15); border-color: rgba(0, 180, 216, 0.4); color: #00b4d8;">
+                            <svg class="icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M24,2.5A21.5,21.5,0,1,0,45.5,24,21.51,21.51,0,0,0,24,2.5ZM18.07,13.14a1.42,1.42,0,0,1,.82.23l15.75,10.2a1.44,1.44,0,0,1,0,2.41L18.89,36.18A1.44,1.44,0,0,1,16.67,35V14.57a1.43,1.43,0,0,1,1.4-1.43Z"/></svg>
+                        </div>
+                        <div class="ext-details">
+                            <div class="ext-title-row">
+                                <span class="ext-name">MX Player (Android)</span>
+                            </div>
+                            <div class="ext-desc">HW+ hardware acceleration & multi-core decoding with swipe gestures.</div>
+                        </div>
+                        <button class="btn btn-ghost" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; color: #00b4d8; border-color: rgba(0, 180, 216, 0.4);">
+                            <span>Launch MX</span>
+                        </button>
+                    </div>
+
+                    <!-- PotPlayer -->
+                    <div class="ext-player-card" onclick="openInPotPlayer()">
+                        <div class="ext-icon-badge" style="background: rgba(255, 184, 0, 0.15); border-color: rgba(255, 184, 0, 0.4); color: var(--accent-gold);">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        </div>
+                        <div class="ext-details">
+                            <div class="ext-title-row">
+                                <span class="ext-name">PotPlayer (PC)</span>
+                            </div>
+                            <div class="ext-desc">Ultra lightweight, smooth 4K HDR playback for Windows desktop.</div>
+                        </div>
+                        <button class="btn btn-ghost" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; color: var(--accent-gold); border-color: rgba(255, 184, 0, 0.4);">
+                            <span>Launch PC</span>
+                        </button>
+                    </div>
+
+                    <!-- System Video Player Chooser -->
+                    <div class="ext-player-card" onclick="openInSystemChooser()">
+                        <div class="ext-icon-badge" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: #c084fc;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                        </div>
+                        <div class="ext-details">
+                            <div class="ext-title-row">
+                                <span class="ext-name">Other Installed Players</span>
+                            </div>
+                            <div class="ext-desc">Open system player menu to choose MPV, Just Player, Nova, or KMPlayer.</div>
+                        </div>
+                        <button class="btn btn-ghost" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; color: #c084fc; border-color: rgba(168, 85, 247, 0.4);">
+                            <span>Open App</span>
+                        </button>
+                    </div>
+
+                    <!-- Direct Stream Link -->
+                    <div class="ext-player-card" onclick="copyCurrentStreamUrl()">
+                        <div class="ext-icon-badge" style="background: rgba(0, 229, 255, 0.15); border-color: rgba(0, 229, 255, 0.4); color: var(--primary);">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                        </div>
+                        <div class="ext-details">
+                            <div class="ext-title-row">
+                                <span class="ext-name">Copy Direct Stream URL</span>
+                            </div>
+                            <div class="ext-desc">Copy high-speed BDIX stream URL to paste into any network player or Smart TV.</div>
+                        </div>
+                        <button class="btn btn-ghost" style="padding: 7px 14px; font-size: 12px; border-radius: 20px;">
+                            <span>Copy Link</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border); font-size: 11.5px; color: var(--text-muted);">
+                    <span>Need a playlist file for Smart TV or IDM?</span>
+                    <button class="btn-text-action" onclick="exportStreamM3u()">Export .m3u Playlist</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- PWA Install Banner -->
     <div class="pwa-banner" id="pwaBanner" style="display: none;">
         <div class="pwa-banner-content">
@@ -469,6 +753,542 @@
         <div style="display: flex; gap: 8px;">
             <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="installPwaApp()">Install</button>
             <button class="btn btn-ghost" style="padding: 6px 10px; font-size: 12px;" onclick="dismissPwaBanner()">✕</button>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- 🎛️ COMPREHENSIVE PLAYER CUSTOMIZATION STUDIO MODAL                -->
+    <!-- ================================================================= -->
+    <div class="modal player-custom-modal" id="playerCustomModal">
+        <div class="modal-card player-custom-card">
+            <!-- Modal Header -->
+            <div class="modal-header custom-modal-header">
+                <div class="custom-modal-title">
+                    <div class="modal-title-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size: 16px; font-weight: 800; font-family: var(--font-display); color: #fff;">Player Customization Studio</div>
+                        <div style="font-size: 11.5px; color: var(--text-muted);">Configure video filters, audio boost, subtitles, gesture controls & theme</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button class="btn btn-ghost" onclick="resetPlayerSettingsToDefaults()" style="padding: 5px 12px; font-size: 11.5px; border-radius: 20px;" title="Reset all settings to factory default">
+                        <span>↺ Reset Defaults</span>
+                    </button>
+                    <button class="btn-close" onclick="closePlayerCustomModal()">✕</button>
+                </div>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="custom-nav-tabs">
+                <button class="custom-tab-btn active" id="tabBtnVisuals" onclick="switchCustomTab('tabVisuals')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                    <span>Visuals & Filters</span>
+                </button>
+                <button class="custom-tab-btn" id="tabBtnAudio" onclick="switchCustomTab('tabAudio')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+                    <span>Audio Booster</span>
+                </button>
+                <button class="custom-tab-btn" id="tabBtnSubtitles" onclick="switchCustomTab('tabSubtitles')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 10h3M6 14h2M14 10h4M14 14h3"/></svg>
+                    <span>Subtitles (CC)</span>
+                </button>
+                <button class="custom-tab-btn" id="tabBtnPlayback" onclick="switchCustomTab('tabPlayback')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Gestures & Touch</span>
+                </button>
+                <button class="custom-tab-btn" id="tabBtnThemes" onclick="switchCustomTab('tabThemes')">
+                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2z"/></svg>
+                    <span>Themes & Timer</span>
+                </button>
+            </div>
+
+            <!-- Tab Body Panels -->
+            <div class="modal-body custom-modal-body">
+                
+                <!-- ============================================== -->
+                <!-- 🎨 TAB 1: VISUALS & VIDEO FILTERS              -->
+                <!-- ============================================== -->
+                <div class="custom-tab-panel active" id="tabVisuals">
+                    
+                    <!-- Presets Grid -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Video Color Enhancement Presets</span>
+                            <span class="custom-badge" id="customFilterActiveName">Normal</span>
+                        </div>
+                        <div class="custom-presets-grid">
+                            <button class="preset-card active" data-filter="normal" onclick="applyVideoFilterPreset('normal')">
+                                <div class="preset-icon">🎬</div>
+                                <div class="preset-name">Standard</div>
+                                <div class="preset-desc">Original untouched stream</div>
+                            </button>
+                            <button class="preset-card" data-filter="vivid" onclick="applyVideoFilterPreset('vivid')">
+                                <div class="preset-icon">✨</div>
+                                <div class="preset-name">Vivid HDR</div>
+                                <div class="preset-desc">+35% Vibrance & Dynamic Contrast</div>
+                            </button>
+                            <button class="preset-card" data-filter="cinema" onclick="applyVideoFilterPreset('cinema')">
+                                <div class="preset-icon">🍿</div>
+                                <div class="preset-name">Cinema Warm</div>
+                                <div class="preset-desc">3200K Rich Filmic Look</div>
+                            </button>
+                            <button class="preset-card" data-filter="night" onclick="applyVideoFilterPreset('night')">
+                                <div class="preset-icon">🌙</div>
+                                <div class="preset-name">Night Shield</div>
+                                <div class="preset-desc">Blue-light filter for eye comfort</div>
+                            </button>
+                            <button class="preset-card" data-filter="crisp" onclick="applyVideoFilterPreset('crisp')">
+                                <div class="preset-icon">💎</div>
+                                <div class="preset-name">Crisp 4K</div>
+                                <div class="preset-desc">Enhanced edge definition</div>
+                            </button>
+                            <button class="preset-card" data-filter="oled" onclick="applyVideoFilterPreset('oled')">
+                                <div class="preset-icon">⬛</div>
+                                <div class="preset-name">OLED Black</div>
+                                <div class="preset-desc">Deep shadows & deep blacks</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Fine-Tuning Sliders -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Manual Fine-Tuning</span>
+                            <button class="btn-text-action" onclick="resetVideoSliders()">Reset Sliders</button>
+                        </div>
+                        <div class="custom-sliders-grid">
+                            <div class="custom-slider-row">
+                                <div class="slider-header">
+                                    <span class="slider-title">☀️ Brightness</span>
+                                    <span class="slider-val" id="valSliderBrightness">100%</span>
+                                </div>
+                                <input type="range" class="custom-range" id="sliderBrightness" min="50" max="160" value="100" oninput="handleVideoFilterChange('brightness', this.value)">
+                            </div>
+                            <div class="custom-slider-row">
+                                <div class="slider-header">
+                                    <span class="slider-title">🌓 Contrast</span>
+                                    <span class="slider-val" id="valSliderContrast">100%</span>
+                                </div>
+                                <input type="range" class="custom-range" id="sliderContrast" min="50" max="160" value="100" oninput="handleVideoFilterChange('contrast', this.value)">
+                            </div>
+                            <div class="custom-slider-row">
+                                <div class="slider-header">
+                                    <span class="slider-title">🎨 Saturation (Vibrance)</span>
+                                    <span class="slider-val" id="valSliderSaturation">100%</span>
+                                </div>
+                                <input type="range" class="custom-range" id="sliderSaturation" min="50" max="200" value="100" oninput="handleVideoFilterChange('saturation', this.value)">
+                            </div>
+                            <div class="custom-slider-row">
+                                <div class="slider-header">
+                                    <span class="slider-title">🌈 Hue Shift</span>
+                                    <span class="slider-val" id="valSliderHue">0°</span>
+                                </div>
+                                <input type="range" class="custom-range" id="sliderHue" min="-30" max="30" value="0" oninput="handleVideoFilterChange('hue', this.value)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ambient Cinema Glow Controls -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Ambient Cinema Lighting Glow</span>
+                            <span class="custom-badge" id="valAmbientStatus">Active</span>
+                        </div>
+                        <div class="custom-choice-row">
+                            <button class="choice-chip active" id="chipAmbientSync" onclick="setAmbientGlowMode('sync')">Dynamic Sync</button>
+                            <button class="choice-chip" id="chipAmbientAccent" onclick="setAmbientGlowMode('accent')">Theme Glow</button>
+                            <button class="choice-chip" id="chipAmbientOff" onclick="setAmbientGlowMode('off')">Off</button>
+                        </div>
+                        <div class="custom-slider-row" style="margin-top: 10px;">
+                            <div class="slider-header">
+                                <span class="slider-title">Glow Intensity</span>
+                                <span class="slider-val" id="valSliderAmbient">75%</span>
+                            </div>
+                            <input type="range" class="custom-range" id="sliderAmbient" min="20" max="100" value="75" oninput="handleAmbientIntensityChange(this.value)">
+                        </div>
+                    </div>
+
+                    <!-- Aspect Ratio Fitting Options -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Screen Aspect Ratio & Fit Mode</span>
+                            <span class="custom-badge" id="valAspectMode">Fit (Contain)</span>
+                        </div>
+                        <div class="custom-choice-row">
+                            <button class="choice-chip active" id="chipAspectContain" onclick="setPlayerAspectRatio('contain')">Fit Screen</button>
+                            <button class="choice-chip" id="chipAspectCover" onclick="setPlayerAspectRatio('cover')">Fill / Crop Black Bars</button>
+                            <button class="choice-chip" id="chipAspect169" onclick="setPlayerAspectRatio('16/9')">16:9 Cinema</button>
+                            <button class="choice-chip" id="chipAspect43" onclick="setPlayerAspectRatio('4/3')">4:3 Retro</button>
+                            <button class="choice-chip" id="chipAspect219" onclick="setPlayerAspectRatio('21/9')">21:9 Ultrawide</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ============================================== -->
+                <!-- 🔊 TAB 2: AUDIO & BOOSTER                      -->
+                <!-- ============================================== -->
+                <div class="custom-tab-panel" id="tabAudio">
+                    
+                    <!-- Volume Booster -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Master Audio Volume Booster (Web Audio Gain)</span>
+                            <span class="custom-badge custom-badge-boost" id="valAudioBoostText">100% (Normal)</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                            Boost volume up to 300% for quiet movie rips and whispered audio tracks.
+                        </div>
+                        <div class="custom-slider-row">
+                            <div class="slider-header">
+                                <span class="slider-title">Amplification Gain</span>
+                                <span class="slider-val" id="valAudioGainSlider">100%</span>
+                            </div>
+                            <input type="range" class="custom-range" id="sliderAudioBoost" min="100" max="300" step="10" value="100" oninput="handleAudioBoostGain(this.value)">
+                        </div>
+                        <div class="custom-choice-row" style="margin-top: 10px;">
+                            <button class="choice-chip active" id="chipGain100" onclick="handleAudioBoostGain(100)">100% Normal</button>
+                            <button class="choice-chip" id="chipGain150" onclick="handleAudioBoostGain(150)">150% Boost</button>
+                            <button class="choice-chip" id="chipGain200" onclick="handleAudioBoostGain(200)">200% Super</button>
+                            <button class="choice-chip" id="chipGain300" onclick="handleAudioBoostGain(300)">300% Max</button>
+                        </div>
+                    </div>
+
+                    <!-- Audio Profiles -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Audio Equalizer & Dialogue Enhancer</span>
+                            <span class="custom-badge" id="valAudioProfileText">Standard</span>
+                        </div>
+                        <div class="custom-presets-grid">
+                            <button class="preset-card active" data-profile="standard" onclick="setAudioProfile('standard')">
+                                <div class="preset-icon">🎧</div>
+                                <div class="preset-name">Standard Reference</div>
+                                <div class="preset-desc">Original untouched acoustics</div>
+                            </button>
+                            <button class="preset-card" data-profile="dialogue" onclick="setAudioProfile('dialogue')">
+                                <div class="preset-icon">🗣️</div>
+                                <div class="preset-name">Dialogue Clarifier</div>
+                                <div class="preset-desc">Boost vocal 2.5kHz frequencies</div>
+                            </button>
+                            <button class="preset-card" data-profile="bass" onclick="setAudioProfile('bass')">
+                                <div class="preset-icon">💥</div>
+                                <div class="preset-name">Movie Bass Rumble</div>
+                                <div class="preset-desc">Enhanced low-end cinematic punch</div>
+                            </button>
+                            <button class="preset-card" data-profile="night" onclick="setAudioProfile('night')">
+                                <div class="preset-icon">🌙</div>
+                                <div class="preset-name">Night Mode Compression</div>
+                                <div class="preset-desc">Evens out explosions & quiet speech</div>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ============================================== -->
+                <!-- 💬 TAB 3: SUBTITLES (CC)                       -->
+                <!-- ============================================== -->
+                <div class="custom-tab-panel" id="tabSubtitles">
+                    
+                    <!-- Subtitle File & Live Status -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Subtitle Track & File Management</span>
+                            <span class="custom-badge" id="valSubtitleLoadedStatus">No Subtitle</span>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="openSubtitlePicker()" style="padding: 7px 14px; font-size: 12px; border-radius: 8px;">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                <span>Load .SRT / .VTT File</span>
+                            </button>
+                            <button class="btn btn-ghost" onclick="clearLoadedSubtitles()" style="padding: 7px 12px; font-size: 12px; border-radius: 8px;">
+                                <span>✕ Remove Subtitle</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Subtitle Sync / Delay Nudge -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Subtitle Sync / Delay Adjustment</span>
+                            <span class="custom-badge" id="valSubSyncDiff">0.0s (In Sync)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+                            <button class="btn btn-ghost" onclick="nudgeSubtitleSync(-1.0)" style="padding: 5px 12px; font-size: 11.5px;">-1.0s</button>
+                            <button class="btn btn-ghost" onclick="nudgeSubtitleSync(-0.5)" style="padding: 5px 12px; font-size: 11.5px;">-0.5s</button>
+                            <button class="btn btn-ghost" onclick="nudgeSubtitleSync(-0.1)" style="padding: 5px 10px; font-size: 11.5px;">-0.1s</button>
+                            <button class="btn btn-primary" onclick="resetSubtitleSync()" style="padding: 5px 14px; font-size: 11.5px;">Reset Sync</button>
+                            <button class="btn btn-ghost" onclick="nudgeSubtitleSync(0.1)" style="padding: 5px 10px; font-size: 11.5px;">+0.1s</button>
+                            <button class="btn btn-ghost" onclick="nudgeSubtitleSync(0.5)" style="padding: 5px 12px; font-size: 11.5px;">+0.5s</button>
+                            <button class="btn btn-ghost" onclick="nudgeSubtitleSync(1.0)" style="padding: 5px 12px; font-size: 11.5px;">+1.0s</button>
+                        </div>
+                    </div>
+
+                    <!-- Subtitle Appearance (Font Size, Colors, Background) -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Subtitle Text Size</span>
+                            <span class="custom-badge" id="valSubSizeText">Medium (18px)</span>
+                        </div>
+                        <div class="custom-choice-row">
+                            <button class="choice-chip" id="chipSubSize14" onclick="setSubtitleSize(14)">Small (14px)</button>
+                            <button class="choice-chip active" id="chipSubSize18" onclick="setSubtitleSize(18)">Medium (18px)</button>
+                            <button class="choice-chip" id="chipSubSize22" onclick="setSubtitleSize(22)">Large (22px)</button>
+                            <button class="choice-chip" id="chipSubSize28" onclick="setSubtitleSize(28)">Extra Large (28px)</button>
+                            <button class="choice-chip" id="chipSubSize34" onclick="setSubtitleSize(34)">Giant (34px)</button>
+                        </div>
+                    </div>
+
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Subtitle Color & Highlighting</span>
+                            <span class="custom-badge" id="valSubColorText">White</span>
+                        </div>
+                        <div class="custom-color-row">
+                            <button class="color-circle active" style="background: #ffffff;" onclick="setSubtitleColor('#ffffff', 'White')" title="Crisp White"></button>
+                            <button class="color-circle" style="background: #ffeb3b;" onclick="setSubtitleColor('#ffeb3b', 'Cinema Yellow')" title="Cinema Yellow"></button>
+                            <button class="color-circle" style="background: #00e5ff;" onclick="setSubtitleColor('#00e5ff', 'Cyber Cyan')" title="Cyber Cyan"></button>
+                            <button class="color-circle" style="background: #00e676;" onclick="setSubtitleColor('#00e676', 'Emerald Green')" title="Emerald Green"></button>
+                            <button class="color-circle" style="background: #ffb800;" onclick="setSubtitleColor('#ffb800', 'Warm Gold')" title="Warm Gold"></button>
+                            <button class="color-circle" style="background: #ff4081;" onclick="setSubtitleColor('#ff4081', 'Neon Pink')" title="Neon Pink"></button>
+                        </div>
+                    </div>
+
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Subtitle Background Box Style</span>
+                            <span class="custom-badge" id="valSubBgText">Translucent Box</span>
+                        </div>
+                        <div class="custom-choice-row">
+                            <button class="choice-chip active" id="chipSubBgTrans" onclick="setSubtitleBgStyle('translucent')">Translucent Black Box</button>
+                            <button class="choice-chip" id="chipSubBgSolid" onclick="setSubtitleBgStyle('solid')">Solid Black Box</button>
+                            <button class="choice-chip" id="chipSubBgShadow" onclick="setSubtitleBgStyle('shadow')">Drop Shadow Only</button>
+                            <button class="choice-chip" id="chipSubBgOutline" onclick="setSubtitleBgStyle('outline')">Outline Stroke Only</button>
+                        </div>
+                    </div>
+
+                    <!-- Live Subtitle Preview Box -->
+                    <div class="custom-sub-preview-box">
+                        <span class="sub-preview-label">Live Subtitle Preview</span>
+                        <div class="sub-preview-render" id="subPreviewRender">
+                            <span>The cinematic experience is now streaming in 1080p HD.</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ============================================== -->
+                <!-- 🕹️ TAB 4: PLAYBACK & TOUCH GESTURES            -->
+                <!-- ============================================== -->
+                <div class="custom-tab-panel" id="tabPlayback">
+                    
+                    <!-- Double Tap Seek Interval -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Double-Tap Seek Jump Interval</span>
+                            <span class="custom-badge" id="valSeekStepText">10 Seconds</span>
+                        </div>
+                        <div class="custom-choice-row">
+                            <button class="choice-chip" id="chipSeek5" onclick="setSeekStep(5)">5s</button>
+                            <button class="choice-chip active" id="chipSeek10" onclick="setSeekStep(10)">10s (Default)</button>
+                            <button class="choice-chip" id="chipSeek15" onclick="setSeekStep(15)">15s</button>
+                            <button class="choice-chip" id="chipSeek30" onclick="setSeekStep(30)">30s</button>
+                            <button class="choice-chip" id="chipSeek60" onclick="setSeekStep(60)">60s</button>
+                        </div>
+                    </div>
+
+                    <!-- Default Playback Speed -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Default Playback Speed</span>
+                            <span class="custom-badge" id="valDefaultSpeedText">1.0x (Normal)</span>
+                        </div>
+                        <div class="custom-choice-row">
+                            <button class="choice-chip" id="chipSpeed075" onclick="setDefaultPlaybackSpeed(0.75)">0.75x</button>
+                            <button class="choice-chip active" id="chipSpeed100" onclick="setDefaultPlaybackSpeed(1.0)">1.0x Normal</button>
+                            <button class="choice-chip" id="chipSpeed125" onclick="setDefaultPlaybackSpeed(1.25)">1.25x</button>
+                            <button class="choice-chip" id="chipSpeed150" onclick="setDefaultPlaybackSpeed(1.5)">1.5x Fast</button>
+                            <button class="choice-chip" id="chipSpeed200" onclick="setDefaultPlaybackSpeed(2.0)">2.0x 2x</button>
+                        </div>
+                    </div>
+
+                    <!-- Touch Gestures Switches -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Touch & Mobile Gesture Controls</span>
+                        </div>
+                        <div class="custom-toggle-list">
+                            <div class="custom-toggle-row">
+                                <div>
+                                    <div class="toggle-title">Vertical Left Swipe for Brightness</div>
+                                    <div class="toggle-desc">Swipe up/down on left edge of video to adjust brightness</div>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" id="toggleGestureBrightness" checked onchange="handleGestureToggle('brightness', this.checked)">
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
+                            <div class="custom-toggle-row">
+                                <div>
+                                    <div class="toggle-title">Vertical Right Swipe for Volume</div>
+                                    <div class="toggle-desc">Swipe up/down on right edge of video to adjust volume & boost</div>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" id="toggleGestureVolume" checked onchange="handleGestureToggle('volume', this.checked)">
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
+                            <div class="custom-toggle-row">
+                                <div>
+                                    <div class="toggle-title">Double-Tap to Seek (YouTube Style)</div>
+                                    <div class="toggle-desc">Double-tap left or right half of player to seek forward/backward</div>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" id="toggleGestureDoubleTap" checked onchange="handleGestureToggle('doubleTap', this.checked)">
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Automation Preferences -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Playback Automations</span>
+                        </div>
+                        <div class="custom-toggle-list">
+                            <div class="custom-toggle-row">
+                                <div>
+                                    <div class="toggle-title">Auto-Resume Playback</div>
+                                    <div class="toggle-desc">Automatically resume video where you left off</div>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" id="toggleAutoResume" checked onchange="handlePrefToggle('autoResume', this.checked)">
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
+                            <div class="custom-toggle-row">
+                                <div>
+                                    <div class="toggle-title">Auto-Play Next Episode</div>
+                                    <div class="toggle-desc">Show countdown and automatically play next episode for series</div>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" id="toggleAutoPlayNext" checked onchange="handlePrefToggle('autoPlayNext', this.checked)">
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
+                            <div class="custom-toggle-row">
+                                <div>
+                                    <div class="toggle-title">Screen Wake Lock (Keep Display Awake)</div>
+                                    <div class="toggle-desc">Prevents phone or PC screen from turning off while watching</div>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" id="toggleWakeLock" checked onchange="handlePrefToggle('wakeLock', this.checked)">
+                                    <span class="slider-switch"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Auto-Hide Delay -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Player Controls Auto-Hide Delay</span>
+                            <span class="custom-badge" id="valAutoHideText">3.5s (Default)</span>
+                        </div>
+                        <div class="custom-choice-row">
+                            <button class="choice-chip" id="chipHide2" onclick="setAutoHideDelay(2000)">2.0s Fast</button>
+                            <button class="choice-chip active" id="chipHide35" onclick="setAutoHideDelay(3500)">3.5s Default</button>
+                            <button class="choice-chip" id="chipHide5" onclick="setAutoHideDelay(5000)">5.0s Slow</button>
+                            <button class="choice-chip" id="chipHideNever" onclick="setAutoHideDelay(0)">Never (Always Visible)</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ============================================== -->
+                <!-- 🌈 TAB 5: THEMES & SLEEP TIMER                 -->
+                <!-- ============================================== -->
+                <div class="custom-tab-panel" id="tabThemes">
+                    
+                    <!-- Player Accent Themes -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Player Accent Glow Theme</span>
+                            <span class="custom-badge" id="valThemeActiveName">Cyber Cyan</span>
+                        </div>
+                        <div class="custom-themes-grid">
+                            <button class="theme-card active" data-theme="cyan" onclick="setPlayerTheme('cyan', '#00e5ff', 'Cyber Cyan')">
+                                <div class="theme-swatch" style="background: #00e5ff;"></div>
+                                <div class="theme-title">Cyber Cyan</div>
+                                <div class="theme-sub">CineBox Default</div>
+                            </button>
+                            <button class="theme-card" data-theme="amber" onclick="setPlayerTheme('amber', '#ffb800', 'Neon Amber')">
+                                <div class="theme-swatch" style="background: #ffb800;"></div>
+                                <div class="theme-title">Neon Amber</div>
+                                <div class="theme-sub">Golden Glow</div>
+                            </button>
+                            <button class="theme-card" data-theme="emerald" onclick="setPlayerTheme('emerald', '#00e676', 'Emerald Green')">
+                                <div class="theme-swatch" style="background: #00e676;"></div>
+                                <div class="theme-title">Emerald Green</div>
+                                <div class="theme-sub">Vibrant Nature</div>
+                            </button>
+                            <button class="theme-card" data-theme="violet" onclick="setPlayerTheme('violet', '#b388ff', 'Electric Violet')">
+                                <div class="theme-swatch" style="background: #b388ff;"></div>
+                                <div class="theme-title">Electric Violet</div>
+                                <div class="theme-sub">Cyberpunk Neon</div>
+                            </button>
+                            <button class="theme-card" data-theme="crimson" onclick="setPlayerTheme('crimson', '#ff5252', 'Crimson Red')">
+                                <div class="theme-swatch" style="background: #ff5252;"></div>
+                                <div class="theme-title">Crimson Red</div>
+                                <div class="theme-sub">Cinema Scarlet</div>
+                            </button>
+                            <button class="theme-card" data-theme="oled" onclick="setPlayerTheme('oled', '#ffffff', 'Pure OLED')">
+                                <div class="theme-swatch" style="background: #ffffff;"></div>
+                                <div class="theme-title">Monochrome</div>
+                                <div class="theme-sub">Pure OLED Minimal</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sleep Timer -->
+                    <div class="custom-section-block">
+                        <div class="custom-block-label">
+                            <span>Bedtime Sleep Timer</span>
+                            <span class="custom-badge" id="valSleepTimerStatus">Off</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+                            Automatically pause playback when sleep timer expires.
+                        </div>
+                        <div class="custom-choice-row">
+                            <button class="choice-chip active" id="chipSleepOff" onclick="setSleepTimer(0)">Off</button>
+                            <button class="choice-chip" id="chipSleep15" onclick="setSleepTimer(15)">15 Min</button>
+                            <button class="choice-chip" id="chipSleep30" onclick="setSleepTimer(30)">30 Min</button>
+                            <button class="choice-chip" id="chipSleep45" onclick="setSleepTimer(45)">45 Min</button>
+                            <button class="choice-chip" id="chipSleep60" onclick="setSleepTimer(60)">60 Min</button>
+                            <button class="choice-chip" id="chipSleepEnd" onclick="setSleepTimer('end')">End of Episode</button>
+                        </div>
+                    </div>
+
+                    <!-- Factory Reset -->
+                    <div class="custom-section-block" style="border: 1px dashed rgba(255, 82, 82, 0.3); background: rgba(255, 82, 82, 0.04); border-radius: 12px; padding: 14px 18px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                            <div>
+                                <div style="font-size: 13.5px; font-weight: 700; color: #ff5252;">Reset Player Customizations</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Revert all visual filters, audio boost, subtitle styles & gestures to defaults.</div>
+                            </div>
+                            <button class="btn btn-ghost" onclick="resetPlayerSettingsToDefaults()" style="border-color: rgba(255, 82, 82, 0.4); color: #ff5252; padding: 6px 14px; font-size: 12px; border-radius: 8px;">
+                                ↺ Reset All
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
         </div>
     </div>
 

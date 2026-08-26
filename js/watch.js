@@ -18,13 +18,63 @@ let episodeFilterQuery = '';
 let isSynopsisExpanded = false;
 let isPlayerMode = false;
 
-// Player state
-const playbackSpeeds = [0.75, 1.0, 1.25, 1.5, 2.0];
-let currentSpeedIdx = 1;
-const aspectRatios = ['contain', 'cover', 'fill'];
+// ==========================================================================
+// 🎛️ CineBox Player Customization & Settings Engine State
+// ==========================================================================
+const DEFAULT_PLAYER_SETTINGS = {
+    videoFilter: 'normal', // normal, vivid, cinema, night, crisp, oled
+    brightness: 100,
+    contrast: 100,
+    saturation: 100,
+    hue: 0,
+    ambientMode: 'sync', // sync, accent, off
+    ambientIntensity: 75,
+    aspectRatio: 'contain', // contain, cover, 16/9, 4/3, 21/9
+    audioBoostGain: 100, // 100 to 300%
+    audioProfile: 'standard', // standard, dialogue, bass, night
+    subSize: 18,
+    subColor: '#ffffff',
+    subColorName: 'White',
+    subBgStyle: 'translucent', // translucent, solid, shadow, outline
+    subSyncOffset: 0.0, // in seconds
+    seekStep: 10, // 5, 10, 15, 30, 60
+    defaultSpeed: 1.0,
+    gestureBrightness: true,
+    gestureVolume: true,
+    gestureDoubleTap: true,
+    autoResume: true,
+    autoPlayNext: true,
+    wakeLock: true,
+    autoHideDelay: 3500, // ms, 0 = never
+    themeName: 'cyan',
+    themeColor: '#00e5ff',
+    themeTitle: 'Cyber Cyan',
+    sleepTimer: 0 // 0 = off, or minutes
+};
+
+let playerSettings = { ...DEFAULT_PLAYER_SETTINGS };
+
+// Player Runtime State
+const playbackSpeeds = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
+let currentSpeedIdx = 2; // 1.0x
+const aspectRatios = ['contain', 'cover', '16/9', '4/3', '21/9'];
 let currentAspectIdx = 0;
 let nextEpCountdownTimer = null;
 let currentSubtitleTrack = null;
+let isControlsLocked = false;
+let isTheaterMode = false;
+let isTimeRemainingMode = false;
+let controlsHideTimer = null;
+let sleepTimeoutId = null;
+let wakeLockSentinel = null;
+
+// Audio Booster Web Audio API Nodes
+let audioCtx = null;
+let audioSourceNode = null;
+let audioGainNode = null;
+let audioFilterNode = null;
+let audioCompressorNode = null;
+let isAudioEngineInitialized = false;
 
 // Official VLC Cone SVG
 const VLC_ICON_SVG = `
@@ -40,8 +90,18 @@ const VLC_ICON_SVG = `
     </svg>
 `;
 
+// Official MX Player SVG from SVGRepo (518012/mx)
+const MX_ICON_SVG = `
+    <svg class="icon" viewBox="0 0 48 48" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-label="MX Player" style="vertical-align: middle;">
+        <path d="M24,2.5A21.5,21.5,0,1,0,45.5,24,21.51,21.51,0,0,0,24,2.5ZM18.07,13.14a1.42,1.42,0,0,1,.82.23l15.75,10.2a1.44,1.44,0,0,1,0,2.41L18.89,36.18A1.44,1.44,0,0,1,16.67,35V14.57a1.43,1.43,0,0,1,1.4-1.43Z"/>
+    </svg>
+`;
+
 async function initWatch() {
     updateWatchlistNavBadge();
+    loadPlayerSettings();
+    applyAllPlayerSettings();
+
     const urlParams = new URLSearchParams(window.location.search);
     const targetTitle = urlParams.get('title');
     const dataParam = urlParams.get('data');
@@ -144,6 +204,9 @@ async function initWatch() {
     setupDoubleTapSeekControls();
     setupSubtitleDragAndDrop();
     setupSearchKeybindings();
+    setupCustomPlayerControls();
+    setupMobileTouchGestures();
+    setupCustomScrubber();
 
     // Auto-enter player mode only if explicitly requested in URL (e.g. ?play=1)
     if (shouldAutoPlay && currentItem && currentItem.url) {
@@ -605,9 +668,9 @@ function renderWatchPage(item) {
             <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/></svg>
             <span>Trailer</span>
         </button>
-        <button class="mb-btn-action mb-btn-vlc" onclick="openCurrentInVLC()">
-            ${VLC_ICON_SVG}
-            <span>Play in VLC</span>
+        <button class="mb-btn-action mb-btn-external" onclick="openExternalPlayersModal('${item.url}', '${escapeQuotes(item.title)}')" title="Play in External Players (VLC, MX Player, PotPlayer)">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            <span>External Player</span>
         </button>
         ${isSeries ? `
             <button class="mb-btn-action" onclick="openDownloadModal(null, null, true)">
@@ -620,6 +683,10 @@ function renderWatchPage(item) {
                 <span>Download</span>
             </button>
         `}
+        <button class="mb-btn-action" onclick="openPlayerCustomModal()" title="Customize Video Player Settings">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Player Settings</span>
+        </button>
         <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
             <svg class="icon" id="wHeartIconAction" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
             <span id="wWatchlistActionText">${isInWatchlist(item.title) ? 'Saved ❤️' : 'Watchlist'}</span>
@@ -662,21 +729,33 @@ function enterPlayerMode(url, title) {
     const pView = document.getElementById('playerView');
     pView.style.display = 'block';
 
-    // Populate Player Heading Info
+    // Populate Player Heading Info & Custom Overlay Title
     document.getElementById('playerHeadingTitle').textContent = currentActiveStreamTitle;
-    document.getElementById('playerQualityTag').textContent = (currentItem && currentItem.tag) ? currentItem.tag : '1080p HD';
+    const mediaTag = (currentItem && currentItem.tag) ? currentItem.tag : '1080p HD';
+    document.getElementById('playerQualityTag').textContent = mediaTag;
+    
+    const cpTitleEl = document.getElementById('cpMediaTitle');
+    if (cpTitleEl) cpTitleEl.textContent = currentActiveStreamTitle;
+    const cpQualityEl = document.getElementById('cpQualityBadge');
+    if (cpQualityEl) cpQualityEl.textContent = mediaTag;
 
     const isSeries = currentItem && (currentItem.tag === 'TV Series' || currentItem.tag === 'K-Drama' || (currentItem.url && currentItem.url.endsWith('/')));
+    const cpNav = document.getElementById('cpSeriesNav');
+    if (cpNav) cpNav.style.display = isSeries ? 'inline-flex' : 'none';
 
     // Populate Quick Actions Toolbar
     document.getElementById('playerQuickActions').innerHTML = `
-        <button class="mb-btn-action mb-btn-vlc" onclick="openCurrentInVLC()">
-            ${VLC_ICON_SVG}
-            <span>VLC Player</span>
+        <button class="mb-btn-action mb-btn-external" onclick="openExternalPlayersModal(currentActiveStreamUrl, currentActiveStreamTitle)" title="Open in External Player (VLC, MX Player, PotPlayer)">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+            <span>External Player</span>
         </button>
         <button class="mb-btn-action" onclick="openDownloadModal(currentActiveStreamUrl, currentActiveStreamTitle)">
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span>Download</span>
+        </button>
+        <button class="mb-btn-action" onclick="openPlayerCustomModal()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Customize</span>
         </button>
         <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
             <svg class="icon" id="wHeartIconPlayer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
@@ -688,8 +767,19 @@ function enterPlayerMode(url, title) {
         </button>
     `;
 
+    // Apply player settings to current stream
+    applyAllPlayerSettings();
+
     // Start video playback
     startStream(url, currentActiveStreamTitle);
+
+    // Acquire WakeLock if enabled
+    if (playerSettings.wakeLock) {
+        acquireWakeLock();
+    }
+
+    // Reset controls auto-hide timer
+    resetControlsTimeout();
 
     // If TV Series: display episode playlist in player view
     if (isSeries && currentTvEntry) {
@@ -713,6 +803,12 @@ function exitPlayerMode() {
     // Pause playback
     const player = document.getElementById('videoPlayer');
     if (player) player.pause();
+
+    // Release WakeLock
+    releaseWakeLock();
+
+    // Reset screen lock
+    unlockPlayerScreen();
 
     // Switch Views back
     document.getElementById('playerView').style.display = 'none';
@@ -811,27 +907,40 @@ function setupPlayerListeners() {
             );
         }
 
+        // Update custom scrubber & time text
+        updateScrubberProgress();
+
+        // Update dynamic ambient glow if active
+        if (playerSettings.ambientMode === 'sync' && !player.paused) {
+            updateAmbientGlow();
+        }
+
         if (currentPlayingEpisodeIdx >= 0 && currentSeasonEpisodes.length > currentPlayingEpisodeIdx + 1) {
             if (player.duration > 30 && player.currentTime >= player.duration - 12 && !nextEpCountdownTimer) {
-                triggerNextEpisodeCountdown();
+                if (playerSettings.autoPlayNext) {
+                    triggerNextEpisodeCountdown();
+                }
             }
         }
     });
 
-    player.addEventListener('ended', () => {
-        savePlaybackProgress(
-            currentActiveStreamUrl,
-            currentActiveStreamTitle,
-            player.duration,
-            player.duration,
-            currentItem || {}
-        );
-        if (currentPlayingEpisodeIdx >= 0 && currentSeasonEpisodes.length > currentPlayingEpisodeIdx + 1) {
-            confirmNextEpisode();
+    player.addEventListener('progress', () => {
+        updateScrubberBuffer();
+    });
+
+    player.addEventListener('play', () => {
+        updatePlayPauseButtonUI(true);
+        if (isAudioEngineInitialized && audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(() => {});
         }
+        if (playerSettings.wakeLock) {
+            acquireWakeLock();
+        }
+        resetControlsTimeout();
     });
 
     player.addEventListener('pause', () => {
+        updatePlayPauseButtonUI(false);
         savePlaybackProgress(
             currentActiveStreamUrl,
             currentActiveStreamTitle,
@@ -839,6 +948,38 @@ function setupPlayerListeners() {
             player.duration,
             currentItem || {}
         );
+    });
+
+    player.addEventListener('ended', () => {
+        updatePlayPauseButtonUI(false);
+        savePlaybackProgress(
+            currentActiveStreamUrl,
+            currentActiveStreamTitle,
+            player.duration,
+            player.duration,
+            currentItem || {}
+        );
+        if (playerSettings.sleepTimer === 'end') {
+            showToast('Sleep Timer: Playback ended. Goodnight! 🌙');
+            return;
+        }
+        if (currentPlayingEpisodeIdx >= 0 && currentSeasonEpisodes.length > currentPlayingEpisodeIdx + 1) {
+            if (playerSettings.autoPlayNext) {
+                confirmNextEpisode();
+            }
+        }
+    });
+
+    player.addEventListener('volumechange', () => {
+        updateVolumeUI();
+    });
+
+    player.addEventListener('loadedmetadata', () => {
+        updateScrubberProgress();
+        applyAspectRatioCss();
+        if (playerSettings.defaultSpeed && playerSettings.defaultSpeed !== 1.0) {
+            player.playbackRate = playerSettings.defaultSpeed;
+        }
     });
 }
 
@@ -848,14 +989,29 @@ function startStream(url, title) {
 
     currentActiveStreamUrl = url;
     currentActiveStreamTitle = title || 'Playing Media';
-    document.getElementById('playerCurrentTitle').textContent = currentActiveStreamTitle;
+    
+    const currTitleEl = document.getElementById('playerCurrentTitle');
+    if (currTitleEl) currTitleEl.textContent = currentActiveStreamTitle;
+    const cpTitleEl = document.getElementById('cpMediaTitle');
+    if (cpTitleEl) cpTitleEl.textContent = currentActiveStreamTitle;
 
     player.src = url;
 
-    const prev = getPlaybackProgress(url, title);
-    if (prev && prev.time > 15 && prev.time < prev.duration - 20) {
-        player.currentTime = prev.time;
-        showToast(`Resumed from ${formatTime(prev.time)}`);
+    // Apply audio booster engine on play
+    setupAudioBooster();
+
+    // Auto-resume from last saved time
+    if (playerSettings.autoResume) {
+        const prev = getPlaybackProgress(url, title);
+        if (prev && prev.time > 15 && prev.time < prev.duration - 20) {
+            player.currentTime = prev.time;
+            showToast(`Resumed from ${formatTime(prev.time)}`);
+        }
+    }
+
+    // Apply default speed
+    if (playerSettings.defaultSpeed) {
+        player.playbackRate = playerSettings.defaultSpeed;
     }
 
     player.play().catch(e => console.log(e));
@@ -877,6 +1033,7 @@ function setupDoubleTapSeekControls() {
     if (!leftZone || !rightZone || !player) return;
 
     leftZone.addEventListener('click', (e) => {
+        if (!playerSettings.gestureDoubleTap || isControlsLocked) return;
         leftTapCount++;
         clearTimeout(leftTapTimer);
         if (leftTapCount === 1) {
@@ -885,11 +1042,13 @@ function setupDoubleTapSeekControls() {
             }, 300);
         } else if (leftTapCount >= 2) {
             leftTapCount = 0;
-            seekRelative(-10, 'left');
+            const step = playerSettings.seekStep || 10;
+            seekRelative(-step, 'left');
         }
     });
 
     rightZone.addEventListener('click', (e) => {
+        if (!playerSettings.gestureDoubleTap || isControlsLocked) return;
         rightTapCount++;
         clearTimeout(rightTapTimer);
         if (rightTapCount === 1) {
@@ -898,7 +1057,8 @@ function setupDoubleTapSeekControls() {
             }, 300);
         } else if (rightTapCount >= 2) {
             rightTapCount = 0;
-            seekRelative(10, 'right');
+            const step = playerSettings.seekStep || 10;
+            seekRelative(step, 'right');
         }
     });
 }
@@ -907,10 +1067,14 @@ function seekRelative(seconds, direction) {
     const player = document.getElementById('videoPlayer');
     if (!player) return;
 
-    player.currentTime = Math.max(0, Math.min(player.duration || 0, player.currentTime + seconds));
+    const targetTime = Math.max(0, Math.min(player.duration || 0, player.currentTime + seconds));
+    player.currentTime = targetTime;
 
     const ripple = direction === 'left' ? document.getElementById('seekRippleLeft') : document.getElementById('seekRippleRight');
     if (ripple) {
+        const textEl = direction === 'left' ? document.getElementById('seekLeftText') : document.getElementById('seekRightText');
+        if (textEl) textEl.textContent = `${seconds > 0 ? '+' : ''}${seconds}s`;
+        
         ripple.classList.remove('active');
         void ripple.offsetWidth;
         ripple.classList.add('active');
@@ -1415,6 +1579,78 @@ function downloadSeasonM3u() {
 // 🍦 External Player Launchers
 // ==========================================
 function openInVLC(url, title) {
+    url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
+    title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
+    if (!url) return;
+
+    const cleanTitle = encodeURIComponent(title);
+    const isAndroid = /Android/i.test(navigator.userAgent);
+
+    if (isAndroid) {
+        // Direct Android Intent for VLC without downloading any file
+        const intentUrl = `intent:${url}#Intent;package=org.videolan.vlc;type=video/*;S.title=${cleanTitle};end`;
+        window.location.href = intentUrl;
+    } else {
+        // Direct VLC URL scheme on Web/Desktop (Windows, Mac, Linux) without downloading file
+        window.location.href = `vlc://${url}`;
+    }
+
+    showToast('Launching VLC Media Player 🎬');
+}
+
+function openCurrentInVLC() {
+    openInVLC(currentActiveStreamUrl || (currentItem ? currentItem.url : ''), currentActiveStreamTitle || (currentItem ? currentItem.title : ''));
+}
+
+function openInMXPlayer(url, title) {
+    url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
+    title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
+    if (!url) return;
+    const cleanTitle = encodeURIComponent(title);
+    const intentUrl = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;type=video/*;S.title=${cleanTitle};end`;
+    window.location.href = intentUrl;
+    showToast('Launching MX Player...');
+}
+
+function openInPotPlayer(url, title) {
+    url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
+    if (!url) return;
+    window.location.href = `potplayer://${url}`;
+    showToast('Launching PotPlayer on PC...');
+}
+
+function openInSystemChooser(url, title) {
+    url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
+    title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
+    if (!url) return;
+    const cleanTitle = encodeURIComponent(title);
+    const intentUrl = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;S.title=${cleanTitle};end`;
+    window.location.href = intentUrl;
+    showToast('Opening video player menu...');
+}
+
+function openExternalPlayersModal(url, title) {
+    if (url) currentActiveStreamUrl = url;
+    if (title) currentActiveStreamTitle = title;
+    const modal = document.getElementById('externalPlayersModal');
+    if (!modal) return;
+    const titleEl = document.getElementById('extModalMediaTitle');
+    if (titleEl) {
+        titleEl.textContent = currentActiveStreamTitle || (currentItem ? currentItem.title : 'Selected Media');
+    }
+    modal.style.display = 'flex';
+}
+
+function closeExternalPlayersModal() {
+    const modal = document.getElementById('externalPlayersModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function exportStreamM3u(url, title) {
+    url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
+    title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
+    if (!url) return;
+
     const cleanTitle = (title || 'movie').replace(/[/\\?%*:|"<>]/g, '_');
     const m3uContent = `#EXTM3U\n#EXTINF:-1,${title}\n${url}\n`;
     const blob = new Blob([m3uContent], { type: 'application/x-mpegurl' });
@@ -1428,40 +1664,14 @@ function openInVLC(url, title) {
     document.body.removeChild(a);
     URL.revokeObjectURL(blobUrl);
 
-    setTimeout(() => {
-        try {
-            window.location.href = `vlc://${url}`;
-        } catch (e) {}
-    }, 300);
-
-    showToast('Opening in VLC Player...');
-}
-
-function openCurrentInVLC() {
-    openInVLC(currentActiveStreamUrl || (currentItem ? currentItem.url : ''), currentActiveStreamTitle || (currentItem ? currentItem.title : ''));
-}
-
-function openInMXPlayer() {
-    const url = currentActiveStreamUrl || (currentItem ? currentItem.url : '');
-    if (!url) return;
-    const title = encodeURIComponent(currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie'));
-    const intentUrl = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;type=video/*;S.title=${title};end`;
-    window.location.href = intentUrl;
-    showToast('Launching MX Player...');
-}
-
-function openInPotPlayer() {
-    const url = currentActiveStreamUrl || (currentItem ? currentItem.url : '');
-    if (!url) return;
-    window.location.href = `potplayer://${url}`;
-    showToast('Launching PotPlayer on PC...');
+    showToast('Downloaded stream playlist (.m3u) 📥');
 }
 
 function copyCurrentStreamUrl() {
     const url = currentActiveStreamUrl || (currentItem ? currentItem.url : '');
     if (url) {
         copyLink(url);
-        showToast('Stream URL copied to clipboard');
+        showToast('Stream URL copied to clipboard 🔗');
     }
 }
 
@@ -1470,81 +1680,1121 @@ function copyLink(url) {
 }
 
 // ==========================================
-// 🎛️ Video Player Toolbar Controls
+// ==========================================================================
+// 🎛️ CINEBOX PLAYER CUSTOMIZATION & SETTINGS ENGINE
+// ==========================================================================
+
+function loadPlayerSettings() {
+    try {
+        const saved = localStorage.getItem('cinebox_player_custom_settings');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            playerSettings = { ...DEFAULT_PLAYER_SETTINGS, ...parsed };
+        }
+    } catch (e) {
+        console.warn('Error loading player settings', e);
+    }
+}
+
+function savePlayerSettings() {
+    try {
+        localStorage.setItem('cinebox_player_custom_settings', JSON.stringify(playerSettings));
+    } catch (e) {
+        console.warn('Error saving player settings', e);
+    }
+}
+
+function applyAllPlayerSettings() {
+    // 1. Apply Color Theme & CSS Variables
+    if (playerSettings.themeColor) {
+        document.documentElement.style.setProperty('--primary', playerSettings.themeColor);
+        document.documentElement.style.setProperty('--primary-glow', `${playerSettings.themeColor}40`);
+    }
+
+    // 2. Apply Video Filters
+    applyVideoFilterCss();
+
+    // 3. Apply Aspect Ratio
+    applyAspectRatioCss();
+
+    // 4. Apply Subtitle Styles
+    updateSubtitleStyleSheet();
+
+    // 5. Update UI Controls & Badges
+    updateCustomizerUIState();
+
+    // 6. Update Seek labels
+    const step = playerSettings.seekStep || 10;
+    const l1 = document.getElementById('stepRewindLabel');
+    const l2 = document.getElementById('stepForwardLabel');
+    if (l1) l1.textContent = step;
+    if (l2) l2.textContent = step;
+}
+
+function resetPlayerSettingsToDefaults() {
+    playerSettings = { ...DEFAULT_PLAYER_SETTINGS };
+    try {
+        localStorage.removeItem('cinebox_player_custom_settings');
+    } catch (e) {}
+
+    applyAllPlayerSettings();
+    showToast('Player customizations reset to default ↺');
+}
+
+function updateCustomizerUIState() {
+    // Active Filter preset badge
+    const filterName = playerSettings.videoFilter.charAt(0).toUpperCase() + playerSettings.videoFilter.slice(1);
+    const filterActiveEl = document.getElementById('customFilterActiveName');
+    if (filterActiveEl) filterActiveEl.textContent = filterName;
+    const cpFilterBadge = document.getElementById('cpFilterBadge');
+    if (cpFilterBadge) {
+        if (playerSettings.videoFilter === 'normal') {
+            cpFilterBadge.style.display = 'none';
+        } else {
+            cpFilterBadge.style.display = 'inline-flex';
+            cpFilterBadge.textContent = filterName;
+        }
+    }
+    const filterLabel = document.getElementById('filterLabel');
+    if (filterLabel) filterLabel.textContent = filterName;
+
+    // Filter Preset cards active class
+    document.querySelectorAll('.preset-card[data-filter]').forEach(card => {
+        card.classList.toggle('active', card.getAttribute('data-filter') === playerSettings.videoFilter);
+    });
+
+    // Sliders
+    const sBright = document.getElementById('sliderBrightness');
+    if (sBright) sBright.value = playerSettings.brightness;
+    const vBright = document.getElementById('valSliderBrightness');
+    if (vBright) vBright.textContent = `${playerSettings.brightness}%`;
+
+    const sContrast = document.getElementById('sliderContrast');
+    if (sContrast) sContrast.value = playerSettings.contrast;
+    const vContrast = document.getElementById('valSliderContrast');
+    if (vContrast) vContrast.textContent = `${playerSettings.contrast}%`;
+
+    const sSat = document.getElementById('sliderSaturation');
+    if (sSat) sSat.value = playerSettings.saturation;
+    const vSat = document.getElementById('valSliderSaturation');
+    if (vSat) vSat.textContent = `${playerSettings.saturation}%`;
+
+    const sHue = document.getElementById('sliderHue');
+    if (sHue) sHue.value = playerSettings.hue;
+    const vHue = document.getElementById('valSliderHue');
+    if (vHue) vHue.textContent = `${playerSettings.hue}°`;
+
+    // Ambient
+    const ambStat = document.getElementById('valAmbientStatus');
+    if (ambStat) ambStat.textContent = playerSettings.ambientMode === 'off' ? 'Disabled' : (playerSettings.ambientMode === 'sync' ? 'Dynamic Sync' : 'Theme Glow');
+    const sAmb = document.getElementById('sliderAmbient');
+    if (sAmb) sAmb.value = playerSettings.ambientIntensity;
+    const vAmb = document.getElementById('valSliderAmbient');
+    if (vAmb) vAmb.textContent = `${playerSettings.ambientIntensity}%`;
+
+    const chipSync = document.getElementById('chipAmbientSync');
+    const chipAccent = document.getElementById('chipAmbientAccent');
+    const chipOff = document.getElementById('chipAmbientOff');
+    if (chipSync) chipSync.classList.toggle('active', playerSettings.ambientMode === 'sync');
+    if (chipAccent) chipAccent.classList.toggle('active', playerSettings.ambientMode === 'accent');
+    if (chipOff) chipOff.classList.toggle('active', playerSettings.ambientMode === 'off');
+
+    // Audio Boost
+    const boostTxt = document.getElementById('valAudioBoostText');
+    if (boostTxt) boostTxt.textContent = `${playerSettings.audioBoostGain}% ${playerSettings.audioBoostGain > 100 ? '(Boosted)' : '(Normal)'}`;
+    const boostGainVal = document.getElementById('valAudioGainSlider');
+    if (boostGainVal) boostGainVal.textContent = `${playerSettings.audioBoostGain}%`;
+    const sAudio = document.getElementById('sliderAudioBoost');
+    if (sAudio) sAudio.value = playerSettings.audioBoostGain;
+
+    const cpBoostBadge = document.getElementById('cpBoostBadge');
+    if (cpBoostBadge) {
+        if (playerSettings.audioBoostGain > 100) {
+            cpBoostBadge.style.display = 'inline-flex';
+            cpBoostBadge.textContent = `Boost ${playerSettings.audioBoostGain}%`;
+        } else {
+            cpBoostBadge.style.display = 'none';
+        }
+    }
+
+    [100, 150, 200, 300].forEach(g => {
+        const c = document.getElementById(`chipGain${g}`);
+        if (c) c.classList.toggle('active', playerSettings.audioBoostGain === g);
+    });
+
+    // Audio Profile cards
+    document.querySelectorAll('.preset-card[data-profile]').forEach(card => {
+        card.classList.toggle('active', card.getAttribute('data-profile') === playerSettings.audioProfile);
+    });
+    const audProfText = document.getElementById('valAudioProfileText');
+    if (audProfText) audProfText.textContent = playerSettings.audioProfile.charAt(0).toUpperCase() + playerSettings.audioProfile.slice(1);
+
+    // Subtitle UI
+    const subSizeText = document.getElementById('valSubSizeText');
+    if (subSizeText) subSizeText.textContent = `${playerSettings.subSize}px`;
+    [14, 18, 22, 28, 34].forEach(sz => {
+        const c = document.getElementById(`chipSubSize${sz}`);
+        if (c) c.classList.toggle('active', playerSettings.subSize === sz);
+    });
+
+    const subColText = document.getElementById('valSubColorText');
+    if (subColText) subColText.textContent = playerSettings.subColorName || 'Custom';
+
+    const subBgText = document.getElementById('valSubBgText');
+    if (subBgText) subBgText.textContent = playerSettings.subBgStyle.charAt(0).toUpperCase() + playerSettings.subBgStyle.slice(1);
+
+    // Seek step chips
+    [5, 10, 15, 30, 60].forEach(st => {
+        const c = document.getElementById(`chipSeek${st}`);
+        if (c) c.classList.toggle('active', playerSettings.seekStep === st);
+    });
+    const seekStepText = document.getElementById('valSeekStepText');
+    if (seekStepText) seekStepText.textContent = `${playerSettings.seekStep}s`;
+
+    // Speed chips
+    [0.75, 1.0, 1.25, 1.5, 2.0].forEach(sp => {
+        const key = String(sp).replace('.', '');
+        const c = document.getElementById(`chipSpeed${key}`);
+        if (c) c.classList.toggle('active', playerSettings.defaultSpeed === sp);
+    });
+    const speedLabel = document.getElementById('speedLabel');
+    if (speedLabel) speedLabel.textContent = `${playerSettings.defaultSpeed}x`;
+
+    // Aspect chips
+    const aspMode = document.getElementById('valAspectMode');
+    if (aspMode) aspMode.textContent = playerSettings.aspectRatio;
+    const aspectLabel = document.getElementById('aspectLabel');
+    if (aspectLabel) aspectLabel.textContent = playerSettings.aspectRatio;
+
+    // Toggles
+    const tgb = document.getElementById('toggleGestureBrightness');
+    if (tgb) tgb.checked = !!playerSettings.gestureBrightness;
+    const tgv = document.getElementById('toggleGestureVolume');
+    if (tgv) tgv.checked = !!playerSettings.gestureVolume;
+    const tgd = document.getElementById('toggleGestureDoubleTap');
+    if (tgd) tgd.checked = !!playerSettings.gestureDoubleTap;
+    const tar = document.getElementById('toggleAutoResume');
+    if (tar) tar.checked = !!playerSettings.autoResume;
+    const tap = document.getElementById('toggleAutoPlayNext');
+    if (tap) tap.checked = !!playerSettings.autoPlayNext;
+    const twl = document.getElementById('toggleWakeLock');
+    if (twl) twl.checked = !!playerSettings.wakeLock;
+
+    // Theme cards
+    document.querySelectorAll('.theme-card[data-theme]').forEach(tc => {
+        tc.classList.toggle('active', tc.getAttribute('data-theme') === playerSettings.themeName);
+    });
+    const themeNameEl = document.getElementById('valThemeActiveName');
+    if (themeNameEl) themeNameEl.textContent = playerSettings.themeTitle || 'Cyber Cyan';
+}
+
 // ==========================================
-function cyclePlaybackSpeed() {
-    currentSpeedIdx = (currentSpeedIdx + 1) % playbackSpeeds.length;
-    const speed = playbackSpeeds[currentSpeedIdx];
+// 🎨 Visual Filters Engine
+// ==========================================
+const VIDEO_PRESET_CONFIGS = {
+    normal: { brightness: 100, contrast: 100, saturation: 100, hue: 0 },
+    vivid: { brightness: 106, contrast: 124, saturation: 140, hue: 0 },
+    cinema: { brightness: 102, contrast: 112, saturation: 118, hue: 3 },
+    night: { brightness: 90, contrast: 96, saturation: 85, hue: -5 },
+    crisp: { brightness: 104, contrast: 120, saturation: 110, hue: 0 },
+    oled: { brightness: 100, contrast: 138, saturation: 122, hue: 0 }
+};
+
+function applyVideoFilterPreset(presetName) {
+    if (!VIDEO_PRESET_CONFIGS[presetName]) return;
+    playerSettings.videoFilter = presetName;
+    const conf = VIDEO_PRESET_CONFIGS[presetName];
+    playerSettings.brightness = conf.brightness;
+    playerSettings.contrast = conf.contrast;
+    playerSettings.saturation = conf.saturation;
+    playerSettings.hue = conf.hue;
+
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    showToast(`Applied Visual Filter: ${presetName.toUpperCase()} ✨`);
+}
+
+function handleVideoFilterChange(prop, val) {
+    playerSettings.videoFilter = 'custom';
+    playerSettings[prop] = parseFloat(val);
+    savePlayerSettings();
+    applyAllPlayerSettings();
+}
+
+function resetVideoSliders() {
+    playerSettings.videoFilter = 'normal';
+    playerSettings.brightness = 100;
+    playerSettings.contrast = 100;
+    playerSettings.saturation = 100;
+    playerSettings.hue = 0;
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    showToast('Video sliders reset');
+}
+
+function applyVideoFilterCss() {
     const player = document.getElementById('videoPlayer');
-    if (player) player.playbackRate = speed;
-    document.getElementById('speedLabel').textContent = `${speed}x`;
-    showToast(`Speed: ${speed}x`);
+    if (!player) return;
+
+    const b = playerSettings.brightness / 100;
+    const c = playerSettings.contrast / 100;
+    const s = playerSettings.saturation / 100;
+    const h = playerSettings.hue;
+
+    let filterStr = `brightness(${b}) contrast(${c}) saturate(${s})`;
+    if (h !== 0) {
+        filterStr += ` hue-rotate(${h}deg)`;
+    }
+
+    if (playerSettings.videoFilter === 'night') {
+        filterStr += ` sepia(0.2)`;
+    } else if (playerSettings.videoFilter === 'cinema') {
+        filterStr += ` sepia(0.12)`;
+    }
+
+    player.style.filter = filterStr;
+}
+
+function cycleVideoFilter() {
+    const presets = ['normal', 'vivid', 'cinema', 'night', 'crisp', 'oled'];
+    let idx = presets.indexOf(playerSettings.videoFilter);
+    if (idx === -1) idx = 0;
+    idx = (idx + 1) % presets.length;
+    applyVideoFilterPreset(presets[idx]);
+}
+
+// ==========================================
+// 💡 Dynamic Ambient Cinema Lighting
+// ==========================================
+function setAmbientGlowMode(mode) {
+    playerSettings.ambientMode = mode;
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    updateAmbientGlow();
+    showToast(`Ambient Lighting: ${mode.toUpperCase()}`);
+}
+
+function handleAmbientIntensityChange(val) {
+    playerSettings.ambientIntensity = parseInt(val, 10);
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    updateAmbientGlow();
+}
+
+function toggleAmbientGlow() {
+    const nextMode = playerSettings.ambientMode === 'off' ? 'sync' : 'off';
+    setAmbientGlowMode(nextMode);
+}
+
+function updateAmbientGlow() {
+    const glowEl = document.getElementById('playerAmbientGlow');
+    if (!glowEl) return;
+
+    if (playerSettings.ambientMode === 'off') {
+        glowEl.style.opacity = '0';
+        return;
+    }
+
+    const intensity = (playerSettings.ambientIntensity || 75) / 100;
+    glowEl.style.opacity = String(intensity);
+
+    const themeColor = playerSettings.themeColor || '#00e5ff';
+    glowEl.style.background = `radial-gradient(ellipse at center, ${themeColor}55 0%, ${themeColor}22 45%, transparent 70%)`;
+}
+
+// ==========================================
+// 📐 Aspect Ratio Fit Engine
+// ==========================================
+function setPlayerAspectRatio(mode) {
+    playerSettings.aspectRatio = mode;
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    showToast(`Aspect: ${mode}`);
 }
 
 function cycleAspectRatio() {
     currentAspectIdx = (currentAspectIdx + 1) % aspectRatios.length;
     const fit = aspectRatios[currentAspectIdx];
-    const player = document.getElementById('videoPlayer');
-    if (player) player.style.objectFit = fit;
-    document.getElementById('aspectLabel').textContent = fit.charAt(0).toUpperCase() + fit.slice(1);
-    showToast(`Aspect: ${fit}`);
+    setPlayerAspectRatio(fit);
 }
 
-async function togglePictureInPicture() {
+function applyAspectRatioCss() {
     const player = document.getElementById('videoPlayer');
     if (!player) return;
-    try {
-        if (document.pictureInPictureElement) {
-            await document.exitPictureInPicture();
-        } else if (document.pictureInPictureEnabled) {
-            await player.requestPictureInPicture();
-        }
-    } catch (e) {
-        showToast('PiP not supported');
+
+    const mode = playerSettings.aspectRatio || 'contain';
+    if (mode === 'contain' || mode === 'cover' || mode === 'fill') {
+        player.style.objectFit = mode;
+        player.style.aspectRatio = '16/9';
+    } else if (mode === '16/9') {
+        player.style.objectFit = 'contain';
+        player.style.aspectRatio = '16/9';
+    } else if (mode === '4/3') {
+        player.style.objectFit = 'fill';
+        player.style.aspectRatio = '4/3';
+    } else if (mode === '21/9') {
+        player.style.objectFit = 'cover';
+        player.style.aspectRatio = '21/9';
     }
 }
 
 // ==========================================
-// ⌨️ Keyboard Shortcuts
+// 🔊 Audio Booster & Web Audio API Engine
+// ==========================================
+function setupAudioBooster() {
+    const player = document.getElementById('videoPlayer');
+    if (!player || isAudioEngineInitialized) return;
+
+    try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        audioCtx = new AudioContextClass();
+        audioSourceNode = audioCtx.createMediaElementSource(player);
+        audioGainNode = audioCtx.createGain();
+        audioFilterNode = audioCtx.createBiquadFilter();
+        audioCompressorNode = audioCtx.createDynamicsCompressor();
+
+        // Connect chain: source -> filter -> compressor -> gain -> destination
+        audioSourceNode.connect(audioFilterNode);
+        audioFilterNode.connect(audioCompressorNode);
+        audioCompressorNode.connect(audioGainNode);
+        audioGainNode.connect(audioCtx.destination);
+
+        isAudioEngineInitialized = true;
+        applyAudioSettings();
+    } catch (e) {
+        console.warn('Audio Context initialization fallback', e);
+    }
+}
+
+function handleAudioBoostGain(val) {
+    const gainNum = parseInt(val, 10);
+    playerSettings.audioBoostGain = gainNum;
+    savePlayerSettings();
+    applyAudioSettings();
+    updateCustomizerUIState();
+    showToast(`Volume Gain: ${gainNum}%`);
+}
+
+function setAudioProfile(profile) {
+    playerSettings.audioProfile = profile;
+    savePlayerSettings();
+    applyAudioSettings();
+    updateCustomizerUIState();
+    showToast(`Audio Profile: ${profile.toUpperCase()}`);
+}
+
+function applyAudioSettings() {
+    if (!isAudioEngineInitialized || !audioGainNode) return;
+
+    // 1. Apply Gain
+    const gainMultiplier = (playerSettings.audioBoostGain || 100) / 100;
+    audioGainNode.gain.value = gainMultiplier;
+
+    // 2. Apply Profile Filters
+    if (audioFilterNode && audioCompressorNode) {
+        const prof = playerSettings.audioProfile || 'standard';
+        if (prof === 'dialogue') {
+            audioFilterNode.type = 'peaking';
+            audioFilterNode.frequency.value = 2500;
+            audioFilterNode.Q.value = 1.4;
+            audioFilterNode.gain.value = 6.0;
+        } else if (prof === 'bass') {
+            audioFilterNode.type = 'lowshelf';
+            audioFilterNode.frequency.value = 110;
+            audioFilterNode.gain.value = 6.5;
+        } else {
+            audioFilterNode.type = 'allpass';
+            audioFilterNode.gain.value = 0;
+        }
+
+        if (prof === 'night') {
+            audioCompressorNode.threshold.value = -24;
+            audioCompressorNode.ratio.value = 12;
+        } else {
+            audioCompressorNode.threshold.value = -10;
+            audioCompressorNode.ratio.value = 3;
+        }
+    }
+}
+
+// ==========================================
+// 💬 Subtitles (CC) Customizer
+// ==========================================
+function setSubtitleSize(size) {
+    playerSettings.subSize = parseInt(size, 10);
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    showToast(`Subtitle Size: ${size}px`);
+}
+
+function setSubtitleColor(hex, name) {
+    playerSettings.subColor = hex;
+    playerSettings.subColorName = name;
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    showToast(`Subtitle Color: ${name}`);
+}
+
+function setSubtitleBgStyle(style) {
+    playerSettings.subBgStyle = style;
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    showToast(`Subtitle Background: ${style}`);
+}
+
+function nudgeSubtitleSync(delta) {
+    playerSettings.subSyncOffset = Math.round((playerSettings.subSyncOffset + delta) * 10) / 10;
+    savePlayerSettings();
+    
+    const diffEl = document.getElementById('valSubSyncDiff');
+    if (diffEl) {
+        diffEl.textContent = `${playerSettings.subSyncOffset > 0 ? '+' : ''}${playerSettings.subSyncOffset}s`;
+    }
+    showToast(`Subtitle Offset: ${playerSettings.subSyncOffset > 0 ? '+' : ''}${playerSettings.subSyncOffset}s`);
+}
+
+function resetSubtitleSync() {
+    playerSettings.subSyncOffset = 0.0;
+    savePlayerSettings();
+    const diffEl = document.getElementById('valSubSyncDiff');
+    if (diffEl) diffEl.textContent = `0.0s (In Sync)`;
+    showToast('Subtitle sync reset to 0.0s');
+}
+
+function clearLoadedSubtitles() {
+    const player = document.getElementById('videoPlayer');
+    if (!player) return;
+    const tracks = player.querySelectorAll('track');
+    tracks.forEach(t => t.remove());
+    currentSubtitleTrack = null;
+
+    const subStatus = document.getElementById('valSubtitleLoadedStatus');
+    if (subStatus) subStatus.textContent = 'No Subtitle';
+    const subBtn = document.getElementById('subBtn');
+    if (subBtn) subBtn.classList.remove('active');
+
+    showToast('Subtitles removed');
+}
+
+function updateSubtitleStyleSheet() {
+    let styleEl = document.getElementById('cineboxSubtitleDynamicStyles');
+    if (!styleEl) {
+        styleEl = document.createElement('style');
+        styleEl.id = 'cineboxSubtitleDynamicStyles';
+        document.head.appendChild(styleEl);
+    }
+
+    const sz = playerSettings.subSize || 18;
+    const col = playerSettings.subColor || '#ffffff';
+    let bg = 'rgba(0, 0, 0, 0.75)';
+    let shadow = '0 2px 4px rgba(0,0,0,0.9)';
+
+    if (playerSettings.subBgStyle === 'solid') {
+        bg = '#000000';
+    } else if (playerSettings.subBgStyle === 'shadow') {
+        bg = 'transparent';
+        shadow = '0 0 10px rgba(0,0,0,1), 0 2px 8px rgba(0,0,0,1)';
+    } else if (playerSettings.subBgStyle === 'outline') {
+        bg = 'transparent';
+        shadow = '-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000';
+    }
+
+    styleEl.innerHTML = `
+        video::cue {
+            background-color: ${bg} !important;
+            color: ${col} !important;
+            font-size: ${sz}px !important;
+            text-shadow: ${shadow} !important;
+            font-family: var(--font-body), sans-serif !important;
+            font-weight: 600 !important;
+            border-radius: 6px !important;
+            line-height: 1.4 !important;
+            padding: 4px 10px !important;
+        }
+    `;
+
+    // Update Modal Live Preview Box
+    const prevRender = document.getElementById('subPreviewRender');
+    if (prevRender) {
+        prevRender.style.backgroundColor = bg;
+        prevRender.style.color = col;
+        prevRender.style.fontSize = `${sz}px`;
+        prevRender.style.textShadow = shadow;
+    }
+}
+
+// ==========================================
+// 🕹️ Playback, Gestures & Themes
+// ==========================================
+function setSeekStep(seconds) {
+    playerSettings.seekStep = parseInt(seconds, 10);
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    showToast(`Seek Jump: ${seconds}s`);
+}
+
+function setDefaultPlaybackSpeed(speed) {
+    playerSettings.defaultSpeed = parseFloat(speed);
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    const player = document.getElementById('videoPlayer');
+    if (player) player.playbackRate = playerSettings.defaultSpeed;
+    showToast(`Default Speed: ${speed}x`);
+}
+
+function cyclePlaybackSpeed() {
+    currentSpeedIdx = (currentSpeedIdx + 1) % playbackSpeeds.length;
+    const speed = playbackSpeeds[currentSpeedIdx];
+    setDefaultPlaybackSpeed(speed);
+}
+
+function handleGestureToggle(key, val) {
+    if (key === 'brightness') playerSettings.gestureBrightness = val;
+    if (key === 'volume') playerSettings.gestureVolume = val;
+    if (key === 'doubleTap') playerSettings.gestureDoubleTap = val;
+    savePlayerSettings();
+    applyAllPlayerSettings();
+}
+
+function handlePrefToggle(key, val) {
+    if (key === 'autoResume') playerSettings.autoResume = val;
+    if (key === 'autoPlayNext') playerSettings.autoPlayNext = val;
+    if (key === 'wakeLock') {
+        playerSettings.wakeLock = val;
+        if (val) acquireWakeLock(); else releaseWakeLock();
+    }
+    savePlayerSettings();
+    applyAllPlayerSettings();
+}
+
+function setAutoHideDelay(ms) {
+    playerSettings.autoHideDelay = parseInt(ms, 10);
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    resetControlsTimeout();
+    showToast(`Auto-hide controls: ${ms > 0 ? (ms / 1000) + 's' : 'Never'}`);
+}
+
+function setPlayerTheme(themeKey, colorHex, titleName) {
+    playerSettings.themeName = themeKey;
+    playerSettings.themeColor = colorHex;
+    playerSettings.themeTitle = titleName;
+    savePlayerSettings();
+    applyAllPlayerSettings();
+    updateAmbientGlow();
+    showToast(`Player Theme: ${titleName} 🎨`);
+}
+
+function setSleepTimer(minutesOrEnd) {
+    if (sleepTimeoutId) {
+        clearTimeout(sleepTimeoutId);
+        sleepTimeoutId = null;
+    }
+
+    const stat = document.getElementById('valSleepTimerStatus');
+
+    if (minutesOrEnd === 0 || minutesOrEnd === '0') {
+        playerSettings.sleepTimer = 0;
+        if (stat) stat.textContent = 'Off';
+        showToast('Sleep Timer: Disabled');
+        return;
+    }
+
+    if (minutesOrEnd === 'end') {
+        playerSettings.sleepTimer = 'end';
+        if (stat) stat.textContent = 'End of Video';
+        showToast('Sleep Timer set: Will pause at end of video 🌙');
+        return;
+    }
+
+    const mins = parseInt(minutesOrEnd, 10);
+    playerSettings.sleepTimer = mins;
+    if (stat) stat.textContent = `${mins} Min`;
+
+    sleepTimeoutId = setTimeout(() => {
+        const player = document.getElementById('videoPlayer');
+        if (player) player.pause();
+        showToast('Sleep Timer: Paused playback. Sleep tight! 🌙');
+    }, mins * 60 * 1000);
+
+    showToast(`Sleep Timer set: ${mins} minutes 🌙`);
+}
+
+async function acquireWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLockSentinel = await navigator.wakeLock.request('screen');
+        }
+    } catch (e) {}
+}
+
+function releaseWakeLock() {
+    try {
+        if (wakeLockSentinel) {
+            wakeLockSentinel.release();
+            wakeLockSentinel = null;
+        }
+    } catch (e) {}
+}
+
+// ==========================================
+// 🎛️ Custom Video Player Overlay & Scrubber
+// ==========================================
+function setupCustomPlayerControls() {
+    const container = document.getElementById('videoContainer');
+    if (!container) return;
+
+    ['mousemove', 'touchstart', 'click', 'keydown'].forEach(evt => {
+        container.addEventListener(evt, () => {
+            if (!isControlsLocked) {
+                showCustomControls();
+                resetControlsTimeout();
+            }
+        });
+    });
+
+    const centerArea = document.getElementById('cpCenterArea');
+    if (centerArea) {
+        centerArea.addEventListener('click', (e) => {
+            if (isControlsLocked) return;
+            togglePlayPause();
+        });
+    }
+}
+
+function showCustomControls() {
+    const controls = document.getElementById('customPlayerControls');
+    if (controls) {
+        controls.classList.add('visible');
+    }
+}
+
+function hideCustomControls() {
+    const player = document.getElementById('videoPlayer');
+    if (player && !player.paused && !isControlsLocked) {
+        const controls = document.getElementById('customPlayerControls');
+        if (controls) controls.classList.remove('visible');
+    }
+}
+
+function resetControlsTimeout() {
+    if (controlsHideTimer) {
+        clearTimeout(controlsHideTimer);
+    }
+    const delay = playerSettings.autoHideDelay;
+    if (delay > 0) {
+        controlsHideTimer = setTimeout(() => {
+            hideCustomControls();
+        }, delay);
+    }
+}
+
+function togglePlayPause() {
+    const player = document.getElementById('videoPlayer');
+    if (!player) return;
+
+    if (player.paused) {
+        player.play().catch(() => {});
+        showCenterPlayRipple(true);
+    } else {
+        player.pause();
+        showCenterPlayRipple(false);
+    }
+}
+
+function updatePlayPauseButtonUI(isPlaying) {
+    const btn = document.getElementById('btnCustomPlayPause');
+    if (!btn) return;
+    const playIcon = btn.querySelector('.icon-play');
+    const pauseIcon = btn.querySelector('.icon-pause');
+    if (playIcon) playIcon.style.display = isPlaying ? 'none' : 'block';
+    if (pauseIcon) pauseIcon.style.display = isPlaying ? 'block' : 'none';
+}
+
+function toggleMute() {
+    const player = document.getElementById('videoPlayer');
+    if (!player) return;
+    player.muted = !player.muted;
+    updateVolumeUI();
+    showToast(player.muted ? 'Muted 🔇' : 'Unmuted 🔊');
+}
+
+function handleVolumeSlider(val) {
+    const player = document.getElementById('videoPlayer');
+    if (!player) return;
+    player.muted = false;
+    player.volume = Math.max(0, Math.min(1, val / 100));
+    updateVolumeUI();
+}
+
+function updateVolumeUI() {
+    const player = document.getElementById('videoPlayer');
+    if (!player) return;
+
+    const slider = document.getElementById('customVolumeSlider');
+    if (slider) slider.value = player.muted ? 0 : player.volume * 100;
+
+    const btn = document.getElementById('btnCustomMute');
+    if (btn) {
+        const highIcon = btn.querySelector('.icon-vol-high');
+        const muteIcon = btn.querySelector('.icon-vol-mute');
+        const isMuted = player.muted || player.volume === 0;
+        if (highIcon) highIcon.style.display = isMuted ? 'none' : 'block';
+        if (muteIcon) muteIcon.style.display = isMuted ? 'block' : 'none';
+    }
+}
+
+function toggleTimeRemainingMode() {
+    isTimeRemainingMode = !isTimeRemainingMode;
+    updateScrubberProgress();
+}
+
+function toggleTheaterMode() {
+    isTheaterMode = !isTheaterMode;
+    const box = document.getElementById('playerCinemaBox');
+    if (box) {
+        box.classList.toggle('theater-mode', isTheaterMode);
+    }
+    showToast(isTheaterMode ? 'Theater Mode Active 🎭' : 'Standard Cinema Mode');
+}
+
+function togglePlayerFullscreen() {
+    const cinemaBox = document.getElementById('playerCinemaBox');
+    if (!cinemaBox) return;
+
+    if (!document.fullscreenElement) {
+        cinemaBox.requestFullscreen().catch(() => {});
+    } else {
+        document.exitFullscreen().catch(() => {});
+    }
+}
+
+function lockPlayerScreen() {
+    isControlsLocked = true;
+    const shield = document.getElementById('screenLockShield');
+    if (shield) shield.style.display = 'flex';
+    const controls = document.getElementById('customPlayerControls');
+    if (controls) controls.classList.remove('visible');
+    showToast('Screen touches locked 🔒');
+}
+
+function unlockPlayerScreen() {
+    isControlsLocked = false;
+    const shield = document.getElementById('screenLockShield');
+    if (shield) shield.style.display = 'none';
+    showCustomControls();
+    showToast('Screen unlocked 🔓');
+}
+
+// Scrubber interactions
+function setupCustomScrubber() {
+    const wrap = document.getElementById('customScrubberWrap');
+    const player = document.getElementById('videoPlayer');
+    const tooltip = document.getElementById('scrubberTooltip');
+    if (!wrap || !player) return;
+
+    let isScrubbing = false;
+
+    const updateSeekFromPointer = (e) => {
+        const rect = wrap.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const pos = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        if (player.duration) {
+            player.currentTime = pos * player.duration;
+            updateScrubberProgress();
+        }
+    };
+
+    wrap.addEventListener('mousedown', (e) => {
+        isScrubbing = true;
+        updateSeekFromPointer(e);
+    });
+
+    wrap.addEventListener('mousemove', (e) => {
+        const rect = wrap.getBoundingClientRect();
+        const pos = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+        if (tooltip && player.duration) {
+            tooltip.style.left = `${pos * 100}%`;
+            tooltip.textContent = formatTime(pos * player.duration);
+        }
+        if (isScrubbing) {
+            updateSeekFromPointer(e);
+        }
+    });
+
+    window.addEventListener('mouseup', () => {
+        isScrubbing = false;
+    });
+
+    wrap.addEventListener('touchstart', (e) => {
+        isScrubbing = true;
+        updateSeekFromPointer(e);
+    }, { passive: true });
+
+    wrap.addEventListener('touchmove', (e) => {
+        if (isScrubbing) updateSeekFromPointer(e);
+    }, { passive: true });
+
+    wrap.addEventListener('touchend', () => {
+        isScrubbing = false;
+    });
+}
+
+function updateScrubberProgress() {
+    const player = document.getElementById('videoPlayer');
+    if (!player || !player.duration) return;
+
+    const percent = (player.currentTime / player.duration) * 100;
+    const progressEl = document.getElementById('scrubberProgress');
+    if (progressEl) progressEl.style.width = `${percent}%`;
+
+    const currTimeEl = document.getElementById('cpCurrentTime');
+    const totalDurEl = document.getElementById('cpTotalDuration');
+
+    if (currTimeEl && totalDurEl) {
+        if (isTimeRemainingMode) {
+            const rem = Math.max(0, player.duration - player.currentTime);
+            currTimeEl.textContent = `-${formatTime(rem)}`;
+            totalDurEl.textContent = formatTime(player.duration);
+        } else {
+            currTimeEl.textContent = formatTime(player.currentTime);
+            totalDurEl.textContent = formatTime(player.duration);
+        }
+    }
+}
+
+function updateScrubberBuffer() {
+    const player = document.getElementById('videoPlayer');
+    const bufferEl = document.getElementById('scrubberBuffer');
+    if (!player || !bufferEl || !player.duration || player.buffered.length === 0) return;
+
+    try {
+        const end = player.buffered.end(player.buffered.length - 1);
+        const percent = (end / player.duration) * 100;
+        bufferEl.style.width = `${percent}%`;
+    } catch (e) {}
+}
+
+// ==========================================
+// 📱 Touch Gestures & HUD Engine
+// ==========================================
+function setupMobileTouchGestures() {
+    const container = document.getElementById('videoContainer');
+    const player = document.getElementById('videoPlayer');
+    if (!container || !player) return;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let initialTouchVal = 0;
+    let gestureType = null; // 'brightness' | 'volume' | 'seek'
+
+    container.addEventListener('touchstart', (e) => {
+        if (isControlsLocked || e.touches.length > 1) return;
+        const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        const rect = container.getBoundingClientRect();
+        const xRel = (touchStartX - rect.left) / rect.width;
+
+        if (xRel < 0.4 && playerSettings.gestureBrightness) {
+            gestureType = 'brightness';
+            initialTouchVal = playerSettings.brightness;
+        } else if (xRel > 0.6 && playerSettings.gestureVolume) {
+            gestureType = 'volume';
+            initialTouchVal = playerSettings.audioBoostGain;
+        } else {
+            gestureType = 'seek';
+            initialTouchVal = player.currentTime;
+        }
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e) => {
+        if (isControlsLocked || !gestureType || e.touches.length > 1) return;
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - touchStartX;
+        const deltaY = touchStartY - touch.clientY; // up is positive
+
+        if (gestureType === 'brightness' && Math.abs(deltaY) > 10) {
+            const newB = Math.max(50, Math.min(160, initialTouchVal + (deltaY / 150) * 50));
+            playerSettings.brightness = Math.round(newB);
+            applyVideoFilterCss();
+            showGestureHud('brightness', '☀️', `${playerSettings.brightness}%`, (playerSettings.brightness - 50) / 110);
+        } else if (gestureType === 'volume' && Math.abs(deltaY) > 10) {
+            const newGain = Math.max(0, Math.min(300, initialTouchVal + (deltaY / 150) * 100));
+            playerSettings.audioBoostGain = Math.round(newGain);
+            applyAudioSettings();
+            showGestureHud('volume', newGain > 100 ? '🚀' : '🔊', `${playerSettings.audioBoostGain}%`, playerSettings.audioBoostGain / 300);
+        } else if (gestureType === 'seek' && Math.abs(deltaX) > 15 && player.duration) {
+            const timeDelta = (deltaX / 300) * 60; // 300px = 60s
+            const targetTime = Math.max(0, Math.min(player.duration, initialTouchVal + timeDelta));
+            showSeekHud(formatTime(targetTime), `${timeDelta > 0 ? '+' : ''}${Math.round(timeDelta)}s`);
+        }
+    }, { passive: true });
+
+    container.addEventListener('touchend', (e) => {
+        hideGestureHuds();
+        gestureType = null;
+    });
+}
+
+function showGestureHud(type, icon, value, percent) {
+    const hudB = document.getElementById('hudBrightness');
+    const hudV = document.getElementById('hudVolume');
+
+    if (type === 'brightness' && hudB) {
+        hudB.style.display = 'flex';
+        if (hudV) hudV.style.display = 'none';
+        const fill = document.getElementById('hudBrightnessFill');
+        const val = document.getElementById('hudBrightnessVal');
+        if (fill) fill.style.height = `${Math.max(5, Math.min(100, percent * 100))}%`;
+        if (val) val.textContent = value;
+    } else if (type === 'volume' && hudV) {
+        hudV.style.display = 'flex';
+        if (hudB) hudB.style.display = 'none';
+        const fill = document.getElementById('hudVolumeFill');
+        const val = document.getElementById('hudVolumeVal');
+        const ico = document.getElementById('hudVolumeIcon');
+        if (fill) fill.style.height = `${Math.max(5, Math.min(100, percent * 100))}%`;
+        if (val) val.textContent = value;
+        if (ico) ico.textContent = icon;
+    }
+}
+
+function showSeekHud(timeStr, diffStr) {
+    const hud = document.getElementById('hudSeek');
+    if (!hud) return;
+    hud.style.display = 'flex';
+    const t = document.getElementById('hudSeekTime');
+    const d = document.getElementById('hudSeekDiff');
+    if (t) t.textContent = timeStr;
+    if (d) d.textContent = diffStr;
+}
+
+function hideGestureHuds() {
+    setTimeout(() => {
+        const hudB = document.getElementById('hudBrightness');
+        const hudV = document.getElementById('hudVolume');
+        const hudS = document.getElementById('hudSeek');
+        if (hudB) hudB.style.display = 'none';
+        if (hudV) hudV.style.display = 'none';
+        if (hudS) hudS.style.display = 'none';
+    }, 450);
+}
+
+function showCenterPlayRipple(isPlaying) {
+    const ripple = document.getElementById('centerPlayRipple');
+    const icon = document.getElementById('centerPlayIcon');
+    if (!ripple || !icon) return;
+
+    icon.innerHTML = isPlaying ? '<polygon points="5 3 19 12 5 21 5 3"/>' : '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    ripple.classList.remove('active');
+    void ripple.offsetWidth;
+    ripple.classList.add('active');
+    setTimeout(() => ripple.classList.remove('active'), 550);
+}
+
+// ==========================================
+// 🎛️ Player Customization Studio Modal
+// ==========================================
+function openPlayerCustomModal() {
+    const modal = document.getElementById('playerCustomModal');
+    if (!modal) return;
+    updateCustomizerUIState();
+    modal.style.display = 'flex';
+}
+
+function closePlayerCustomModal() {
+    const modal = document.getElementById('playerCustomModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function switchCustomTab(tabId) {
+    document.querySelectorAll('.custom-tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId || btn.id === `tabBtn${tabId.replace('tab', '')}`);
+    });
+    document.querySelectorAll('.custom-tab-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === tabId);
+    });
+}
+
+// ==========================================
+// ⌨️ Comprehensive Keyboard Shortcuts
 // ==========================================
 function setupSearchKeybindings() {
     document.addEventListener('keydown', (e) => {
         const player = document.getElementById('videoPlayer');
         if (document.activeElement.tagName === 'INPUT') return;
 
-        if (e.code === 'Space' || e.key === 'k') {
+        if (e.code === 'Space' || e.key === 'k' || e.key === 'K') {
             e.preventDefault();
-            if (player) {
-                if (player.paused) player.play(); else player.pause();
-            }
+            togglePlayPause();
         } else if (e.key === 'ArrowRight' || e.key === 'l' || e.key === 'L') {
             e.preventDefault();
-            if (player) seekRelative(10, 'right');
+            const step = playerSettings.seekStep || 10;
+            seekRelative(step, 'right');
         } else if (e.key === 'ArrowLeft' || e.key === 'j' || e.key === 'J') {
             e.preventDefault();
-            if (player) seekRelative(-10, 'left');
+            const step = playerSettings.seekStep || 10;
+            seekRelative(-step, 'left');
         } else if (e.key === 'f' || e.key === 'F') {
             e.preventDefault();
-            if (player) {
-                if (!document.fullscreenElement) {
-                    player.requestFullscreen().catch(() => {});
-                } else {
-                    document.exitFullscreen().catch(() => {});
-                }
-            }
+            togglePlayerFullscreen();
+        } else if (e.key === 't' || e.key === 'T') {
+            e.preventDefault();
+            toggleTheaterMode();
+        } else if (e.key === 's' || e.key === 'S') {
+            e.preventDefault();
+            openPlayerCustomModal();
         } else if (e.key === 'm' || e.key === 'M') {
-            if (player) {
-                player.muted = !player.muted;
-                showToast(player.muted ? 'Muted' : 'Unmuted');
-            }
+            toggleMute();
+        } else if (e.key === 'v' || e.key === 'V') {
+            cycleVideoFilter();
+        } else if (e.key === 'a' || e.key === 'A') {
+            cycleAspectRatio();
         } else if (e.key === 'n' || e.key === 'N') {
             playNextEpisode();
         } else if (e.key === 'p' || e.key === 'P') {
             playPrevEpisode();
         } else if (e.key === 'c' || e.key === 'C') {
             toggleSubtitles();
-        } else if (e.key === 'Escape' && isPlayerMode) {
-            exitPlayerMode();
+        } else if (e.key === 'Escape') {
+            const customModal = document.getElementById('playerCustomModal');
+            const extModal = document.getElementById('externalPlayersModal');
+            const dlModal = document.getElementById('downloadModal');
+            const trModal = document.getElementById('trailerModal');
+
+            if (customModal && customModal.style.display === 'flex') {
+                closePlayerCustomModal();
+            } else if (extModal && extModal.style.display === 'flex') {
+                closeExternalPlayersModal();
+            } else if (dlModal && dlModal.style.display === 'flex') {
+                closeDownloadModal();
+            } else if (trModal && trModal.style.display === 'flex') {
+                closeTrailerModal();
+            } else if (isPlayerMode) {
+                exitPlayerMode();
+            }
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        const customModal = document.getElementById('playerCustomModal');
+        if (customModal && e.target === customModal) {
+            closePlayerCustomModal();
+        }
+        const extModal = document.getElementById('externalPlayersModal');
+        if (extModal && e.target === extModal) {
+            closeExternalPlayersModal();
+        }
+        const dlModal = document.getElementById('downloadModal');
+        if (dlModal && e.target === dlModal) {
+            closeDownloadModal();
+        }
+        const trModal = document.getElementById('trailerModal');
+        if (trModal && e.target === trModal) {
+            closeTrailerModal();
         }
     });
 }
