@@ -16,3 +16,16 @@ Thumbs.db
 # Scratch and logs
 *.log
 scratch/
+build-output/
+*.apk
+*.aab
+
+# Android Gradle
+.gradle/
+build/
+android/build/
+android/app/build/
+android/.gradle/
+local.properties
+*.jks
+*.keystore
