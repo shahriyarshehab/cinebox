@@ -3543,25 +3543,33 @@ async function loadRelatedMedia(tag, currentTitle) {
         const isSeries = obj.tag === 'TV Series' || obj.tag === 'K-Drama' || (obj.url && obj.url.endsWith('/'));
         const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
 
+        const playIconSvg = getLucideSvg(isSeries ? 'tv' : 'play', {
+          width: 16,
+          height: 16,
+          fill: isSeries ? 'none' : 'currentColor',
+          stroke: 'currentColor'
+        });
+        const fallbackIconSvg = getLucideSvg('film', { width: 28, height: 28 });
+
         return `
                 <a class="movie-card" href="${linkUrl}">
                     <div class="card-cover">
                         <img src="${obj.poster}" alt="${safeTitle}" loading="lazy"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                         <div class="cover-fallback" style="display: none;">
-                            <i data-lucide="film" style="width: 28px; height: 28px;"></i>
-                            <div style="font-size: 11px; font-weight: 600;">${obj.title}</div>
+                            ${fallbackIconSvg}
+                            <div style="font-size: 11px; font-weight: 600;">${safeTitle}</div>
                         </div>
                         <div class="tag-badge">${obj.tag || 'HD'}</div>
                         <div class="cover-overlay">
                             <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
-                                <i data-lucide="${isSeries ? 'tv' : 'play'}" style="width: 16px; height: 16px; fill: ${isSeries ? 'none' : 'currentColor'};"></i>
+                                ${playIconSvg}
                             </div>
                             <span style="font-size: 10.5px; font-weight: 700; color: #fff;">${isSeries ? 'View Series' : 'Watch Now'}</span>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-title" title="${obj.title}">${obj.title}</div>
+                        <div class="card-title" title="${safeTitle}">${obj.title}</div>
                         <div class="card-meta">
                             <span>${obj.size || 'HD'}</span>
                             <span>${obj.date || ''}</span>

@@ -308,6 +308,7 @@ function applyHomeData(data) {
   if (currentView === 'home') {
     renderHomeRowsFromPayload(data.categories);
   }
+  refreshLucideIcons();
 }
 
 const ALL_CATEGORY_FILES = Object.values(CATEGORY_JSON_MAP);
@@ -616,7 +617,7 @@ function renderHomeRowsFromPayload(categoriesMap) {
         : item
     );
 
-    const sixItems = items.slice(0, 6);
+    const rowItems = items.slice(0, 7);
     const rowSliderId = `rowSlider_${catIdx}`;
 
     html += `
@@ -636,26 +637,29 @@ function renderHomeRowsFromPayload(categoriesMap) {
                 </div>
 
                 <div class="row-slider" id="${rowSliderId}">
-                    ${sixItems.map((item) => renderMovieCardHtml(item)).join('')}
-                    ${renderShowAllCardHtml(cat)}
+                    ${rowItems.map((item) => renderMovieCardHtml(item)).join('')}
+                    ${renderShowAllCardHtml(cat, rawItems.length)}
                 </div>
             </div>
         `;
   });
 
   container.innerHTML = html;
+  refreshLucideIcons();
 }
 
-function renderShowAllCardHtml(cat) {
+function renderShowAllCardHtml(cat, count) {
+  const arrowSvg = getLucideSvg('arrow-right', { width: 22, height: 22, strokeWidth: 2.2 });
   return `
         <div class="movie-card show-all-card" onclick="openCategoryView('${cat.tag}', '${escapeQuotes(cat.name)}')">
             <div class="show-all-card-inner">
                 <div class="show-all-glow-orb"></div>
                 <div class="show-all-icon-circle">
-                    <i data-lucide="arrow-right"></i>
+                    ${arrowSvg}
                 </div>
                 <div class="show-all-card-title">Show All</div>
                 <div class="show-all-card-cat">${cat.name}</div>
+                ${count && count > 0 ? `<div class="show-all-count">${count.toLocaleString()} Titles</div>` : ''}
             </div>
         </div>
     `;
@@ -683,7 +687,7 @@ function renderHomeRows(container) {
     const catMovies = allMovies.filter((m) => m.tag === cat.tag || (m.category && m.category.includes(cat.tag)));
     if (catMovies.length === 0) return;
 
-    const sixItems = catMovies.slice(0, 6);
+    const rowItems = catMovies.slice(0, 7);
     const rowSliderId = `rowSlider_${catIdx}`;
 
     html += `
@@ -704,7 +708,7 @@ function renderHomeRows(container) {
                 </div>
 
                 <div class="row-slider" id="${rowSliderId}">
-                    ${sixItems.map((item) => renderMovieCardHtml(item)).join('')}
+                    ${rowItems.map((item) => renderMovieCardHtml(item)).join('')}
                     ${renderShowAllCardHtml(cat, catMovies.length)}
                 </div>
             </div>
@@ -712,6 +716,7 @@ function renderHomeRows(container) {
   });
 
   container.innerHTML = html;
+  refreshLucideIcons();
 }
 
 async function fetchCategoryData(tag) {
@@ -1515,26 +1520,34 @@ function renderMovieCardHtml(item) {
   const markerHtml = getMediaReleaseMarker(item.date);
   const isRecent = markerHtml.length > 0;
 
+  const playIconSvg = getLucideSvg(isSeries ? 'tv' : 'play', {
+    width: 16,
+    height: 16,
+    fill: isSeries ? 'none' : 'currentColor',
+    stroke: 'currentColor'
+  });
+  const fallbackIconSvg = getLucideSvg('film', { width: 24, height: 24 });
+
   return `
         <a class="movie-card" href="${linkUrl}">
             <div class="card-cover">
                 <img src="${item.poster}" alt="${safeTitle}" loading="lazy" decoding="async"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="cover-fallback" style="display: none;">
-                    <i data-lucide="film" style="width: 24px; height: 24px;"></i>
-                    <div style="font-size: 10px; font-weight: 600;">${item.title}</div>
+                    ${fallbackIconSvg}
+                    <div style="font-size: 10px; font-weight: 600;">${safeTitle}</div>
                 </div>
                 ${markerHtml}
                 <div class="tag-badge">${item.tag || (isSeries ? 'Series' : 'HD')}</div>
                 <div class="cover-overlay">
                     <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
-                        <i data-lucide="${isSeries ? 'tv' : 'play'}" style="width: 14px; height: 14px; fill: ${isSeries ? 'none' : 'currentColor'};"></i>
+                        ${playIconSvg}
                     </div>
                     <span style="font-size: 10px; font-weight: 700; color: #fff;">${isSeries ? 'Series' : 'Watch'}</span>
                 </div>
             </div>
             <div class="card-body">
-                <div class="card-title" title="${item.title}">${item.title}</div>
+                <div class="card-title" title="${safeTitle}">${item.title}</div>
                 <div class="card-meta">
                     <span>${item.size || 'HD'}</span>
                     <span style="${isRecent ? 'color: var(--primary); font-weight: 700;' : ''}">${item.date || ''}</span>

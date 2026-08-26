@@ -393,18 +393,23 @@ function dismissPwaBanner() {
 // ==========================================
 // Lucide Icons Integration Engine
 // ==========================================
+const CINEBOX_ICON_PATHS = {
+  'arrow-right': '<path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path>',
+  'arrow-left': '<path d="m12 19-7-7 7-7"></path><path d="M19 12H5"></path>',
+  'play': '<polygon points="6 3 20 12 6 21 6 3"></polygon>',
+  'tv': '<rect width="20" height="15" x="2" y="7" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline>',
+  'film': '<rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M7 3v18"></path><path d="M17 3v18"></path><path d="M3 7.5h4"></path><path d="M3 12h18"></path><path d="M3 16.5h4"></path><path d="M17 16.5h4"></path><path d="M17 7.5h4"></path>',
+  'sparkles': '<path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"></path>',
+  'bookmark': '<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>',
+  'search': '<circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path>',
+  'chevron-left': '<path d="m15 18-6-6 6-6"></path>',
+  'chevron-right': '<path d="m9 18 6-6-6-6"></path>',
+  'x': '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>',
+  'house': '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>',
+  'loader-2': '<path d="M21 12a9 9 0 1 1-6.219-8.56"></path>'
+};
+
 function getLucideSvg(iconName, options = {}) {
-  if (!window.lucide || !window.lucide.icons) {
-    return `<i data-lucide="${iconName}"></i>`;
-  }
-  const pascal = iconName
-    .split('-')
-    .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-    .join('');
-  const iconDef = window.lucide.icons[pascal] || window.lucide.icons[iconName];
-  if (!iconDef) {
-    return `<i data-lucide="${iconName}"></i>`;
-  }
   const cls = options.class || 'icon lucide-icon';
   const width = options.width || 18;
   const height = options.height || 18;
@@ -412,16 +417,32 @@ function getLucideSvg(iconName, options = {}) {
   const fill = options.fill || 'none';
   const stroke = options.stroke || 'currentColor';
 
-  const children = iconDef
-    .map(([tag, attrs]) => {
-      const attrStr = Object.entries(attrs)
-        .map(([k, v]) => `${k}="${v}"`)
-        .join(' ');
-      return `<${tag} ${attrStr}></${tag}>`;
-    })
-    .join('');
+  if (window.lucide) {
+    const pascal = iconName
+      .split('-')
+      .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+      .join('');
+    const iconsMap = window.lucide.icons || window.lucide;
+    const iconDef = iconsMap[pascal] || iconsMap[iconName] || (window.lucide[pascal] || window.lucide[iconName]);
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${children}</svg>`;
+    if (iconDef && Array.isArray(iconDef)) {
+      const children = iconDef
+        .map(([tag, attrs]) => {
+          const attrStr = Object.entries(attrs)
+            .map(([k, v]) => `${k}="${v}"`)
+            .join(' ');
+          return `<${tag} ${attrStr}></${tag}>`;
+        })
+        .join('');
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${children}</svg>`;
+    }
+  }
+
+  if (CINEBOX_ICON_PATHS[iconName]) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" class="${cls}">${CINEBOX_ICON_PATHS[iconName]}</svg>`;
+  }
+
+  return `<i data-lucide="${iconName}" style="width:${width}px;height:${height}px;"></i>`;
 }
 
 function refreshLucideIcons() {
