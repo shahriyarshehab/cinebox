@@ -335,3 +335,40 @@ function slideRow(rowId, direction) {
     const scrollAmount = Math.max(cardWidth * 2, Math.floor(slider.clientWidth * 0.75)) * direction;
     slider.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 }
+
+// ==========================================
+// 📱 PWA Install Promotion Engine
+// ==========================================
+let deferredPwaPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPwaPrompt = e;
+    const dismissedUntil = localStorage.getItem('cinebox_pwa_dismissed');
+    if (dismissedUntil && Date.now() < Number(dismissedUntil)) return;
+    
+    const banner = document.getElementById('pwaBanner');
+    if (banner) banner.style.display = 'flex';
+});
+
+function installPwaApp() {
+    if (!deferredPwaPrompt) {
+        showToast('Install CineBox via browser menu (Add to Home Screen)');
+        return;
+    }
+    deferredPwaPrompt.prompt();
+    deferredPwaPrompt.userChoice.then((choice) => {
+        if (choice.outcome === 'accepted') {
+            showToast('Installing CineBox App... 🎉');
+        }
+        deferredPwaPrompt = null;
+        dismissPwaBanner();
+    });
+}
+
+function dismissPwaBanner() {
+    const banner = document.getElementById('pwaBanner');
+    if (banner) banner.style.display = 'none';
+    localStorage.setItem('cinebox_pwa_dismissed', (Date.now() + 7 * 24 * 60 * 60 * 1000).toString());
+}
+

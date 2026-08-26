@@ -524,19 +524,27 @@ function toggleWatchlistAndRefresh(movieObj, event) {
 // ==========================================
 function renderView() {
     const main = document.getElementById('mainContent');
+    const carousel = document.getElementById('heroCarousel');
+    const page = detectPageType();
 
     if (currentView === 'home') {
-        document.getElementById('heroCarousel').style.display = 'block';
+        if (carousel) carousel.style.display = 'block';
         if (homeData && homeData.categories) {
             renderHomeRowsFromPayload(homeData.categories);
         } else {
             renderHomeRows(main);
         }
     } else if (currentView === 'watchlist') {
-        document.getElementById('heroCarousel').style.display = 'none';
+        if (carousel) carousel.style.display = 'none';
         renderWatchlistView();
     } else {
-        document.getElementById('heroCarousel').style.display = 'none';
+        if (carousel) {
+            if (page !== 'home' && (currentCategoryTag.startsWith('All_') || currentCategoryTag === 'All')) {
+                carousel.style.display = 'block';
+            } else {
+                carousel.style.display = 'none';
+            }
+        }
         renderCategoryFullGrid(main);
     }
 }
