@@ -151,6 +151,231 @@ async function initWatch() {
     }
 }
 
+// ==========================================
+// 🌐 Real-Time Online Movie & Series Metadata Engine
+// ==========================================
+function parseCleanMediaInfo(rawTitle) {
+    if (!rawTitle) return { cleanName: '', year: '', isSeries: false };
+    let title = rawTitle.trim().replace(/^\d+\.\s*/, '');
+    const isSeries = /TV\s*(Series|Mini\s*Series)?/i.test(title);
+    const yearMatch = title.match(/\b(19\d{2}|20\d{2})\b/);
+    const year = yearMatch ? yearMatch[1] : '';
+
+    let cleanName = title
+        .replace(/\(TV\s*(Series|Mini\s*Series)?[^)]*\)/gi, '')
+        .replace(/\((19\d{2}|20\d{2})[^)]*\)/g, '')
+        .replace(/\[[^\]]*\]/g, '')
+        .replace(/\b(1080p|720p|480p|576p|2160p|4K|WEB-?DL|BluRay|HD|HDRip|DVDRip|Dual\s*Audio|Multi\s*Audio|Hindi\s*Dubbed|UNCUT|REM|HEVC|x265|x264|AAC|ESub|DDR|AMZN|DSNP|NF)\b/gi, '')
+        .replace(/[._]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    return { cleanName, year, isSeries };
+}
+
+const OMDB_API_KEYS = ['trilogy', 'b7da8d63', 'd63a8a37', 'a8c17b8f'];
+
+let preloadedMetaCache = null;
+
+async function getPreloadedMetaCache() {
+    if (preloadedMetaCache) return preloadedMetaCache;
+    try {
+        const res = await fetch('./metadata_cache.json');
+        if (res.ok) {
+            preloadedMetaCache = await res.json();
+            return preloadedMetaCache;
+        }
+    } catch(e) {}
+    return {};
+}
+
+async function fetchOnlineMetadata(rawTitle, fallbackCategory = '') {
+    const { cleanName, year, isSeries } = parseCleanMediaInfo(rawTitle);
+    if (!cleanName) return null;
+
+    // Check preloaded static cache first (0ms instantaneous)
+    const preloaded = await getPreloadedMetaCache();
+    if (preloaded && preloaded[cleanName.toLowerCase()]) {
+        return preloaded[cleanName.toLowerCase()];
+    }
+
+    const cacheKey = `cinebox_meta_${cleanName.toLowerCase()}_${year || ''}`;
+    try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Date.now() - parsed._cachedAt < 1000 * 60 * 60 * 24 * 14) {
+                return parsed.data;
+            }
+        }
+    } catch (e) {}
+
+    let meta = null;
+
+    // 1. Try OMDb API with failover keys
+    for (const key of OMDB_API_KEYS) {
+        try {
+            const url = `https://www.omdbapi.com/?t=${encodeURIComponent(cleanName)}${year ? '&y=' + year : ''}&plot=full&apikey=${key}`;
+            const res = await fetch(url);
+            if (res.ok) {
+                const data = await res.json();
+                if (data.Response === 'True') {
+                    meta = {
+                        title: data.Title,
+                        year: data.Year,
+                        rating: data.imdbRating && data.imdbRating !== 'N/A' ? data.imdbRating : null,
+                        runtime: data.Runtime && data.Runtime !== 'N/A' ? data.Runtime : null,
+                        rated: data.Rated && data.Rated !== 'N/A' ? data.Rated : null,
+                        genres: data.Genre && data.Genre !== 'N/A' ? data.Genre.split(',').map(g => g.trim()) : [],
+                        director: data.Director && data.Director !== 'N/A' ? data.Director : null,
+                        actors: data.Actors && data.Actors !== 'N/A' ? data.Actors : null,
+                        synopsis: data.Plot && data.Plot !== 'N/A' ? data.Plot : null,
+                        awards: data.Awards && data.Awards !== 'N/A' ? data.Awards : null,
+                        language: data.Language && data.Language !== 'N/A' ? data.Language : null,
+                        poster: data.Poster && data.Poster !== 'N/A' ? data.Poster : null
+                    };
+                    break;
+                }
+            }
+        } catch (e) {}
+    }
+
+    // 2. If Series or TVMaze lookup
+    if (!meta && (isSeries || fallbackCategory.includes('TV') || fallbackCategory.includes('Drama') || fallbackCategory.includes('Series'))) {
+        try {
+            const res = await fetch(`https://api.tvmaze.com/singlesearch/shows?q=${encodeURIComponent(cleanName)}`);
+            if (res.ok) {
+                const data = await res.json();
+                const summary = (data.summary || '').replace(/<[^>]*>/g, '').trim();
+                meta = {
+                    title: data.name,
+                    year: data.premiered ? data.premiered.slice(0, 4) : year,
+                    rating: data.rating && data.rating.average ? data.rating.average.toString() : null,
+                    runtime: data.averageRuntime ? `${data.averageRuntime} min/ep` : null,
+                    genres: data.genres || [],
+                    synopsis: summary,
+                    network: data.network ? data.network.name : (data.webChannel ? data.webChannel.name : null),
+                    poster: data.image ? (data.image.original || data.image.medium) : null,
+                    backdrop: data.image ? data.image.original : null
+                };
+            }
+        } catch (e) {}
+    }
+
+    // 3. Fallback to Wikipedia REST API
+    if (!meta) {
+        try {
+            const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(cleanName.replace(/\s+/g, '_'))}`);
+            if (wikiRes.ok) {
+                const wiki = await wikiRes.json();
+                if (wiki.extract && !wiki.title.toLowerCase().includes('disambiguation')) {
+                    meta = {
+                        title: wiki.title,
+                        year: year,
+                        synopsis: wiki.extract,
+                        backdrop: wiki.originalimage ? wiki.originalimage.source : (wiki.thumbnail ? wiki.thumbnail.source : null)
+                    };
+                }
+            }
+        } catch (e) {}
+    }
+
+    if (meta) {
+        try {
+            localStorage.setItem(cacheKey, JSON.stringify({ _cachedAt: Date.now(), data: meta }));
+        } catch (e) {}
+    }
+
+    return meta;
+}
+
+async function loadAndApplyOnlineMetadata(item) {
+    if (!item || !item.title) return;
+    try {
+        const meta = await fetchOnlineMetadata(item.title, item.category || item.tag);
+        if (!meta) return;
+
+        // Apply synopsis
+        if (meta.synopsis) {
+            const synEl = document.getElementById('wSynopsis');
+            if (synEl) synEl.textContent = meta.synopsis;
+        }
+
+        // Apply IMDb rating
+        if (meta.rating) {
+            const rateEl = document.getElementById('wRating');
+            if (rateEl) {
+                rateEl.innerHTML = `<span style="color:#ffb800; font-size:14px;">★</span> ${meta.rating} / 10`;
+            }
+        }
+
+        // Apply runtime
+        if (meta.runtime) {
+            const durEl = document.getElementById('wDuration');
+            if (durEl) durEl.textContent = meta.runtime;
+        }
+
+        // Apply year
+        if (meta.year) {
+            const yearEl = document.getElementById('wYear');
+            if (yearEl) yearEl.textContent = meta.year;
+        }
+
+        // Apply Genres
+        if (meta.genres && meta.genres.length > 0) {
+            const genEl = document.getElementById('wGenres');
+            if (genEl) {
+                genEl.innerHTML = meta.genres.map(g => `
+                    <a class="mb-genre-pill" href="index.html?q=${encodeURIComponent(g)}"># ${g}</a>
+                `).join('') + `
+                    <span class="mb-genre-pill" style="border-color: rgba(255, 184, 0, 0.4); color: #ffb800;">★ Official IMDb</span>
+                `;
+            }
+        }
+
+        // Apply Director
+        if (meta.director) {
+            const dirWrap = document.getElementById('wDirectorWrap');
+            const dirVal = document.getElementById('wDirectorVal');
+            if (dirWrap && dirVal) {
+                dirVal.textContent = meta.director;
+                dirWrap.style.display = 'flex';
+            }
+        }
+
+        // Apply Cast
+        if (meta.actors) {
+            const actWrap = document.getElementById('wActorsWrap');
+            const actVal = document.getElementById('wActorsVal');
+            if (actWrap && actVal) {
+                actVal.textContent = meta.actors;
+                actWrap.style.display = 'flex';
+            }
+        }
+
+        // Apply Awards
+        if (meta.awards) {
+            const awWrap = document.getElementById('wAwardsWrap');
+            const awVal = document.getElementById('wAwardsVal');
+            if (awWrap && awVal) {
+                awVal.textContent = meta.awards;
+                awWrap.style.display = 'flex';
+            }
+        }
+
+        // High-res backdrop
+        if (meta.backdrop || meta.poster) {
+            const bg = meta.backdrop || meta.poster;
+            const bEl = document.getElementById('mbBackdrop');
+            if (bEl && bg) {
+                bEl.style.backgroundImage = `url('${bg}')`;
+            }
+        }
+    } catch (e) {
+        console.warn('Online metadata notice:', e);
+    }
+}
+
 function renderWatchPage(item) {
     document.title = `${item.title} — CineBox`;
     
@@ -237,6 +462,9 @@ function renderWatchPage(item) {
         document.getElementById('tvExplorerWrap').style.display = 'flex';
         loadTvSeriesSeasons(item.url, item.title);
     }
+
+    // Retrieve & apply rich real-time metadata (IMDb rating, Plot synopsis, Director, Cast, Awards, Genres)
+    loadAndApplyOnlineMetadata(item);
 }
 
 // ==========================================
