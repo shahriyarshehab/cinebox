@@ -651,6 +651,10 @@ function renderWatchPage(item) {
     const { cleanName, year } = parseCleanMediaInfo(item.title);
     currentTrailerQuery = `${cleanName} ${year || ''}`;
 
+    // Ensure stream state is initialized for external launchers
+    if (item.url) currentActiveStreamUrl = item.url;
+    if (item.title) currentActiveStreamTitle = item.title;
+
     // MovieBox Action Buttons (On Details View)
     document.getElementById('wActions').innerHTML = `
         ${isSeries ? `
@@ -661,17 +665,9 @@ function renderWatchPage(item) {
         ` : `
             <button class="mb-btn-primary" onclick="enterPlayerMode('${item.url}', '${escapeQuotes(item.title)}')">
                 <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M8 5v14l11-7z"/></svg>
-                <span>▶ Watch Online</span>
+                <span>Watch Online</span>
             </button>
         `}
-        <button class="mb-btn-action mb-btn-trailer" onclick="openTrailerModal('${escapeQuotes(cleanName + ' ' + (year || ''))}')" title="Watch official HD trailer">
-            <svg class="icon" viewBox="0 0 24 24" fill="currentColor" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            <span>Trailer</span>
-        </button>
-        <button class="mb-btn-action mb-btn-external" onclick="openExternalPlayersModal('${item.url}', '${escapeQuotes(item.title)}')" title="Play in External Players (VLC, MX Player, PotPlayer)">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
-            <span>External Player</span>
-        </button>
         ${isSeries ? `
             <button class="mb-btn-action" onclick="openDownloadModal(null, null, true)">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -683,10 +679,6 @@ function renderWatchPage(item) {
                 <span>Download</span>
             </button>
         `}
-        <button class="mb-btn-action" onclick="openPlayerCustomModal()" title="Customize Video Player Settings">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-            <span>Player Settings</span>
-        </button>
         <button class="mb-btn-action" onclick="toggleCurrentWatchlist()">
             <svg class="icon" id="wHeartIconAction" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
             <span id="wWatchlistActionText">${isInWatchlist(item.title) ? 'Saved ❤️' : 'Watchlist'}</span>
@@ -1208,9 +1200,10 @@ function triggerNextEpisodeCountdown() {
     if (!currentSeasonEpisodes[nextIdx]) return;
 
     const nextEp = currentSeasonEpisodes[nextIdx];
-    document.getElementById('nextEpTitle').textContent = `${currentSeasonName} • ${nextEp.name}`;
+    const epTitleEl = document.getElementById('nextEpTitle');
+    if (epTitleEl) epTitleEl.textContent = `${currentSeasonName} • ${nextEp.name}`;
     const countdownEl = document.getElementById('nextEpCountdown');
-    countdownEl.style.display = 'block';
+    if (countdownEl) countdownEl.style.display = 'block';
 
     let secs = 8;
     document.getElementById('countdownSecs').textContent = secs;
@@ -1493,16 +1486,17 @@ function renderPlayerEpisodeList(episodes) {
 }
 
 function playSpecificEpisode(idx) {
-    if (!currentSeasonEpisodes[idx]) return;
+    if (!currentSeasonEpisodes || !currentSeasonEpisodes[idx]) return;
     cancelNextEpisode();
     currentPlayingEpisodeIdx = idx;
     const ep = currentSeasonEpisodes[idx];
 
-    const fullTitle = `${currentSeasonName} • ${ep.name}`;
+    const fullTitle = `${currentSeasonName || 'Episode'} • ${ep.name}`;
     currentActiveStreamUrl = ep.url;
     currentActiveStreamTitle = fullTitle;
 
-    document.getElementById('playerNavBtns').style.display = 'flex';
+    const cpNav = document.getElementById('cpSeriesNav');
+    if (cpNav) cpNav.style.display = 'inline-flex';
 
     renderEpisodeListHtml(currentSeasonEpisodes);
     renderPlayerEpisodeList(currentSeasonEpisodes);
@@ -1511,7 +1505,10 @@ function playSpecificEpisode(idx) {
     if (!isPlayerMode) {
         enterPlayerMode(ep.url, fullTitle);
     } else {
-        document.getElementById('playerHeadingTitle').textContent = fullTitle;
+        const headTitle = document.getElementById('playerHeadingTitle');
+        if (headTitle) headTitle.textContent = fullTitle;
+        const cpTitle = document.getElementById('cpMediaTitle');
+        if (cpTitle) cpTitle.textContent = fullTitle;
         startStream(ep.url, fullTitle);
     }
 }

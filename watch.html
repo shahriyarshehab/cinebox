@@ -230,17 +230,51 @@
                     <span style="font-size: 11.5px; color: var(--text-muted);">Ultra-speed BDIX Playback</span>
                 </div>
                 <div class="player-hub-grid">
-                    <button class="btn mb-btn-primary" onclick="openExternalPlayersModal(currentActiveStreamUrl, currentActiveStreamTitle)" style="min-height: 42px; font-size: 13px; padding: 9px 18px;">
-                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        <span>Launch External Player Hub</span>
+                    <!-- VLC Media Player -->
+                    <button class="btn btn-vlc" onclick="openCurrentInVLC()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Stream directly in VLC Media Player">
+                        <svg class="icon" viewBox="0 0 512 512" width="16" height="16" aria-label="VLC" style="vertical-align: middle;">
+                            <g fill="#ffffff">
+                                <path d="M437 400l-36-94c-3-10-13-16-23-16H134c-10 0-20 6-23 16l-36 94c-2 3-2 7-2 11 0 16 13 29 29 29h308a29 29 0 0 0 27-40z"/>
+                                <path d="M299 109l-15-51c-3-11-13-18-24-18h-8c-11 0-21 7-24 18l-15 51a307 307 0 0 0 86 0zM256 183c-24 0-46-2-64-6l-19 65c20 8 49 13 83 13s63-5 83-13l-20-65c-17 4-39 6-63 6z"/>
+                            </g>
+                            <g fill="#ffe0b2">
+                                <path d="M319 177l-20-68a307 307 0 0 1-86 0l-21 68c18 4 40 6 64 6s46-2 63-6z"/>
+                                <path d="M173 242l-18 62c19 14 55 23 101 23s82-9 101-23l-18-62c-20 8-49 13-83 13s-63-5-83-13z"/>
+                            </g>
+                        </svg>
+                        <span>VLC Player</span>
                     </button>
-                    <button class="btn btn-ghost" onclick="copyCurrentStreamUrl()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;">
+
+                    <!-- PotPlayer (PC) -->
+                    <button class="btn btn-pot" onclick="openInPotPlayer()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Stream in PotPlayer (Windows PC)">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        <span>PotPlayer</span>
+                    </button>
+
+                    <!-- MX Player (Android) -->
+                    <button class="btn btn-mx" onclick="openInMXPlayer()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Stream in MX Player (Android HW+)">
+                        <svg class="icon" viewBox="0 0 48 48" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M24,2.5A21.5,21.5,0,1,0,45.5,24,21.51,21.51,0,0,0,24,2.5ZM18.07,13.14a1.42,1.42,0,0,1,.82.23l15.75,10.2a1.44,1.44,0,0,1,0,2.41L18.89,36.18A1.44,1.44,0,0,1,16.67,35V14.57a1.43,1.43,0,0,1,1.4-1.43Z"/>
+                        </svg>
+                        <span>MX Player</span>
+                    </button>
+
+                    <!-- Copy Stream Link -->
+                    <button class="btn btn-ghost" onclick="copyCurrentStreamUrl()" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Copy direct BDIX stream URL">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                        <span>Copy Stream Link</span>
+                        <span>Copy Link</span>
                     </button>
-                    <button class="btn btn-ghost" onclick="exportStreamM3u(currentActiveStreamUrl, currentActiveStreamTitle)" style="min-height: 42px; font-size: 13px; padding: 9px 16px;">
+
+                    <!-- Export Playlist (.m3u) -->
+                    <button class="btn btn-ghost" onclick="exportStreamM3u(currentActiveStreamUrl, currentActiveStreamTitle)" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="Export stream as .m3u playlist">
                         <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        <span>Export Playlist (.m3u)</span>
+                        <span>Export .m3u</span>
+                    </button>
+
+                    <!-- More Players / External Player Hub -->
+                    <button class="btn btn-ghost" onclick="openExternalPlayersModal(currentActiveStreamUrl, currentActiveStreamTitle)" style="min-height: 42px; font-size: 13px; padding: 9px 16px;" title="View all external players & options">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polygon points="5 3 19 12 5 21 5 3"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+                        <span>More Players</span>
                     </button>
                 </div>
             </div>
@@ -260,9 +294,6 @@
 
     </main>
 
-    <!-- ================================================================= -->
-    <!-- 📺 2. FOCUSED ONLINE PLAYER VIEW (Opened on "Watch Online" Click) -->
-    <!-- ================================================================= -->
     <!-- ================================================================= -->
     <!-- 📺 2. FOCUSED ONLINE PLAYER VIEW (Opened on "Watch Online" Click) -->
     <!-- ================================================================= -->
