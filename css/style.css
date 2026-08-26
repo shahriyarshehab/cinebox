@@ -2552,78 +2552,66 @@ header {
     background: transparent;
     border: none;
     color: #fff;
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
     flex-shrink: 0;
+    position: relative;
 }
 
 .cp-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: var(--primary);
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    transform: scale(1.08);
+}
+
+.cp-btn:active {
+    transform: scale(0.94);
 }
 
 .cp-btn.active {
     color: var(--primary);
 }
 
+#subBtn.active {
+    color: var(--primary);
+}
+
+#subBtn.active::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 14px;
+    height: 2px;
+    background: var(--primary);
+    border-radius: 2px;
+    box-shadow: 0 0 6px var(--primary-glow);
+}
+
 .cp-btn-play {
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.12);
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.14);
     border-radius: 50%;
+    margin-right: 2px;
 }
 
 .cp-btn-play:hover {
     background: var(--primary);
     color: #07090e;
-    box-shadow: 0 0 12px var(--primary-glow);
-}
-
-.cp-btn-step {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.cp-step-label {
-    position: absolute;
-    bottom: 2px;
-    font-size: 8px;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1;
+    box-shadow: 0 0 16px var(--primary-glow);
+    transform: scale(1.1);
 }
 
 .cp-series-nav {
     display: inline-flex;
     align-items: center;
     gap: 2px;
-}
-
-.cp-btn-badge {
-    width: auto;
-    padding: 0 8px;
-    height: 28px;
-    font-size: 11px;
-    font-weight: 700;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 6px;
-    gap: 4px;
-}
-
-.cp-btn-badge:hover {
-    background: var(--primary);
-    color: #07090e;
-    border-color: var(--primary);
 }
 
 /* Volume Pop-out Slider */
@@ -4229,19 +4217,13 @@ kbd {
     }
 
     .cp-btn {
-        width: 28px;
-        height: 28px;
-    }
-
-    .cp-btn-play {
         width: 32px;
         height: 32px;
     }
 
-    .cp-btn-badge {
-        height: 24px;
-        padding: 0 6px;
-        font-size: 10px;
+    .cp-btn-play {
+        width: 36px;
+        height: 36px;
     }
 
     .cp-controls-row {
