@@ -1800,6 +1800,12 @@ function openInVLC(url, title) {
   title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
   if (!url) return;
 
+  if (window.CineBoxNative && typeof window.CineBoxNative.openInVlc === 'function') {
+    window.CineBoxNative.openInVlc(url, title);
+    showToast('Launching VLC Media Player');
+    return;
+  }
+
   const cleanTitle = encodeURIComponent(title);
   const isAndroid = /Android/i.test(navigator.userAgent);
 
@@ -1826,6 +1832,13 @@ function openInMXPlayer(url, title) {
   url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
   title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
   if (!url) return;
+
+  if (window.CineBoxNative && typeof window.CineBoxNative.openInMx === 'function') {
+    window.CineBoxNative.openInMx(url, title);
+    showToast('Launching MX Player...');
+    return;
+  }
+
   const cleanTitle = encodeURIComponent(title);
   const intentUrl = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;type=video/*;S.title=${cleanTitle};end`;
   window.location.href = intentUrl;
@@ -1843,6 +1856,13 @@ function openInSystemChooser(url, title) {
   url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
   title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
   if (!url) return;
+
+  if (window.CineBoxNative && typeof window.CineBoxNative.openInSystemChooser === 'function') {
+    window.CineBoxNative.openInSystemChooser(url, title);
+    showToast('Opening video player menu...');
+    return;
+  }
+
   const cleanTitle = encodeURIComponent(title);
   const intentUrl = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;S.title=${cleanTitle};end`;
   window.location.href = intentUrl;

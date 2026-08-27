@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,11 +23,14 @@ import android.view.WindowManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
+import android.webkit.JavascriptInterface;
+import android.webkit.SslErrorHandler;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -121,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
         settings.setDatabaseEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
+        settings.setAllowFileAccessFromFileURLs(true);
+        settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setLoadsImagesAutomatically(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
         settings.setBuiltInZoomControls(false);
@@ -134,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
             CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
+            CookieManager.getInstance().setAcceptCookie(true);
         }
 
         // Custom User-Agent tag
@@ -143,15 +150,22 @@ public class MainActivity extends AppCompatActivity {
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
+        // Native JavaScript Bridge for VLC, MX Player, and System Chooser
+        webView.addJavascriptInterface(new CineBoxNativeBridge(), "CineBoxNative");
+
         // Download Listener
         webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
                 try {
                     DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                    request.setMimeType(mimeType);
+                    if (mimeType != null && !mimeType.isEmpty()) {
+                        request.setMimeType(mimeType);
+                    }
                     String cookies = CookieManager.getInstance().getCookie(url);
-                    request.addRequestHeader("cookie", cookies);
+                    if (cookies != null) {
+                        request.addRequestHeader("cookie", cookies);
+                    }
                     request.addRequestHeader("User-Agent", userAgent);
                     request.setDescription("Downloading media from CineBox...");
                     String fileName = URLUtil.guessFileName(url, contentDisposition, mimeType);
@@ -190,17 +204,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             private boolean handleUrlLoading(WebView view, String url) {
-                if (url.startsWith("http://") || url.startsWith("https://")) {
-                    return false; // Keep inside WebView
-                }
-
-                // Handle external apps (VLC, MX Player, WhatsApp, Telegram, etc.)
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(intent);
-                    return true;
-                } catch (ActivityNotFoundException e) {
-                    if (url.startsWith("intent:")) {
+                if (url.startsWith("intent:")) {
+                    try {
+                        Intent intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
+                        if (intent != null) {
+                            startActivity(intent);
+                            return true;
+                        }
+                    } catch (Exception e) {
                         try {
                             Intent parsedIntent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME);
                             String fallbackUrl = parsedIntent.getStringExtra("browser_fallback_url");
@@ -208,10 +219,34 @@ public class MainActivity extends AppCompatActivity {
                                 view.loadUrl(fallbackUrl);
                                 return true;
                             }
+                            String pkg = parsedIntent.getPackage();
+                            if (pkg != null) {
+                                Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkg));
+                                startActivity(marketIntent);
+                                return true;
+                            }
                         } catch (Exception ignored) {}
                     }
                     return true;
                 }
+
+                if (url.startsWith("vlc:") || url.startsWith("mxplayer:") || url.startsWith("market:") || url.startsWith("tel:") || url.startsWith("mailto:")) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                        startActivity(intent);
+                        return true;
+                    } catch (Exception ignored) {}
+                    return true;
+                }
+
+                // Keep normal HTTP / HTTPS pages inside WebView
+                return false;
+            }
+
+            @Override
+            public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+                // Permit SSL connections for mother servers or local proxy IPs
+                handler.proceed();
             }
 
             @Override
@@ -433,5 +468,78 @@ public class MainActivity extends AppCompatActivity {
             webView.destroy();
         }
         super.onDestroy();
+    }
+
+    // =========================================================================
+    //  Native Bridge for VLC, MX Player, and System Chooser Player
+    // =========================================================================
+    public class CineBoxNativeBridge {
+        @JavascriptInterface
+        public void openInVlc(String streamUrl, String title) {
+            runOnUiThread(() -> {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(streamUrl), "video/*");
+                    intent.setPackage("org.videolan.vlc");
+                    intent.putExtra("title", title != null ? title : "Movie");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.parse(streamUrl), "video/*");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(Intent.createChooser(intent, "Play with..."));
+                    } catch (Exception ex) {
+                        Toast.makeText(MainActivity.this, "VLC Player not installed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void openInMx(String streamUrl, String title) {
+            runOnUiThread(() -> {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(streamUrl), "video/*");
+                    intent.setPackage("com.mxtech.videoplayer.ad");
+                    intent.putExtra("title", title != null ? title : "Movie");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.parse(streamUrl), "video/*");
+                        intent.setPackage("com.mxtech.videoplayer.pro");
+                        intent.putExtra("title", title != null ? title : "Movie");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    } catch (Exception ex) {
+                        Toast.makeText(MainActivity.this, "MX Player not installed", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void openInSystemChooser(String streamUrl, String title) {
+            runOnUiThread(() -> {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(streamUrl), "video/*");
+                    intent.putExtra("title", title != null ? title : "Movie");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(Intent.createChooser(intent, "Play " + (title != null ? title : "Video")));
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "No video player found", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public boolean isNativeApp() {
+            return true;
+        }
     }
 }
