@@ -5,6 +5,9 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build Android APK
@@ -26,12 +29,13 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: '8.6'
+          gradle-version: '8.7'
 
       - name: Build Debug APK
         working-directory: ./android
         run: |
-          gradle assembleDebug --stacktrace
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
           cp app/build/outputs/apk/debug/app-debug.apk ../cinebox.apk
 
       - name: Upload CineBox APK Artifact
@@ -45,15 +49,25 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v2.0-apk
+          tag_name: v2.0
           name: CineBox Native Android App (v2.0)
           body: |
             ## 🎬 CineBox Standalone Android APK (v2.0)
             
-            - 🚀 **Full-screen Edge-to-Edge UI**: Runs standalone without Chrome or browser address bars.
-            - ⚡ **Hardware Accelerated**: Instant 0ms streaming with custom HTML5 video fullscreen player.
-            - 🔄 **Pull-to-Refresh & High-Speed Media Downloader**: Integrated native download manager.
-            - 🌓 **Deep OLED Dark Theme**: Designed specifically for movies, anime & TV series.
+            Official full-screen Android app for CineBox with hardware-accelerated playback and high-speed BDIX downloading.
+            
+            ### ✨ Key Features:
+            - 🚀 **100% Standalone Full-screen**: Native Android WebView architecture — no Chrome URL bar, no browser banners.
+            - ⚡ **BDIX & Mother Server Cleartext Support**: Seamless playback and poster loading from local BDIX servers (172.16.50.*).
+            - 🎬 **Dedicated Fullscreen Video Player**: Auto-rotates to landscape, auto-hides system navigation bars for immersive movie watching.
+            - 📥 **Native High-Speed Downloader**: Built-in Android DownloadManager saves movies directly to your phone's Downloads directory.
+            - 📺 **External Players Bridge**: 1-tap launching in VLC Media Player, MX Player, and System Player.
+            - 🔄 **Pull-to-Refresh & OLED Dark Theme**: Smooth gestures with Cyber Cyan styling.
+            
+            ### 📦 Installation:
+            1. Download **`cinebox.apk`** below.
+            2. Tap the downloaded file to install on your Android phone, tablet, or Android TV.
+            3. Enjoy buffer-free movies and series!
           files: cinebox.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
