@@ -256,7 +256,13 @@
     <script>
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(() => {});
+          if (navigator.userAgent.includes('CineBoxNativeApp') || window.CineBoxNative) {
+            navigator.serviceWorker.getRegistrations().then((registrations) => {
+              for (let reg of registrations) reg.unregister();
+            });
+          } else {
+            navigator.serviceWorker.register('./sw.js').catch(() => {});
+          }
         });
       }
     </script>

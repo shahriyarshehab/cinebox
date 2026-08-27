@@ -814,13 +814,19 @@ function renderWatchPage(item) {
   refreshLucideIcons();
 }
 
-// ==========================================
-//  Dedicated Online Player View Mode
-// ==========================================
-function enterPlayerMode(url, title) {
+function enterPlayerMode(url, title, forceWebPlayer = false) {
   if (!url && currentItem) url = currentItem.url;
   if (!title && currentItem) title = currentItem.title;
   if (!url) return;
+
+  // In Native Android App: Launch high-performance AndroidX Media3 ExoPlayer
+  if (!forceWebPlayer && window.CineBoxNative && typeof window.CineBoxNative.playNative === 'function') {
+    const poster = currentItem && currentItem.poster ? currentItem.poster : '';
+    const pos = getPlaybackProgress(url, title);
+    const posMs = pos && pos.time ? Math.floor(pos.time * 1000) : 0;
+    window.CineBoxNative.playNative(url, title, poster, posMs);
+    return;
+  }
 
   isPlayerMode = true;
   currentActiveStreamUrl = url;

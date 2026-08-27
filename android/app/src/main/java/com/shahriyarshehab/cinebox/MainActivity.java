@@ -216,10 +216,31 @@ public class MainActivity extends AppCompatActivity {
             @Nullable
             @Override
             public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                String method = request.getMethod();
                 String url = request.getUrl().toString();
+
+                // 1. Handle CORS & Private Network Access (PNA) Preflight OPTIONS requests
+                if ("OPTIONS".equalsIgnoreCase(method)) {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Access-Control-Allow-Origin", "*");
+                    headers.put("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD");
+                    headers.put("Access-Control-Allow-Headers", "*");
+                    headers.put("Access-Control-Allow-Private-Network", "true");
+                    headers.put("Access-Control-Max-Age", "86400");
+                    headers.put("Content-Type", "text/plain");
+                    headers.put("Connection", "close");
+                    return new WebResourceResponse("text/plain", "UTF-8", 200, "OK", headers, null);
+                }
+
+                // 2. Intercept Mother Server & BDIX HTTP requests (images, video streams, audio, JSON)
                 if (isMotherServerResource(url)) {
                     try {
                         Request.Builder reqBuilder = new Request.Builder().url(url);
+                        if ("HEAD".equalsIgnoreCase(method)) {
+                            reqBuilder.head();
+                        } else {
+                            reqBuilder.get();
+                        }
                         for (Map.Entry<String, String> header : request.getRequestHeaders().entrySet()) {
                             reqBuilder.addHeader(header.getKey(), header.getValue());
                         }
@@ -232,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
                             responseHeaders.put("Access-Control-Allow-Origin", "*");
                             responseHeaders.put("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
                             responseHeaders.put("Access-Control-Allow-Headers", "*");
+                            responseHeaders.put("Access-Control-Allow-Private-Network", "true");
                             responseHeaders.put("Accept-Ranges", "bytes");
 
                             for (String name : response.headers().names()) {
@@ -414,11 +436,23 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isMotherServerResource(String url) {
         if (url == null) return false;
-        return url.contains("172.16.") ||
-                url.contains("10.") ||
-                url.contains("192.168.") ||
-                url.contains("DHAKA-FLIX") ||
-                (url.startsWith("http://") && (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".mkv") || url.endsWith(".mp4") || url.endsWith(".webp")));
+        String lower = url.toLowerCase();
+        return lower.startsWith("http://172.16.") ||
+                lower.startsWith("http://10.") ||
+                lower.startsWith("http://192.168.") ||
+                lower.contains("dhaka-flix") ||
+                lower.contains("172.16.50.") ||
+                (lower.startsWith("http://") && (
+                        lower.contains(".jpg") ||
+                        lower.contains(".jpeg") ||
+                        lower.contains(".png") ||
+                        lower.contains(".webp") ||
+                        lower.contains(".mkv") ||
+                        lower.contains(".mp4") ||
+                        lower.contains(".m3u8") ||
+                        lower.contains(".ts") ||
+                        lower.contains(".avi")
+                ));
     }
 
     private String getMimeType(String url, Response response) {
