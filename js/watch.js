@@ -1869,6 +1869,22 @@ function openInSystemChooser(url, title) {
   showToast('Opening video player menu...');
 }
 
+function openInExoPlayer(url, title) {
+  url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
+  title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
+  if (!url) return;
+
+  if (window.CineBoxNative && typeof window.CineBoxNative.playNative === 'function') {
+    const poster = currentItem && currentItem.poster ? currentItem.poster : '';
+    const pos = getPlaybackProgress(url, title);
+    const posMs = pos && pos.time ? Math.floor(pos.time * 1000) : 0;
+    window.CineBoxNative.playNative(url, title, poster, posMs);
+    showToast('Launching Modern Native Player...');
+    return;
+  }
+  enterPlayerMode(url, title);
+}
+
 function openExternalPlayersModal(url, title) {
   if (url) currentActiveStreamUrl = url;
   if (title) currentActiveStreamTitle = title;

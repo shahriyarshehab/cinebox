@@ -16,6 +16,7 @@ import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -24,6 +25,7 @@ import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
+import android.webkit.MimeTypeMap;
 import android.webkit.SslErrorHandler;
 import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
@@ -48,10 +50,21 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final String APP_URL = "https://shahriyarshehab.github.io/cinebox/";
     private static final int FILE_CHOOSER_REQUEST_CODE = 1001;
+    private static final String TAG = "CineBoxNative";
 
     private WebView webView;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -64,6 +77,14 @@ public class MainActivity extends AppCompatActivity {
 
     private long backPressedTime = 0;
     private Toast exitToast;
+
+    // High-performance OkHttpClient for proxying BDIX mother server streaming & posters
+    private final OkHttpClient httpClient = new OkHttpClient.Builder()
+            .followRedirects(true)
+            .followSslRedirects(true)
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build();
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -145,12 +166,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Custom User-Agent tag
         String defaultUa = settings.getUserAgentString();
-        settings.setUserAgentString(defaultUa + " CineBoxNativeApp/2.0 StandaloneApp");
+        settings.setUserAgentString(defaultUa + " CineBoxNativeApp/2.0 StandaloneApp ExoPlayerReady");
 
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
-        // Native JavaScript Bridge for VLC, MX Player, and System Chooser
+        // Native JavaScript Bridge for ExoPlayer, VLC, MX Player, and System Chooser
         webView.addJavascriptInterface(new CineBoxNativeBridge(), "CineBoxNative");
 
         // Download Listener
@@ -190,8 +211,52 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // WebViewClient
+        // WebViewClient with Mother Server HTTP Interceptor
         webView.setWebViewClient(new WebViewClient() {
+            @Nullable
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                String url = request.getUrl().toString();
+                if (isMotherServerResource(url)) {
+                    try {
+                        Request.Builder reqBuilder = new Request.Builder().url(url);
+                        for (Map.Entry<String, String> header : request.getRequestHeaders().entrySet()) {
+                            reqBuilder.addHeader(header.getKey(), header.getValue());
+                        }
+                        Response response = httpClient.newCall(reqBuilder.build()).execute();
+                        if (response.isSuccessful() || response.code() == 206) {
+                            String mimeType = getMimeType(url, response);
+                            String encoding = "UTF-8";
+
+                            Map<String, String> responseHeaders = new HashMap<>();
+                            responseHeaders.put("Access-Control-Allow-Origin", "*");
+                            responseHeaders.put("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS");
+                            responseHeaders.put("Access-Control-Allow-Headers", "*");
+                            responseHeaders.put("Accept-Ranges", "bytes");
+
+                            for (String name : response.headers().names()) {
+                                responseHeaders.put(name, response.header(name));
+                            }
+
+                            ResponseBody body = response.body();
+                            InputStream stream = body != null ? body.byteStream() : null;
+
+                            return new WebResourceResponse(
+                                    mimeType,
+                                    encoding,
+                                    response.code(),
+                                    response.message(),
+                                    responseHeaders,
+                                    stream
+                            );
+                        }
+                    } catch (Exception e) {
+                        Log.w(TAG, "Failed to proxy mother server resource: " + url + ", err: " + e.getMessage());
+                    }
+                }
+                return super.shouldInterceptRequest(view, request);
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 String url = request.getUrl().toString();
@@ -347,6 +412,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private boolean isMotherServerResource(String url) {
+        if (url == null) return false;
+        return url.contains("172.16.") ||
+                url.contains("10.") ||
+                url.contains("192.168.") ||
+                url.contains("DHAKA-FLIX") ||
+                (url.startsWith("http://") && (url.endsWith(".jpg") || url.endsWith(".png") || url.endsWith(".mkv") || url.endsWith(".mp4") || url.endsWith(".webp")));
+    }
+
+    private String getMimeType(String url, Response response) {
+        String contentType = response.header("Content-Type");
+        if (contentType != null && !contentType.isEmpty()) {
+            return contentType.split(";")[0].trim();
+        }
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            String mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
+            if (mime != null) return mime;
+        }
+        if (url.endsWith(".mkv")) return "video/x-matroska";
+        if (url.endsWith(".mp4")) return "video/mp4";
+        if (url.endsWith(".jpg") || url.endsWith(".jpeg")) return "image/jpeg";
+        if (url.endsWith(".png")) return "image/png";
+        if (url.endsWith(".webp")) return "image/webp";
+        return "application/octet-stream";
+    }
+
     private void setupSwipeRefresh() {
         swipeRefreshLayout.setColorSchemeColors(Color.parseColor("#00E5FF"), Color.parseColor("#FFB800"));
         swipeRefreshLayout.setProgressBackgroundColorSchemeColor(Color.parseColor("#07090E"));
@@ -471,9 +563,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // =========================================================================
-    //  Native Bridge for VLC, MX Player, and System Chooser Player
+    //  Native Bridge for Media3 ExoPlayer, VLC, MX Player, and System Chooser
     // =========================================================================
     public class CineBoxNativeBridge {
+
+        @JavascriptInterface
+        public void playNative(String streamUrl, String title, String posterUrl, long positionMs) {
+            runOnUiThread(() -> {
+                try {
+                    Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+                    intent.putExtra(PlayerActivity.EXTRA_STREAM_URL, streamUrl);
+                    intent.putExtra(PlayerActivity.EXTRA_TITLE, title);
+                    intent.putExtra(PlayerActivity.EXTRA_POSTER_URL, posterUrl);
+                    intent.putExtra(PlayerActivity.EXTRA_POSITION_MS, positionMs);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Toast.makeText(MainActivity.this, "Cannot start player: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
         @JavascriptInterface
         public void openInVlc(String streamUrl, String title) {
             runOnUiThread(() -> {

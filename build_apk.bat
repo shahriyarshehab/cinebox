@@ -3,7 +3,7 @@ setlocal enabledelayedexpansion
 title CineBox APK Builder
 
 echo ============================================================
-echo   🎬 CineBox Native Android APK Builder
+echo   🎬 CineBox Official Production Release APK Builder
 echo ============================================================
 echo.
 
@@ -54,23 +54,25 @@ if not defined GRADLE_CMD (
 
 echo [+] Using Gradle: %GRADLE_CMD%
 echo.
-echo [*] Building CineBox Standalone APK...
+echo [*] Building CineBox Signed Release APK (Play Protect Compliant)...
 echo.
 
 cd /d "%~dp0android"
-call "%GRADLE_CMD%" assembleDebug --no-daemon
+call "%GRADLE_CMD%" assembleRelease --no-daemon
 
 if %ERRORLEVEL% EQU 0 (
     echo.
     echo ============================================================
-    echo   ✅ CineBox APK built successfully!
+    echo   ✅ CineBox Signed Release APK built successfully!
     echo ============================================================
-    if exist "%~dp0android\app\build\outputs\apk\debug\app-debug.apk" (
-        copy /y "%~dp0android\app\build\outputs\apk\debug\app-debug.apk" "%~dp0cinebox.apk"
-        echo   > Output APK: %~dp0cinebox.apk
+    if exist "%~dp0android\app\build\outputs\apk\release\app-release.apk" (
+        copy /y "%~dp0android\app\build\outputs\apk\release\app-release.apk" "%~dp0cinebox.apk"
+        echo   > Production Output APK: %~dp0cinebox.apk
     )
     echo ============================================================
 ) else (
     echo.
     echo [X] Build failed with exit code %ERRORLEVEL%.
 )
+
+pause
