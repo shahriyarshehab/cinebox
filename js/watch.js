@@ -814,19 +814,10 @@ function renderWatchPage(item) {
   refreshLucideIcons();
 }
 
-function enterPlayerMode(url, title, forceWebPlayer = false) {
+function enterPlayerMode(url, title) {
   if (!url && currentItem) url = currentItem.url;
   if (!title && currentItem) title = currentItem.title;
   if (!url) return;
-
-  // In Native Android App: Launch high-performance AndroidX Media3 ExoPlayer
-  if (!forceWebPlayer && window.CineBoxNative && typeof window.CineBoxNative.playNative === 'function') {
-    const poster = currentItem && currentItem.poster ? currentItem.poster : '';
-    const pos = getPlaybackProgress(url, title);
-    const posMs = pos && pos.time ? Math.floor(pos.time * 1000) : 0;
-    window.CineBoxNative.playNative(url, title, poster, posMs);
-    return;
-  }
 
   isPlayerMode = true;
   currentActiveStreamUrl = url;
@@ -1141,7 +1132,7 @@ function setupPlayerListeners() {
   player.addEventListener('loadedmetadata', () => {
     updateScrubberProgress();
     applyAspectRatioCss();
-    detectNativeAudioTracks();
+    detectAndRenderAudioTracks();
     updateYouTubeMenuState();
     if (playerSettings.defaultSpeed && playerSettings.defaultSpeed !== 1.0) {
       player.playbackRate = playerSettings.defaultSpeed;
@@ -1806,21 +1797,13 @@ function openInVLC(url, title) {
   title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
   if (!url) return;
 
-  if (window.CineBoxNative && typeof window.CineBoxNative.openInVlc === 'function') {
-    window.CineBoxNative.openInVlc(url, title);
-    showToast('Launching VLC Media Player');
-    return;
-  }
-
   const cleanTitle = encodeURIComponent(title);
   const isAndroid = /Android/i.test(navigator.userAgent);
 
   if (isAndroid) {
-    // Direct Android Intent for VLC without downloading any file
     const intentUrl = `intent:${url}#Intent;package=org.videolan.vlc;type=video/*;S.title=${cleanTitle};end`;
     window.location.href = intentUrl;
   } else {
-    // Direct VLC URL scheme on Web/Desktop (Windows, Mac, Linux) without downloading file
     window.location.href = `vlc://${url}`;
   }
 
@@ -1838,12 +1821,6 @@ function openInMXPlayer(url, title) {
   url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
   title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
   if (!url) return;
-
-  if (window.CineBoxNative && typeof window.CineBoxNative.openInMx === 'function') {
-    window.CineBoxNative.openInMx(url, title);
-    showToast('Launching MX Player...');
-    return;
-  }
 
   const cleanTitle = encodeURIComponent(title);
   const intentUrl = `intent:${url}#Intent;package=com.mxtech.videoplayer.ad;type=video/*;S.title=${cleanTitle};end`;
@@ -1863,32 +1840,10 @@ function openInSystemChooser(url, title) {
   title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
   if (!url) return;
 
-  if (window.CineBoxNative && typeof window.CineBoxNative.openInSystemChooser === 'function') {
-    window.CineBoxNative.openInSystemChooser(url, title);
-    showToast('Opening video player menu...');
-    return;
-  }
-
   const cleanTitle = encodeURIComponent(title);
   const intentUrl = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/*;S.title=${cleanTitle};end`;
   window.location.href = intentUrl;
   showToast('Opening video player menu...');
-}
-
-function openInExoPlayer(url, title) {
-  url = url || currentActiveStreamUrl || (currentItem ? currentItem.url : '');
-  title = title || currentActiveStreamTitle || (currentItem ? currentItem.title : 'Movie');
-  if (!url) return;
-
-  if (window.CineBoxNative && typeof window.CineBoxNative.playNative === 'function') {
-    const poster = currentItem && currentItem.poster ? currentItem.poster : '';
-    const pos = getPlaybackProgress(url, title);
-    const posMs = pos && pos.time ? Math.floor(pos.time * 1000) : 0;
-    window.CineBoxNative.playNative(url, title, poster, posMs);
-    showToast('Launching Modern Native Player...');
-    return;
-  }
-  enterPlayerMode(url, title);
 }
 
 function openExternalPlayersModal(url, title) {
@@ -2412,34 +2367,224 @@ function selectAudioTrackMode(mode, title, nativeTrackIdx = -1) {
   showToast(`Audio Track: ${playerSettings.audioTrackTitle}`);
 }
 
-function detectNativeAudioTracks() {
-  const player = document.getElementById('videoPlayer');
-  const container = document.getElementById('ytNativeAudioTracksList');
-  if (!player || !container) return;
+// ==========================================================================
+//  SMART MULTI-LANGUAGE AUDIO TRACK ENGINE (Hindi, English, Bangla, etc.)
+// ==========================================================================
+const CINEBOX_AUDIO_LANGUAGES = [
+  { key: 'hindi', label: 'Hindi', flag: '🇮🇳', nativeName: 'हिन्दी', regex: /\b(hindi|hin|হিন্দি)\b/i },
+  { key: 'english', label: 'English', flag: '🇬🇧', nativeName: 'English', regex: /\b(english|eng|ইংরেজি)\b/i },
+  { key: 'bangla', label: 'Bangla', flag: '🇧🇩', nativeName: 'বাংলা', regex: /\b(bangla|bengali|ben|বাংলা)\b/i },
+  { key: 'tamil', label: 'Tamil', flag: '🇮🇳', nativeName: 'தமிழ்', regex: /\b(tamil|tam|தமிழ்)\b/i },
+  { key: 'telugu', label: 'Telugu', flag: '🇮🇳', nativeName: 'తెలుగు', regex: /\b(telugu|tel|తెలుగు)\b/i },
+  { key: 'malayalam', label: 'Malayalam', flag: '🇮🇳', nativeName: 'മലയാളം', regex: /\b(malayalam|mal|മലയാളം)\b/i },
+  { key: 'kannada', label: 'Kannada', flag: '🇮🇳', nativeName: 'ಕನ್ನಡ', regex: /\b(kannada|kan|ಕನ್ನಡ)\b/i },
+  { key: 'japanese', label: 'Japanese', flag: '🇯🇵', nativeName: '日本語', regex: /\b(japanese|jap|jpn|anime|日本語)\b/i },
+  { key: 'korean', label: 'Korean', flag: '🇰🇷', nativeName: '한국어', regex: /\b(korean|kor|k-drama|한국어)\b/i },
+  { key: 'spanish', label: 'Spanish', flag: '🇪🇸', nativeName: 'Español', regex: /\b(spanish|esp|español)\b/i },
+  { key: 'french', label: 'French', flag: '🇫🇷', nativeName: 'Français', regex: /\b(french|fr|français)\b/i },
+  { key: 'chinese', label: 'Chinese', flag: '🇨🇳', nativeName: '中文', regex: /\b(chinese|mandarin|cantonese|chi|中文)\b/i },
+  { key: 'arabic', label: 'Arabic', flag: '🇸🇦', nativeName: 'العربية', regex: /\b(arabic|ara|العربية)\b/i },
+  { key: 'russian', label: 'Russian', flag: '🇷🇺', nativeName: 'Русский', regex: /\b(russian|rus|русский)\b/i }
+];
 
-  if (player.audioTracks && player.audioTracks.length > 0) {
-    let html = '';
+function getAvailableAudioTracks() {
+  const player = document.getElementById('videoPlayer');
+  const detectedTracks = [];
+
+  // 1. Check Native HTML5 Video audioTracks
+  if (player && player.audioTracks && player.audioTracks.length > 0) {
     for (let i = 0; i < player.audioTracks.length; i++) {
       const tr = player.audioTracks[i];
-      const trackLabel = tr.label || tr.language || `Track ${i + 1}`;
-      const isSelected =
-        playerSettings.audioTrackMode === `native-${i}` ||
-        (playerSettings.audioTrackMode === 'stereo' && i === 0 && tr.enabled);
-      html += `
-                <div class="yt-submenu-item ${isSelected ? 'active' : ''}" data-audiomode="native-${i}" onclick="selectAudioTrackMode('native-${i}', '${escapeQuotes(trackLabel)}', ${i})">
-                    <div class="yt-submenu-item-main">
-                        <span class="yt-opt-title">${trackLabel}</span>
-                        <span class="yt-opt-desc">Embedded Stream Audio Track ${i + 1} (${tr.language || 'Multi-channel'})</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
-                </div>
-            `;
+      let langName = tr.label || tr.language || `Track ${i + 1}`;
+      let flag = '🎧';
+      for (const kl of CINEBOX_AUDIO_LANGUAGES) {
+        if (kl.regex.test(langName) || (tr.language && kl.regex.test(tr.language))) {
+          langName = kl.label;
+          flag = kl.flag;
+          break;
+        }
+      }
+      detectedTracks.push({
+        id: `native-${i}`,
+        type: 'native',
+        nativeIdx: i,
+        label: langName,
+        flag: flag,
+        desc: `Embedded Track ${i + 1} (${tr.language || 'Multi-channel'})`,
+        enabled: tr.enabled
+      });
     }
-    container.innerHTML = html;
-    refreshLucideIcons();
-  } else {
-    container.innerHTML = '';
+    return detectedTracks;
   }
+
+  // 2. Parse language metadata from Title & URL
+  const titleToCheck = `${currentActiveStreamTitle || ''} ${currentItem ? currentItem.title : ''} ${currentItem ? currentItem.url : ''}`;
+  const foundLanguages = [];
+
+  for (const kl of CINEBOX_AUDIO_LANGUAGES) {
+    if (kl.regex.test(titleToCheck)) {
+      if (!foundLanguages.some((l) => l.key === kl.key)) {
+        foundLanguages.push(kl);
+      }
+    }
+  }
+
+  const isDualAudio = /\b(dual\s*audio|multi\s*audio|multi\s*dub|dual)\b/i.test(titleToCheck);
+
+  // If multiple languages are detected (e.g. Hindi, English, Bangla)
+  if (foundLanguages.length > 1) {
+    foundLanguages.forEach((lang, idx) => {
+      const channelMode = idx === 0 ? 'left-channel' : idx === 1 ? 'right-channel' : 'stereo';
+      detectedTracks.push({
+        id: `lang-${lang.key}`,
+        type: 'channel',
+        channelMode: channelMode,
+        label: lang.label,
+        flag: lang.flag,
+        nativeName: lang.nativeName,
+        desc:
+          idx === 0
+            ? `Primary Dub (Channel 1 / Left) • ${lang.nativeName}`
+            : idx === 1
+              ? `Secondary Audio (Channel 2 / Right) • ${lang.nativeName}`
+              : `Track ${idx + 1} (${lang.label}) • ${lang.nativeName}`
+      });
+    });
+
+    // Also offer Combined Stereo Master
+    detectedTracks.push({
+      id: 'stereo',
+      type: 'channel',
+      channelMode: 'stereo',
+      label: 'Stereo Master (All Channels)',
+      flag: '🎧',
+      desc: 'Combined original audio output'
+    });
+
+    return detectedTracks;
+  }
+
+  // If Dual Audio keyword is found but language names weren't explicitly listed:
+  if (isDualAudio && foundLanguages.length === 0) {
+    return [
+      {
+        id: 'lang-hindi',
+        type: 'channel',
+        channelMode: 'left-channel',
+        label: 'Hindi (Track 1 / Dub)',
+        flag: '🇮🇳',
+        desc: 'Dubbed Audio Channel 1'
+      },
+      {
+        id: 'lang-english',
+        type: 'channel',
+        channelMode: 'right-channel',
+        label: 'English (Track 2 / Original)',
+        flag: '🇬🇧',
+        desc: 'Original Audio Channel 2'
+      },
+      {
+        id: 'stereo',
+        type: 'channel',
+        channelMode: 'stereo',
+        label: 'Stereo Master (All Channels)',
+        flag: '🎧',
+        desc: 'Combined stereo master output'
+      }
+    ];
+  }
+
+  // If only ONE language is matched (e.g. Hindi or English or Bangla) OR Single Audio movie:
+  let singleLang = foundLanguages.length === 1 ? foundLanguages[0] : null;
+  if (!singleLang) {
+    if (currentItem && currentItem.tag && /bangla|natok/i.test(currentItem.tag)) {
+      singleLang = { key: 'bangla', label: 'Bangla', flag: '🇧🇩', nativeName: 'বাংলা' };
+    } else if (currentItem && currentItem.tag && /hindi|bollywood/i.test(currentItem.tag)) {
+      singleLang = { key: 'hindi', label: 'Hindi', flag: '🇮🇳', nativeName: 'हिन्दी' };
+    } else {
+      singleLang = { key: 'original', label: 'Original Audio (Main)', flag: '🎧', nativeName: 'Main Audio' };
+    }
+  }
+
+  // Single Audio Track Output
+  return [
+    {
+      id: 'stereo',
+      type: 'channel',
+      channelMode: 'stereo',
+      label: `${singleLang.label} (Original Master)`,
+      flag: singleLang.flag,
+      isSingle: true,
+      desc: `Single Audio Track Available • Stereo 2.0 / 5.1 Surround`
+    }
+  ];
+}
+
+function detectAndRenderAudioTracks() {
+  const container = document.getElementById('dynamicAudioTracksContainer');
+  if (!container) return;
+
+  const tracks = getAvailableAudioTracks();
+  const isSingle = tracks.length === 1 || (tracks.length === 1 && tracks[0].isSingle);
+
+  // Update button badge count
+  const badgeEl = document.getElementById('cpAudioTrackCountBadge');
+  if (badgeEl) {
+    if (tracks.length > 1) {
+      badgeEl.textContent = tracks.length;
+      badgeEl.style.display = 'inline-flex';
+    } else {
+      badgeEl.style.display = 'none';
+    }
+  }
+
+  let html = '';
+
+  if (isSingle) {
+    const tr = tracks[0];
+    html += `
+      <div class="yt-group-label">AVAILABLE AUDIO TRACK (1 TRACK)</div>
+      <div class="yt-submenu-item active" data-audiomode="${tr.id}" onclick="selectAudioTrackMode('${tr.channelMode || 'stereo'}', '${escapeQuotes(tr.label)}')">
+        <div class="yt-submenu-item-main">
+          <span class="yt-opt-title">${tr.flag} ${tr.label}</span>
+          <span class="yt-opt-desc">${tr.desc}</span>
+        </div>
+        <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
+      </div>
+    `;
+  } else {
+    html += `<div class="yt-group-label">AVAILABLE AUDIO TRACKS (${tracks.length} TRACKS)</div>`;
+    tracks.forEach((tr, idx) => {
+      const modeVal = tr.channelMode || tr.id;
+      let isSelected = false;
+      if (playerSettings.audioTrackMode === modeVal) {
+        isSelected = true;
+      } else if (playerSettings.audioTrackMode === tr.id) {
+        isSelected = true;
+      } else if (!playerSettings.audioTrackMode && idx === 0) {
+        isSelected = true;
+      }
+
+      html += `
+        <div class="yt-submenu-item ${isSelected ? 'active' : ''}" data-audiomode="${modeVal}" onclick="selectAudioTrackMode('${modeVal}', '${escapeQuotes(tr.label)}', ${tr.nativeIdx !== undefined ? tr.nativeIdx : -1})">
+          <div class="yt-submenu-item-main">
+            <span class="yt-opt-title">${tr.flag} ${tr.label}</span>
+            <span class="yt-opt-desc">${tr.desc}</span>
+          </div>
+          <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
+        </div>
+      `;
+    });
+  }
+
+  container.innerHTML = html;
+  refreshLucideIcons();
+}
+
+function openAudioTrackDirectMenu(e) {
+  if (e && e.stopPropagation) e.stopPropagation();
+  openYouTubeSettingsPopup();
+  openYouTubeSubmenu('ytSubAudioTrack');
 }
 
 function promptExternalAudioUrl() {
@@ -2602,7 +2747,7 @@ function openYouTubeSettingsPopup() {
   if (!popup) return;
 
   isYouTubeSettingsOpen = true;
-  detectNativeAudioTracks();
+  detectAndRenderAudioTracks();
   updateYouTubeMenuState();
   backToYouTubeMainMenu();
 
@@ -2643,25 +2788,23 @@ function backToYouTubeMainMenu() {
 function updateYouTubeMenuState() {
   // 1. Audio Track Label & Badge
   const ytValAudio = document.getElementById('ytValAudioTrack');
-  let audioLabel = playerSettings.audioTrackTitle || 'Default (Stereo)';
-  if (playerSettings.audioTrackMode === 'left-channel') audioLabel = 'Left (Track 1)';
-  if (playerSettings.audioTrackMode === 'right-channel') audioLabel = 'Right (Track 2)';
+  const tracks = getAvailableAudioTracks();
+  let audioLabel = playerSettings.audioTrackTitle;
+  if (!audioLabel) {
+    audioLabel = tracks.length > 0 ? tracks[0].label : 'Default Audio';
+  }
   if (ytValAudio) ytValAudio.textContent = audioLabel;
 
   const cpAudioBadge = document.getElementById('cpAudioTrackBadge');
   if (cpAudioBadge) {
-    if (playerSettings.audioTrackMode && playerSettings.audioTrackMode !== 'stereo') {
-      cpAudioBadge.style.display = 'inline-flex';
-      cpAudioBadge.textContent = `Audio: ${audioLabel}`;
-    } else {
-      cpAudioBadge.style.display = 'none';
-    }
+    cpAudioBadge.style.display = 'inline-flex';
+    cpAudioBadge.textContent = `Audio: ${audioLabel}`;
   }
 
   // Active classes in Audio Submenu
   document.querySelectorAll('#ytSubAudioTrack .yt-submenu-item').forEach((item) => {
     const mode = item.getAttribute('data-audiomode');
-    item.classList.toggle('active', mode === playerSettings.audioTrackMode);
+    item.classList.toggle('active', mode === playerSettings.audioTrackMode || (!playerSettings.audioTrackMode && mode === 'stereo'));
   });
 
   const syncVal = document.getElementById('ytAudioSyncVal');

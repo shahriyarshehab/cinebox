@@ -685,53 +685,10 @@
                   <span class="yt-submenu-title">Audio Track</span>
                 </div>
                 <div class="yt-menu-list">
-                  <div class="yt-group-label">STREAM AUDIO CHANNELS</div>
+                  <!-- Dynamically Enumerated Audio Tracks (Hindi, English, Bangla, etc.) -->
+                  <div id="dynamicAudioTracksContainer"></div>
 
-                  <!-- Standard Stereo Full -->
-                  <div
-                    class="yt-submenu-item"
-                    data-audiomode="stereo"
-                    onclick="selectAudioTrackMode('stereo', 'Default (Stereo Full)')"
-                  >
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Default Audio (Stereo Full)</span>
-                      <span class="yt-opt-desc">Original multi-channel master audio</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-
-                  <!-- Dynamically Enumerated Native Stream Tracks (if embedded in container/HLS) -->
-                  <div id="ytNativeAudioTracksList"></div>
-
-                  <div class="yt-group-label">MULTI-AUDIO / DUAL DUB CHANNEL SEPARATION</div>
-
-                  <!-- Left Channel (Dub 1 / Main) -->
-                  <div
-                    class="yt-submenu-item"
-                    data-audiomode="left-channel"
-                    onclick="selectAudioTrackMode('left-channel', 'Left Channel (Track 1)')"
-                  >
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Left Channel (Track 1 / Dub 1)</span>
-                      <span class="yt-opt-desc">Routes Left audio channel to both ears (BDIX Dual Audio)</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-
-                  <!-- Right Channel (Dub 2 / Original) -->
-                  <div
-                    class="yt-submenu-item"
-                    data-audiomode="right-channel"
-                    onclick="selectAudioTrackMode('right-channel', 'Right Channel (Track 2)')"
-                  >
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Right Channel (Track 2 / Dub 2)</span>
-                      <span class="yt-opt-desc">Routes Right audio channel to both ears (BDIX Dual Audio)</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-
-                  <div class="yt-group-label">EXTERNAL SYNCED AUDIO TRACK</div>
+                  <div class="yt-group-label" style="margin-top: 14px">CUSTOM AUDIO TRACK</div>
 
                   <!-- Load External Audio Stream -->
                   <div class="yt-action-item" onclick="promptExternalAudioUrl()">
@@ -757,15 +714,15 @@
                   </div>
 
                   <!-- Audio Sync Delay Nudge -->
-                  <div class="yt-sync-block">
+                  <div class="yt-sync-block" id="ytAudioSyncBlock" style="display: none">
                     <div class="yt-sync-header">
-                      <span>Audio Sync Delay Nudge:</span>
+                      <span>Audio Sync Delay:</span>
                       <span class="yt-sync-val" id="ytAudioSyncVal">0.0s</span>
                     </div>
                     <div class="yt-sync-buttons">
                       <button class="yt-sync-btn" onclick="nudgeAudioSync(-0.5)">-0.5s</button>
                       <button class="yt-sync-btn" onclick="nudgeAudioSync(-0.1)">-0.1s</button>
-                      <button class="yt-sync-btn yt-sync-reset" onclick="resetAudioSync()">Reset Sync</button>
+                      <button class="yt-sync-btn yt-sync-reset" onclick="resetAudioSync()">Reset</button>
                       <button class="yt-sync-btn" onclick="nudgeAudioSync(0.1)">+0.1s</button>
                       <button class="yt-sync-btn" onclick="nudgeAudioSync(0.5)">+0.5s</button>
                     </div>
@@ -1389,12 +1346,24 @@
                       <i data-lucide="captions"></i>
                     </button>
 
+                    <!-- Audio Track Direct Selector -->
+                    <button
+                      class="cp-btn"
+                      id="btnCustomAudioTrack"
+                      onclick="openAudioTrackDirectMenu(event)"
+                      title="Audio Tracks (Hindi, Eng, Bangla)"
+                      aria-label="Audio Tracks"
+                    >
+                      <i data-lucide="mic"></i>
+                      <span class="cp-audio-track-count" id="cpAudioTrackCountBadge" style="display: none">1</span>
+                    </button>
+
                     <!-- Settings Gear (YouTube Popup Trigger) -->
                     <button
                       class="cp-btn"
                       id="btnCustomSettings"
                       onclick="toggleYouTubeSettingsPopup(event)"
-                      title="Settings & Audio Tracks (S)"
+                      title="Settings (S)"
                       aria-label="Settings"
                     >
                       <i data-lucide="settings"></i>
