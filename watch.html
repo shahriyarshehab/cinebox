@@ -528,13 +528,13 @@
                 </div>
 
                 <div class="yt-menu-list">
-                  <!-- Audio Track Selection (Primary Requested Feature) -->
+                  <!-- 1. Dual Audio / Audio Tracks (Primary) -->
                   <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAudioTrack')">
                     <div class="yt-item-left">
                       <span class="yt-item-icon">
                         <i data-lucide="mic"></i>
                       </span>
-                      <span class="yt-item-label">Audio Track</span>
+                      <span class="yt-item-label">Dual Audio / Track</span>
                     </div>
                     <div class="yt-item-right">
                       <span class="yt-item-val" id="ytValAudioTrack">Default (Stereo)</span>
@@ -542,7 +542,7 @@
                     </div>
                   </div>
 
-                  <!-- Quality -->
+                  <!-- 2. Video Quality -->
                   <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubQuality')">
                     <div class="yt-item-left">
                       <span class="yt-item-icon">
@@ -556,7 +556,7 @@
                     </div>
                   </div>
 
-                  <!-- Playback Speed -->
+                  <!-- 3. Playback Speed -->
                   <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubSpeed')">
                     <div class="yt-item-left">
                       <span class="yt-item-icon">
@@ -570,7 +570,7 @@
                     </div>
                   </div>
 
-                  <!-- Subtitles (CC) -->
+                  <!-- 4. Subtitles (CC) -->
                   <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubSubtitles')">
                     <div class="yt-item-left">
                       <span class="yt-item-icon">
@@ -584,92 +584,16 @@
                     </div>
                   </div>
 
-                  <!-- Audio Booster & Equalizer -->
+                  <!-- 5. Audio Booster & Equalizer -->
                   <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAudioBoost')">
                     <div class="yt-item-left">
                       <span class="yt-item-icon">
                         <i data-lucide="volume-2"></i>
                       </span>
-                      <span class="yt-item-label">Audio Booster & EQ</span>
+                      <span class="yt-item-label">Volume Booster & EQ</span>
                     </div>
                     <div class="yt-item-right">
                       <span class="yt-item-val" id="ytValAudioBoost">100%</span>
-                      <i data-lucide="chevron-right" class="yt-chevron"></i>
-                    </div>
-                  </div>
-
-                  <!-- Visual Enhancements & Filters -->
-                  <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubVisuals')">
-                    <div class="yt-item-left">
-                      <span class="yt-item-icon">
-                        <i data-lucide="sun"></i>
-                      </span>
-                      <span class="yt-item-label">Visual Filters</span>
-                    </div>
-                    <div class="yt-item-right">
-                      <span class="yt-item-val" id="ytValVisuals">Standard</span>
-                      <i data-lucide="chevron-right" class="yt-chevron"></i>
-                    </div>
-                  </div>
-
-                  <!-- Aspect Ratio & Screen Fit -->
-                  <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAspect')">
-                    <div class="yt-item-left">
-                      <span class="yt-item-icon">
-                        <i data-lucide="maximize"></i>
-                      </span>
-                      <span class="yt-item-label">Aspect Ratio / Fit</span>
-                    </div>
-                    <div class="yt-item-right">
-                      <span class="yt-item-val" id="ytValAspect">Fit Screen</span>
-                      <i data-lucide="chevron-right" class="yt-chevron"></i>
-                    </div>
-                  </div>
-
-                  <!-- Ambient Cinema Glow -->
-                  <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAmbient')">
-                    <div class="yt-item-left">
-                      <span class="yt-item-icon">
-                        <i data-lucide="sparkles"></i>
-                      </span>
-                      <span class="yt-item-label">Ambient Cinema Glow</span>
-                    </div>
-                    <div class="yt-item-right">
-                      <span class="yt-item-val" id="ytValAmbient">Dynamic Sync</span>
-                      <i data-lucide="chevron-right" class="yt-chevron"></i>
-                    </div>
-                  </div>
-
-                  <!-- Sleep Timer -->
-                  <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubSleep')">
-                    <div class="yt-item-left">
-                      <span class="yt-item-icon">
-                        <i data-lucide="clock"></i>
-                      </span>
-                      <span class="yt-item-label">Sleep Timer</span>
-                    </div>
-                    <div class="yt-item-right">
-                      <span class="yt-item-val" id="ytValSleep">Off</span>
-                      <i data-lucide="chevron-right" class="yt-chevron"></i>
-                    </div>
-                  </div>
-
-                  <!-- Advanced Customization Studio Modal trigger -->
-                  <div
-                    class="yt-menu-item yt-menu-item-studio"
-                    onclick="
-                      closeYouTubeSettingsPopup();
-                      openPlayerCustomModal();
-                    "
-                  >
-                    <div class="yt-item-left">
-                      <span class="yt-item-icon" style="color: var(--primary)">
-                        <i data-lucide="sliders"></i>
-                      </span>
-                      <span class="yt-item-label" style="font-weight: 700">Customization Studio...</span>
-                    </div>
-                    <div class="yt-item-right">
-                      <span class="yt-item-badge">Full Studio</span>
                       <i data-lucide="chevron-right" class="yt-chevron"></i>
                     </div>
                   </div>
@@ -1041,180 +965,6 @@
                       <span class="yt-opt-title">Night Mode Compression</span>
                       <span class="yt-opt-desc">Compresses loud action & boosts speech</span>
                     </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 8. SUBMENU: VISUAL FILTERS -->
-              <div class="yt-menu-panel" id="ytSubVisuals">
-                <div class="yt-submenu-header">
-                  <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
-                    <i data-lucide="chevron-left"></i>
-                  </button>
-                  <span class="yt-submenu-title">Visual Filters</span>
-                </div>
-                <div class="yt-menu-list">
-                  <div
-                    class="yt-submenu-item active"
-                    data-videofilter="normal"
-                    onclick="applyVideoFilterPreset('normal')"
-                  >
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Standard (Original)</span>
-                      <span class="yt-opt-desc">Untouched stream color balance</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-videofilter="vivid" onclick="applyVideoFilterPreset('vivid')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Vivid HDR</span>
-                      <span class="yt-opt-desc">+35% Vibrance & dynamic contrast</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-videofilter="cinema" onclick="applyVideoFilterPreset('cinema')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Cinema Warm</span>
-                      <span class="yt-opt-desc">3200K Rich filmic tone</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-videofilter="night" onclick="applyVideoFilterPreset('night')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Night Shield</span>
-                      <span class="yt-opt-desc">Blue-light eye comfort filter</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-videofilter="crisp" onclick="applyVideoFilterPreset('crisp')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Crisp 4K Clarity</span>
-                      <span class="yt-opt-desc">Enhanced edge definition</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-videofilter="oled" onclick="applyVideoFilterPreset('oled')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">OLED Pure Black</span>
-                      <span class="yt-opt-desc">Deep ink shadows & specular highlights</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 9. SUBMENU: ASPECT RATIO & FIT -->
-              <div class="yt-menu-panel" id="ytSubAspect">
-                <div class="yt-submenu-header">
-                  <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
-                    <i data-lucide="chevron-left"></i>
-                  </button>
-                  <span class="yt-submenu-title">Aspect Ratio / Fit</span>
-                </div>
-                <div class="yt-menu-list">
-                  <div class="yt-submenu-item active" data-aspect="contain" onclick="setPlayerAspectRatio('contain')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Fit Screen (Contain)</span>
-                      <span class="yt-opt-desc">Original video dimensions without cropping</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-aspect="cover" onclick="setPlayerAspectRatio('cover')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Fill Screen (Crop Black Bars)</span>
-                      <span class="yt-opt-desc">Expands video to eliminate black borders</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-aspect="16/9" onclick="setPlayerAspectRatio('16/9')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">16:9 Widescreen</span>
-                      <span class="yt-opt-desc">Standard modern HD Cinema ratio</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-aspect="4/3" onclick="setPlayerAspectRatio('4/3')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">4:3 Retro Classic</span>
-                      <span class="yt-opt-desc">Traditional television aspect ratio</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-aspect="21/9" onclick="setPlayerAspectRatio('21/9')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">21:9 Anamorphic Scope</span>
-                      <span class="yt-opt-desc">Ultrawide theatrical anamorphic framing</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 10. SUBMENU: AMBIENT CINEMA GLOW -->
-              <div class="yt-menu-panel" id="ytSubAmbient">
-                <div class="yt-submenu-header">
-                  <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
-                    <i data-lucide="chevron-left"></i>
-                  </button>
-                  <span class="yt-submenu-title">Ambient Glow</span>
-                </div>
-                <div class="yt-menu-list">
-                  <div class="yt-submenu-item active" data-ambient="sync" onclick="setAmbientGlowMode('sync')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Dynamic Sync</span>
-                      <span class="yt-opt-desc">Real-time color sampling from playing video</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-ambient="accent" onclick="setAmbientGlowMode('accent')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Theme Accent Glow</span>
-                      <span class="yt-opt-desc">Continuous soft glow of chosen UI theme</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-ambient="off" onclick="setAmbientGlowMode('off')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Off (Disabled)</span>
-                      <span class="yt-opt-desc">No ambient backlighting</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 11. SUBMENU: SLEEP TIMER -->
-              <div class="yt-menu-panel" id="ytSubSleep">
-                <div class="yt-submenu-header">
-                  <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
-                    <i data-lucide="chevron-left"></i>
-                  </button>
-                  <span class="yt-submenu-title">Sleep Timer</span>
-                </div>
-                <div class="yt-menu-list">
-                  <div class="yt-submenu-item active" data-sleep="0" onclick="setSleepTimer(0)">
-                    <span class="yt-opt-title">Off</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-sleep="15" onclick="setSleepTimer(15)">
-                    <span class="yt-opt-title">15 Minutes</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-sleep="30" onclick="setSleepTimer(30)">
-                    <span class="yt-opt-title">30 Minutes</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-sleep="45" onclick="setSleepTimer(45)">
-                    <span class="yt-opt-title">45 Minutes</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-sleep="60" onclick="setSleepTimer(60)">
-                    <span class="yt-opt-title">60 Minutes</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-sleep="end" onclick="setSleepTimer('end')">
-                    <span class="yt-opt-title">End of Video / Episode</span>
                     <span class="yt-check-icon"><i data-lucide="check"></i></span>
                   </div>
                 </div>

@@ -1054,7 +1054,8 @@ function setupPlayerListeners() {
 
   player.addEventListener('play', () => {
     updatePlayPauseButtonUI(true);
-    if (isAudioEngineInitialized && audioCtx && audioCtx.state === 'suspended') {
+    setupAudioBooster();
+    if (audioCtx && audioCtx.state === 'suspended') {
       audioCtx.resume().catch(() => {});
     }
     if (externalAudioPlayer) {
@@ -2314,14 +2315,18 @@ function applyAudioChannelRouting() {
     channelSplitterNode.disconnect();
   } catch (e) {}
 
-  const mode = playerSettings.audioTrackMode || 'stereo';
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
+
+  const mode = playerSettings.stereoChannelMode || playerSettings.audioTrackMode || 'stereo';
 
   if (mode === 'left-channel') {
-    // Route Left input channel (0) to both Left (0) and Right (1) outputs (BDIX Dual Audio Track 1)
+    // Route Left input channel (0) to both Left (0) and Right (1) outputs (Dual Audio Dub 1 / Hindi)
     channelSplitterNode.connect(channelMergerNode, 0, 0);
     channelSplitterNode.connect(channelMergerNode, 0, 1);
   } else if (mode === 'right-channel') {
-    // Route Right input channel (1) to both Left (0) and Right (1) outputs (BDIX Dual Audio Track 2)
+    // Route Right input channel (1) to both Left (0) and Right (1) outputs (Dual Audio Dub 2 / English)
     channelSplitterNode.connect(channelMergerNode, 1, 0);
     channelSplitterNode.connect(channelMergerNode, 1, 1);
   } else {
@@ -2335,6 +2340,9 @@ function selectStereoChannelMode(mode) {
   playerSettings.stereoChannelMode = mode;
   savePlayerSettings();
   setupAudioBooster();
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume().catch(() => {});
+  }
   applyAudioChannelRouting();
   updateCustomizerUIState();
   updateYouTubeMenuState();
@@ -2379,6 +2387,9 @@ function selectAudioTrackMode(mode, title, nativeTrackIdx = -1) {
     player.muted = false;
     playerSettings.stereoChannelMode = mode;
     setupAudioBooster();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
     applyAudioChannelRouting();
   }
 
@@ -2460,14 +2471,14 @@ function getAvailableAudioTracks() {
         id: `lang-${lang.key}`,
         type: 'channel',
         channelMode: channelMode,
-        label: lang.label,
+        label: `${lang.label} (Dual Audio)`,
         flag: lang.flag,
         nativeName: lang.nativeName,
         desc:
           idx === 0
-            ? `Primary Dub (Channel 1 / Left) • ${lang.nativeName}`
+            ? `Dual Audio Track 1 (Left Channel) • ${lang.nativeName}`
             : idx === 1
-              ? `Secondary Audio (Channel 2 / Right) • ${lang.nativeName}`
+              ? `Dual Audio Track 2 (Right Channel) • ${lang.nativeName}`
               : `Track ${idx + 1} (${lang.label}) • ${lang.nativeName}`
       });
     });
@@ -2479,7 +2490,7 @@ function getAvailableAudioTracks() {
       channelMode: 'stereo',
       label: 'Stereo Master (All Channels)',
       flag: '🎧',
-      desc: 'Combined original audio output'
+      desc: 'Combined stereo mix'
     });
 
     return detectedTracks;
@@ -2492,17 +2503,17 @@ function getAvailableAudioTracks() {
         id: 'lang-hindi',
         type: 'channel',
         channelMode: 'left-channel',
-        label: 'Hindi (Track 1 / Dub)',
+        label: 'Hindi (Dual Audio Dub 1)',
         flag: '🇮🇳',
-        desc: 'Dubbed Audio Channel 1'
+        desc: 'Left Audio Channel • Hindi Dub'
       },
       {
         id: 'lang-english',
         type: 'channel',
         channelMode: 'right-channel',
-        label: 'English (Track 2 / Original)',
+        label: 'English (Dual Audio Dub 2)',
         flag: '🇬🇧',
-        desc: 'Original Audio Channel 2'
+        desc: 'Right Audio Channel • English Original'
       },
       {
         id: 'stereo',
@@ -2510,7 +2521,7 @@ function getAvailableAudioTracks() {
         channelMode: 'stereo',
         label: 'Stereo Master (All Channels)',
         flag: '🎧',
-        desc: 'Combined stereo master output'
+        desc: 'Combined original audio output'
       }
     ];
   }
