@@ -2811,7 +2811,6 @@ function openYouTubeSettingsPopup() {
   if (!popup) return;
 
   isYouTubeSettingsOpen = true;
-  detectAndRenderAudioTracks();
   updateYouTubeMenuState();
   backToYouTubeMainMenu();
 
@@ -2850,45 +2849,7 @@ function backToYouTubeMainMenu() {
 }
 
 function updateYouTubeMenuState() {
-  // 1. Audio Track Label & Badge
-  const ytValAudio = document.getElementById('ytValAudioTrack');
-  const tracks = getAvailableAudioTracks();
-  let audioLabel = playerSettings.audioTrackTitle;
-  if (!audioLabel) {
-    audioLabel = tracks.length > 0 ? tracks[0].label : 'Default Audio';
-  }
-  if (ytValAudio) ytValAudio.textContent = audioLabel;
-
-  const cpAudioBadge = document.getElementById('cpAudioTrackBadge');
-  if (cpAudioBadge) {
-    cpAudioBadge.style.display = 'inline-flex';
-    cpAudioBadge.textContent = `Audio: ${audioLabel}`;
-  }
-
-  // Active classes in Audio Submenu (VLC Track & Stereo Channel)
-  document.querySelectorAll('#ytSubAudioTrack .yt-submenu-item[data-audiomode]').forEach((item) => {
-    const mode = item.getAttribute('data-audiomode');
-    if (playerSettings.audioTrackMode === 'disable') {
-      item.classList.toggle('active', mode === 'disable');
-    } else {
-      item.classList.toggle(
-        'active',
-        mode === playerSettings.audioTrackMode || (!playerSettings.audioTrackMode && (mode === 'stereo' || mode === 'left-channel'))
-      );
-    }
-  });
-
-  const currStereo = playerSettings.stereoChannelMode || 'stereo';
-  document.querySelectorAll('#ytSubAudioTrack [data-stereomode]').forEach((item) => {
-    const sm = item.getAttribute('data-stereomode');
-    item.classList.toggle('active', sm === currStereo);
-  });
-
-  const syncVal = document.getElementById('ytAudioSyncVal');
-  if (syncVal)
-    syncVal.textContent = `${(playerSettings.externalAudioOffset || 0) > 0 ? '+' : ''}${playerSettings.externalAudioOffset || 0}s`;
-
-  // 2. Quality
+  // 1. Quality
   const qLabel = (playerSettings.videoQuality || '1080p').toUpperCase();
   const ytValQuality = document.getElementById('ytValQuality');
   if (ytValQuality) ytValQuality.textContent = qLabel === 'AUTO' ? 'Auto' : `${qLabel} HD`;
@@ -2898,7 +2859,7 @@ function updateYouTubeMenuState() {
     item.classList.toggle('active', q === (playerSettings.videoQuality || '1080p'));
   });
 
-  // 3. Playback Speed
+  // 2. Playback Speed
   const sp = playerSettings.defaultSpeed || 1.0;
   const spLabel = sp === 1.0 ? 'Normal' : `${sp}x`;
   const ytValSpeed = document.getElementById('ytValSpeed');
@@ -2909,7 +2870,7 @@ function updateYouTubeMenuState() {
     item.classList.toggle('active', speedVal === sp);
   });
 
-  // 4. Subtitles
+  // 3. Subtitles
   const ytValSub = document.getElementById('ytValSubtitles');
   const isSubActive = currentSubtitleTrack !== null;
   if (ytValSub) ytValSub.textContent = isSubActive ? currentSubtitleTrack.label || 'English (Custom)' : 'Off';
@@ -2930,7 +2891,7 @@ function updateYouTubeMenuState() {
     chip.classList.toggle('active', parseInt(chip.getAttribute('data-subsize'), 10) === (playerSettings.subSize || 18));
   });
 
-  // 5. Audio Booster & EQ
+  // 4. Audio Booster & EQ
   const ytValBoost = document.getElementById('ytValAudioBoost');
   if (ytValBoost) {
     if (playerSettings.audioBoostGain > 100) {
