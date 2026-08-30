@@ -1,20 +1,40 @@
 {
   "name": "cinebox",
-  "version": "1.0.0",
-  "description": "CineBox - HD Movies, TV Shows & Animation Streaming Platform",
+  "version": "2.0.0",
+  "description": "CineBox - Ultra-Speed HD Movies, TV Shows & Animation Streaming Platform",
   "main": "server.js",
+  "bin": {
+    "cinebox": "./server.js"
+  },
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js",
-    "serve:py": "python server.py"
+    "dev": "node server.js --open",
+    "serve": "node server.js --open",
+    "lint": "node -c js/core.js js/app.js js/watch.js server.js",
+    "update": "python scripts/auto_update.py"
   },
   "keywords": [
-    "movies",
-    "cinema",
-    "tv-shows",
+    "cinebox",
     "streaming",
-    "pwa"
+    "video-player",
+    "movies",
+    "tv-shows",
+    "bdix",
+    "hls",
+    "pwa",
+    "cinema"
   ],
-  "author": "",
-  "license": "ISC"
+  "author": "Shahriyar Shehab",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shahriyarshehab/cinebox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shahriyarshehab/cinebox/issues"
+  },
+  "homepage": "https://github.com/shahriyarshehab/cinebox#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  }
 }

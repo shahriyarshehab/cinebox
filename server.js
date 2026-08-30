@@ -113,29 +113,88 @@ const server = http.createServer((req, res) => {
   });
 });
 
+const { exec } = require('child_process');
+const os = require('os');
+
+// Parse CLI flags (--port 3000, --open, -o, -p 8080)
+const args = process.argv.slice(2);
+let customPort = null;
+let shouldOpen = false;
+
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i];
+  if (arg === '--open' || arg === '-o') {
+    shouldOpen = true;
+  } else if ((arg === '--port' || arg === '-p') && args[i + 1]) {
+    customPort = parseInt(args[i + 1], 10);
+    i++;
+  } else if (arg.startsWith('--port=')) {
+    customPort = parseInt(arg.split('=')[1], 10);
+  }
+}
+
+const DEFAULT_PORT = customPort || parseInt(process.env.PORT || '3000', 10);
+
+function openBrowser(url) {
+  const platform = process.platform;
+  let cmd = '';
+  if (platform === 'win32') {
+    cmd = `start "" "${url}"`;
+  } else if (platform === 'darwin') {
+    cmd = `open "${url}"`;
+  } else {
+    cmd = `xdg-open "${url}"`;
+  }
+  exec(cmd, (err) => {
+    if (err) {
+      // Ignore background launcher errors
+    }
+  });
+}
+
+function getLocalIpAddresses() {
+  const interfaces = os.networkInterfaces();
+  const addresses = [];
+  for (const name of Object.keys(interfaces)) {
+    for (const net of interfaces[name]) {
+      if (net.family === 'IPv4' && !net.internal) {
+        addresses.push(net.address);
+      }
+    }
+  }
+  return addresses;
+}
+
 function startServer(port) {
   server.removeAllListeners('error');
   server.once('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.log(`Port ${port} in use, attempting port ${port + 1}...`);
+      console.log(`\x1b[33m[!] Port ${port} is in use, trying port ${port + 1}...\x1b[0m`);
       server.close(() => {
         startServer(port + 1);
       });
-      // In case server was not listening yet
       setTimeout(() => startServer(port + 1), 100);
     } else {
-      console.error('Server error:', err);
+      console.error('\x1b[31m[!] Server error:\x1b[0m', err);
     }
   });
 
   server.listen(port, () => {
-    console.log(`\n==============================================`);
-    console.log(`  🎬 CineBox Local Development Server Running`);
-    console.log(`==============================================`);
-    console.log(`  > Local URL:   http://localhost:${port}`);
-    console.log(`  > Network URL: http://127.0.0.1:${port}`);
-    console.log(`\n  Press Ctrl + C to stop the server.\n`);
+    const localUrl = `http://localhost:${port}`;
+    const ips = getLocalIpAddresses();
+    const networkUrl = ips.length > 0 ? `http://${ips[0]}:${port}` : `http://127.0.0.1:${port}`;
+
+    console.log(`\n\x1b[36m╔════════════════════════════════════════════════════════════╗\x1b[0m`);
+    console.log(`\x1b[36m║\x1b[0m   \x1b[1m🎬 CineBox Ultra-Speed Streaming Server (Node.js)\x1b[0m        \x1b[36m║\x1b[0m`);
+    console.log(`\x1b[36m╚════════════════════════════════════════════════════════════╝\x1b[0m`);
+    console.log(`\n  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   \x1b[36m${localUrl}\x1b[0m`);
+    console.log(`  \x1b[32m➜\x1b[0m  \x1b[1mNetwork:\x1b[0m \x1b[36m${networkUrl}\x1b[0m`);
+    console.log(`\n  \x1b[90mReady to stream! Press \x1b[1mCtrl + C\x1b[0m\x1b[90m to stop.\x1b[0m\n`);
+
+    if (shouldOpen) {
+      openBrowser(localUrl);
+    }
   });
 }
 
-startServer(PORT);
+startServer(DEFAULT_PORT);

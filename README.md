@@ -9,11 +9,17 @@ CineBox is an ultra-fast, modern cinema & streaming web portal featuring **36,00
 
 ---
 
-## 📱 Android App (Trusted Web Activity):
-- 📁 Source code located in the [`android/`](android/) directory.
-- ⚡ **Native Android Shell** powered by Google's `AndroidBrowserHelper` and Chrome Custom Tabs.
-- 🎬 Seamless external player intent support for **VLC for Android** and **MX Player**.
-- 🚀 **1-Click Build**: Open `android/` in **Android Studio** or build with **GitHub Actions**.
+## 💻 Local Development (npm):
+
+Start the local streaming development server:
+
+```bash
+# Start local streaming server
+npm start
+
+# Or start in dev mode (automatically opens browser)
+npm run dev
+```
 
 ---
 
