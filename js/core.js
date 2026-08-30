@@ -74,9 +74,48 @@ function toggleWatchlist(movieObj) {
   return isAdded;
 }
 
-function updateWatchlistNavBadge() {
-  const list = getWatchlist();
-  const badges = [document.getElementById('watchlistNavCount'), document.getElementById('mobWatchlistNavCount')];
+// ==========================================
+// 🔔 Future Updates & Release Tracker System
+// ==========================================
+function getMarkedUpdates() {
+  try {
+    return JSON.parse(localStorage.getItem('cinebox_marked_updates') || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function isMarkedForUpdate(title) {
+  if (!title) return false;
+  const list = getMarkedUpdates();
+  const clean = title.toLowerCase().trim();
+  return list.some((m) => (m.title || '').toLowerCase().trim() === clean);
+}
+
+function toggleMarkedUpdate(movieObj) {
+  if (!movieObj || !movieObj.title) return false;
+  const list = getMarkedUpdates();
+  const cleanTitle = (movieObj.title || '').toLowerCase().trim();
+  const idx = list.findIndex((m) => (m.title || '').toLowerCase().trim() === cleanTitle);
+
+  let isMarked = false;
+  if (idx >= 0) {
+    list.splice(idx, 1);
+    showToast('🔔 Removed from Update Tracker');
+  } else {
+    list.unshift(movieObj);
+    showToast('🔔 Marked for Future Updates! Tracking new releases.');
+    isMarked = true;
+  }
+
+  localStorage.setItem('cinebox_marked_updates', JSON.stringify(list));
+  updateMarkedUpdatesBadge();
+  return isMarked;
+}
+
+function updateMarkedUpdatesBadge() {
+  const list = getMarkedUpdates();
+  const badges = [document.getElementById('markedUpdatesCount'), document.getElementById('mobMarkedUpdatesCount')];
   badges.forEach((badge) => {
     if (badge) {
       if (list.length > 0) {

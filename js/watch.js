@@ -793,11 +793,25 @@ function renderWatchPage(item) {
             <i data-lucide="bookmark" id="wHeartIconAction" style="width: 15px; height: 15px; ${isInWatchlist(item.title) ? 'color: var(--accent); fill: var(--accent);' : ''}"></i>
             <span id="wWatchlistActionText">${isInWatchlist(item.title) ? 'Saved' : 'Watchlist'}</span>
         </button>
+        <button class="mb-btn-action btn-mark-update ${typeof isMarkedForUpdate === 'function' && isMarkedForUpdate(item.title) ? 'active' : ''}" id="btnTrackUpdateAction" onclick="toggleCurrentMarkedUpdate()" title="Mark to receive updates when new episodes/dubs arrive">
+            <i data-lucide="bell" id="wBellIconAction" style="width: 15px; height: 15px;"></i>
+            <span id="wMarkUpdateActionText">${typeof isMarkedForUpdate === 'function' && isMarkedForUpdate(item.title) ? 'Tracking' : 'Track Updates'}</span>
+        </button>
         <button class="mb-btn-action" onclick="shareCurrentMedia()">
             <i data-lucide="share-2" style="width: 15px; height: 15px;"></i>
             <span>Share</span>
         </button>
     `;
+
+function toggleCurrentMarkedUpdate() {
+  if (!currentItem) return;
+  const isNowMarked = typeof toggleMarkedUpdate === 'function' ? toggleMarkedUpdate(currentItem) : false;
+  const btn = document.getElementById('btnTrackUpdateAction');
+  const txt = document.getElementById('wMarkUpdateActionText');
+  if (btn) btn.classList.toggle('active', isNowMarked);
+  if (txt) txt.textContent = isNowMarked ? 'Tracking' : 'Track Updates';
+  refreshLucideIcons();
+}
 
   const relatedTag = item.tag || 'Top Rated';
   document.getElementById('relatedHeading').textContent = `More in ${catName}`;

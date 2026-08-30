@@ -798,6 +798,7 @@ function renderWatchlistView() {
 
   const list = getWatchlist();
   const historyList = getWatchHistory();
+  const markedUpdatesList = typeof getMarkedUpdates === 'function' ? getMarkedUpdates() : [];
 
   const moviesOnly = list.filter(
     (m) => !(m.tag === 'TV Series' || m.tag === 'K-Drama' || (m.url && m.url.endsWith('/')))
@@ -808,6 +809,7 @@ function renderWatchlistView() {
   if (currentWatchlistFilter === 'movies') displayList = moviesOnly;
   else if (currentWatchlistFilter === 'tv') displayList = tvOnly;
   else if (currentWatchlistFilter === 'history') displayList = historyList;
+  else if (currentWatchlistFilter === 'updates') displayList = markedUpdatesList;
 
   container.innerHTML = `
         <div class="filter-bar-wrap">
@@ -855,6 +857,9 @@ function renderWatchlistView() {
                 </button>
                 <button class="filter-pill ${currentWatchlistFilter === 'tv' ? 'active' : ''}" onclick="filterWatchlistTab('tv')">
                     TV Shows (${tvOnly.length})
+                </button>
+                <button class="filter-pill ${currentWatchlistFilter === 'updates' ? 'active' : ''}" onclick="filterWatchlistTab('updates')">
+                    <i data-lucide="bell" style="width: 13px; height: 13px; color: #ffb800;"></i> Marked Updates (${markedUpdatesList.length})
                 </button>
                 <button class="filter-pill ${currentWatchlistFilter === 'history' ? 'active' : ''}" onclick="filterWatchlistTab('history')">
                     Continue Watching (${historyList.length})
@@ -1551,7 +1556,11 @@ function renderMovieCardHtml(item) {
       ? isMediaSeries(item)
       : item.tag === 'TV Series' || item.tag === 'K-Drama' || (item.url && item.url.endsWith('/'));
   const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
-  const markerHtml = getMediaReleaseMarker(item.date);
+  let markerHtml = getMediaReleaseMarker(item.date);
+  const isMarked = typeof isMarkedForUpdate === 'function' && isMarkedForUpdate(rawTitle);
+  if (isMarked) {
+    markerHtml = '<div class="media-marker marker-tracking">🔔 TRACKING</div>' + markerHtml;
+  }
   const isRecent = markerHtml.length > 0;
 
   const playIconSvg = getLucideSvg(isSeries ? 'tv' : 'play', {
