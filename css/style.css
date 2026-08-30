@@ -5839,4 +5839,99 @@ kbd {
   view-transition-name: player-cinema;
 }
 
+/* ==========================================================================
+   ⚡ Multi-Server Mirror Streaming Switcher
+   ========================================================================== */
+.player-server-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(14, 18, 26, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 30px;
+  padding: 4px 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.server-badge-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.server-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.server-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.server-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.server-pill .pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transition: all 0.2s ease;
+}
+
+.server-pill:hover {
+  background: rgba(0, 229, 255, 0.1);
+  border-color: rgba(0, 229, 255, 0.3);
+  color: #fff;
+}
+
+.server-pill.active {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(0, 176, 255, 0.15) 100%);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
+}
+
+.server-pill.active .pill-dot {
+  background: #00e676;
+  box-shadow: 0 0 8px #00e676;
+}
+
+@media (max-width: 768px) {
+  .player-top-bar {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px;
+  }
+  .player-server-selector {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+
 

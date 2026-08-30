@@ -380,9 +380,9 @@
     <!--  2. FOCUSED ONLINE PLAYER VIEW (Opened on "Watch Online" Click) -->
     <!-- ================================================================= -->
     <main class="player-fullscreen-layout" id="playerView" style="display: none">
-      <!-- Player Top Navigation Bar -->
+      <!-- Player Top Navigation Bar & Multi-Server Mirror Switcher -->
       <div class="player-top-bar">
-        <div style="display: flex; align-items: center; gap: 8px">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
           <button
             class="btn btn-ghost"
             onclick="exitPlayerMode()"
@@ -394,6 +394,25 @@
           <div class="player-view-badge" id="playerMediaTypeBadge">
             <span class="player-live-dot"></span>
             <span id="playerMediaBadgeText">Now Playing</span>
+          </div>
+        </div>
+
+        <!-- Multi-Server Mirror Selection Pills -->
+        <div class="player-server-selector" id="playerServerSelector">
+          <span class="server-badge-label"><i data-lucide="server"></i> Source Server:</span>
+          <div class="server-pills" id="serverPillsContainer">
+            <button class="server-pill active" data-serveridx="0" onclick="switchMediaServer(0)">
+              <span class="pill-dot"></span>
+              <span>⚡ Server 1 (DhakaFlix)</span>
+            </button>
+            <button class="server-pill" data-serveridx="1" onclick="switchMediaServer(1)">
+              <span class="pill-dot"></span>
+              <span>⚡ Server 2 (SamOnline)</span>
+            </button>
+            <button class="server-pill" data-serveridx="2" onclick="switchMediaServer(2)">
+              <span class="pill-dot"></span>
+              <span>⚡ Server 3 (Elaach Mirror)</span>
+            </button>
           </div>
         </div>
       </div>
@@ -592,6 +611,53 @@
                       <span class="yt-item-val" id="ytValSubtitles">Off</span>
                       <i data-lucide="chevron-right" class="yt-chevron"></i>
                     </div>
+                  </div>
+
+                  <!-- 4. Server Source (Multi-Server Mirrors) -->
+                  <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubServer')">
+                    <div class="yt-item-left">
+                      <span class="yt-item-icon">
+                        <i data-lucide="server"></i>
+                      </span>
+                      <span class="yt-item-label">Server Source</span>
+                    </div>
+                    <div class="yt-item-right">
+                      <span class="yt-item-val" id="ytValServer">Server 1 (DhakaFlix)</span>
+                      <i data-lucide="chevron-right" class="yt-chevron"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SUBMENU: SERVER SOURCE -->
+              <div class="yt-menu-panel" id="ytSubServer">
+                <div class="yt-submenu-header">
+                  <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                    <i data-lucide="chevron-left"></i>
+                  </button>
+                  <span class="yt-submenu-title">Streaming Server</span>
+                </div>
+                <div class="yt-menu-list" id="ytServerSubmenuList">
+                  <div class="yt-submenu-item active" data-serveridx="0" onclick="switchMediaServer(0)">
+                    <div class="yt-submenu-item-main">
+                      <span class="yt-opt-title">⚡ Server 1: DhakaFlix Primary</span>
+                      <span class="yt-opt-desc">Direct 1080p Ultra-Speed Node</span>
+                    </div>
+                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                  </div>
+                  <div class="yt-submenu-item" data-serveridx="1" onclick="switchMediaServer(1)">
+                    <div class="yt-submenu-item-main">
+                      <span class="yt-opt-title">⚡ Server 2: SamOnline Mirror</span>
+                      <span class="yt-opt-desc">High-Speed Secondary Node</span>
+                    </div>
+                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
+                  </div>
+                  <div class="yt-submenu-item" data-serveridx="2" onclick="switchMediaServer(2)">
+                    <div class="yt-submenu-item-main">
+                      <span class="yt-opt-title">⚡ Server 3: Elaach / Triangle Mirror</span>
+                      <span class="yt-opt-desc">Alternative BDIX Server Link</span>
+                    </div>
+                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
                   </div>
                 </div>
               </div>
