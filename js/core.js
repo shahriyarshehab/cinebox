@@ -600,7 +600,98 @@ function refreshLucideIcons() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', refreshLucideIcons);
+  document.addEventListener('DOMContentLoaded', () => {
+    refreshLucideIcons();
+    setupSpaPageRouter();
+  });
 } else {
   refreshLucideIcons();
+  setupSpaPageRouter();
+}
+
+// ==========================================
+// 🚀 Modern Live SPA Instant Page Router
+// ==========================================
+function setupSpaPageRouter() {
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a');
+    if (!link) return;
+
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+      return;
+    }
+
+    if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+
+    try {
+      const targetUrl = new URL(href, window.location.href);
+      if (targetUrl.origin !== window.location.origin) return;
+
+      const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+      const targetPath = targetUrl.pathname.split('/').pop() || 'index.html';
+
+      // If clicking same page with hash only
+      if (currentPath === targetPath && targetUrl.search === window.location.search) return;
+
+      e.preventDefault();
+      navigateToSpaPage(targetUrl.href);
+    } catch (err) {}
+  });
+
+  window.addEventListener('popstate', () => {
+    navigateToSpaPage(window.location.href, false);
+  });
+}
+
+async function navigateToSpaPage(url, push = true) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      window.location.href = url;
+      return;
+    }
+    const htmlText = await res.text();
+    const parser = new DOMParser();
+    const newDoc = parser.parseFromString(htmlText, 'text/html');
+
+    const updateDom = () => {
+      document.title = newDoc.title;
+
+      const newMain = newDoc.querySelector('main');
+      const currentMain = document.querySelector('main');
+      if (newMain && currentMain) {
+        currentMain.innerHTML = newMain.innerHTML;
+        currentMain.className = newMain.className;
+        currentMain.id = newMain.id;
+      }
+
+      // Update active nav links
+      const currentPath = new URL(url).pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.nav-link, .mobile-nav-btn').forEach((nav) => {
+        const navHref = (nav.getAttribute('href') || '').split('/').pop() || 'index.html';
+        const isActive = navHref === currentPath;
+        nav.classList.toggle('active', isActive);
+      });
+
+      if (push) {
+        window.history.pushState(null, '', url);
+      }
+
+      window.scrollTo({ top: 0, behavior: 'instant' });
+      refreshLucideIcons();
+
+      // Trigger page initializers
+      if (typeof initApp === 'function') initApp();
+      if (typeof initWatchPage === 'function') initWatchPage();
+    };
+
+    if (document.startViewTransition) {
+      document.startViewTransition(() => updateDom());
+    } else {
+      updateDom();
+    }
+  } catch (err) {
+    window.location.href = url;
+  }
 }

@@ -29,6 +29,33 @@ const MIME_TYPES = {
   '.webmanifest': 'application/manifest+json; charset=utf-8'
 };
 
+// Live Reload SSE client pool
+const liveReloadClients = new Set();
+
+function broadcastLiveReload() {
+  for (const client of liveReloadClients) {
+    try {
+      client.write('data: reload\n\n');
+    } catch (e) {
+      liveReloadClients.delete(client);
+    }
+  }
+}
+
+// Watch project directory for live changes (excluding .git, node_modules, temp files)
+let reloadDebounce = null;
+try {
+  fs.watch(ROOT, { recursive: true }, (eventType, filename) => {
+    if (!filename) return;
+    if (filename.includes('.git') || filename.includes('__pycache__') || filename.includes('metadata_cache.json')) return;
+    clearTimeout(reloadDebounce);
+    reloadDebounce = setTimeout(() => {
+      console.log(`\x1b[35m[Live Reload]\x1b[0m File changed: ${filename} -> Refreshing connected browsers...`);
+      broadcastLiveReload();
+    }, 150);
+  });
+} catch (e) {}
+
 const server = http.createServer((req, res) => {
   // CORS & Security headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -39,6 +66,19 @@ const server = http.createServer((req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204);
     res.end();
+    return;
+  }
+
+  // Live Reload SSE Endpoint
+  if (req.url === '/live-reload') {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive'
+    });
+    res.write('data: connected\n\n');
+    liveReloadClients.add(res);
+    req.on('close', () => liveReloadClients.delete(res));
     return;
   }
 
@@ -78,6 +118,28 @@ const server = http.createServer((req, res) => {
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     const fileSize = stats.size;
+
+    // Inject live-reload script into HTML documents for instant live development
+    if (ext === '.html') {
+      fs.readFile(filePath, 'utf8', (readErr, htmlContent) => {
+        if (readErr) {
+          res.writeHead(500, { 'Content-Type': 'text/plain' });
+          res.end('Server Read Error');
+          return;
+        }
+        const liveReloadScript = `\n<script>(function(){if(location.hostname==='localhost'||location.hostname==='127.0.0.1'){try{const es=new EventSource('/live-reload');es.onmessage=(e)=>{if(e.data==='reload')location.reload();};}catch(e){}}})();</script>\n</body>`;
+        const modifiedHtml = htmlContent.includes('</body>')
+          ? htmlContent.replace('</body>', liveReloadScript)
+          : htmlContent + liveReloadScript;
+
+        res.writeHead(200, {
+          'Content-Type': 'text/html; charset=utf-8',
+          'Cache-Control': 'no-cache'
+        });
+        res.end(modifiedHtml);
+      });
+      return;
+    }
 
     // Support Range Requests (video / audio streaming seek)
     const range = req.headers.range;
