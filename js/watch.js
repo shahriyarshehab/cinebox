@@ -2331,6 +2331,22 @@ function applyAudioChannelRouting() {
   }
 }
 
+function selectStereoChannelMode(mode) {
+  playerSettings.stereoChannelMode = mode;
+  savePlayerSettings();
+  setupAudioBooster();
+  applyAudioChannelRouting();
+  updateCustomizerUIState();
+  updateYouTubeMenuState();
+  const label =
+    mode === 'left-channel'
+      ? 'Left Channel (Dub 1)'
+      : mode === 'right-channel'
+        ? 'Right Channel (Dub 2)'
+        : 'Stereo (Master)';
+  showToast(`Stereo Mode: ${label}`);
+}
+
 function selectAudioTrackMode(mode, title, nativeTrackIdx = -1) {
   const player = document.getElementById('videoPlayer');
   if (!player) return;
@@ -2338,8 +2354,12 @@ function selectAudioTrackMode(mode, title, nativeTrackIdx = -1) {
   playerSettings.audioTrackMode = mode;
   playerSettings.audioTrackTitle = title || 'Default Audio';
 
-  // If native stream track selected:
-  if (nativeTrackIdx >= 0 && player.audioTracks && player.audioTracks.length > 0) {
+  if (mode === 'disable') {
+    player.muted = true;
+    if (externalAudioPlayer) {
+      externalAudioPlayer.pause();
+    }
+  } else if (nativeTrackIdx >= 0 && player.audioTracks && player.audioTracks.length > 0) {
     for (let i = 0; i < player.audioTracks.length; i++) {
       player.audioTracks[i].enabled = i === nativeTrackIdx;
     }
@@ -2355,8 +2375,9 @@ function selectAudioTrackMode(mode, title, nativeTrackIdx = -1) {
     if (externalAudioPlayer) {
       externalAudioPlayer.pause();
       externalAudioPlayer = null;
-      player.muted = false;
     }
+    player.muted = false;
+    playerSettings.stereoChannelMode = mode;
     setupAudioBooster();
     applyAudioChannelRouting();
   }
@@ -2526,6 +2547,7 @@ function detectAndRenderAudioTracks() {
 
   const tracks = getAvailableAudioTracks();
   const isSingle = tracks.length === 1 || (tracks.length === 1 && tracks[0].isSingle);
+  const isDisabled = playerSettings.audioTrackMode === 'disable';
 
   // Update button badge count
   const badgeEl = document.getElementById('cpAudioTrackCountBadge');
@@ -2538,37 +2560,53 @@ function detectAndRenderAudioTracks() {
     }
   }
 
-  let html = '';
+  let html = `
+    <div class="yt-group-label">AUDIO TRACK (VLC TRACK SELECTOR)</div>
+    <!-- VLC Disable Option -->
+    <div class="yt-submenu-item ${isDisabled ? 'active' : ''}" data-audiomode="disable" onclick="selectAudioTrackMode('disable', 'Disabled (Mute)')">
+      <div class="yt-submenu-item-main">
+        <span class="yt-opt-title">Disable</span>
+        <span class="yt-opt-desc">Mute all audio playback</span>
+      </div>
+      <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
+    </div>
+  `;
 
   if (isSingle) {
     const tr = tracks[0];
+    const isSelected =
+      !isDisabled &&
+      (!playerSettings.audioTrackMode ||
+        playerSettings.audioTrackMode === 'stereo' ||
+        playerSettings.audioTrackMode === tr.id);
     html += `
-      <div class="yt-group-label">AVAILABLE AUDIO TRACK (1 TRACK)</div>
-      <div class="yt-submenu-item active" data-audiomode="${tr.id}" onclick="selectAudioTrackMode('${tr.channelMode || 'stereo'}', '${escapeQuotes(tr.label)}')">
+      <div class="yt-submenu-item ${isSelected ? 'active' : ''}" data-audiomode="${tr.id}" onclick="selectAudioTrackMode('${tr.channelMode || 'stereo'}', '${escapeQuotes(tr.label)}')">
         <div class="yt-submenu-item-main">
-          <span class="yt-opt-title">${tr.flag} ${tr.label}</span>
+          <span class="yt-opt-title">${tr.flag} Track 1: ${tr.label}</span>
           <span class="yt-opt-desc">${tr.desc}</span>
         </div>
         <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
       </div>
     `;
   } else {
-    html += `<div class="yt-group-label">AVAILABLE AUDIO TRACKS (${tracks.length} TRACKS)</div>`;
     tracks.forEach((tr, idx) => {
       const modeVal = tr.channelMode || tr.id;
       let isSelected = false;
-      if (playerSettings.audioTrackMode === modeVal) {
-        isSelected = true;
-      } else if (playerSettings.audioTrackMode === tr.id) {
-        isSelected = true;
-      } else if (!playerSettings.audioTrackMode && idx === 0) {
-        isSelected = true;
+      if (!isDisabled) {
+        if (playerSettings.audioTrackMode === modeVal) {
+          isSelected = true;
+        } else if (playerSettings.audioTrackMode === tr.id) {
+          isSelected = true;
+        } else if (!playerSettings.audioTrackMode && idx === 0) {
+          isSelected = true;
+        }
       }
 
+      const trackNum = idx + 1;
       html += `
         <div class="yt-submenu-item ${isSelected ? 'active' : ''}" data-audiomode="${modeVal}" onclick="selectAudioTrackMode('${modeVal}', '${escapeQuotes(tr.label)}', ${tr.nativeIdx !== undefined ? tr.nativeIdx : -1})">
           <div class="yt-submenu-item-main">
-            <span class="yt-opt-title">${tr.flag} ${tr.label}</span>
+            <span class="yt-opt-title">${tr.flag} Track ${trackNum}: ${tr.label}</span>
             <span class="yt-opt-desc">${tr.desc}</span>
           </div>
           <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
@@ -2801,10 +2839,23 @@ function updateYouTubeMenuState() {
     cpAudioBadge.textContent = `Audio: ${audioLabel}`;
   }
 
-  // Active classes in Audio Submenu
-  document.querySelectorAll('#ytSubAudioTrack .yt-submenu-item').forEach((item) => {
+  // Active classes in Audio Submenu (VLC Track & Stereo Channel)
+  document.querySelectorAll('#ytSubAudioTrack .yt-submenu-item[data-audiomode]').forEach((item) => {
     const mode = item.getAttribute('data-audiomode');
-    item.classList.toggle('active', mode === playerSettings.audioTrackMode || (!playerSettings.audioTrackMode && mode === 'stereo'));
+    if (playerSettings.audioTrackMode === 'disable') {
+      item.classList.toggle('active', mode === 'disable');
+    } else {
+      item.classList.toggle(
+        'active',
+        mode === playerSettings.audioTrackMode || (!playerSettings.audioTrackMode && (mode === 'stereo' || mode === 'left-channel'))
+      );
+    }
+  });
+
+  const currStereo = playerSettings.stereoChannelMode || 'stereo';
+  document.querySelectorAll('#ytSubAudioTrack [data-stereomode]').forEach((item) => {
+    const sm = item.getAttribute('data-stereomode');
+    item.classList.toggle('active', sm === currStereo);
   });
 
   const syncVal = document.getElementById('ytAudioSyncVal');
