@@ -569,20 +569,6 @@
                       <i data-lucide="chevron-right" class="yt-chevron"></i>
                     </div>
                   </div>
-
-                  <!-- 4. Audio Booster & Equalizer -->
-                  <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAudioBoost')">
-                    <div class="yt-item-left">
-                      <span class="yt-item-icon">
-                        <i data-lucide="volume-2"></i>
-                      </span>
-                      <span class="yt-item-label">Volume Booster & EQ</span>
-                    </div>
-                    <div class="yt-item-right">
-                      <span class="yt-item-val" id="ytValAudioBoost">100%</span>
-                      <i data-lucide="chevron-right" class="yt-chevron"></i>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -801,69 +787,6 @@
                   </div>
                 </div>
               </div>
-
-              <!-- 7. SUBMENU: AUDIO BOOSTER & EQ -->
-              <div class="yt-menu-panel" id="ytSubAudioBoost">
-                <div class="yt-submenu-header">
-                  <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
-                    <i data-lucide="chevron-left"></i>
-                  </button>
-                  <span class="yt-submenu-title">Audio Booster & EQ</span>
-                </div>
-                <div class="yt-menu-list">
-                  <div class="yt-group-label">VOLUME AMPLIFICATION GAIN</div>
-                  <div class="yt-submenu-item active" data-audiogain="100" onclick="handleAudioBoostGain(100)">
-                    <span class="yt-opt-title">100% Normal Volume</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-audiogain="150" onclick="handleAudioBoostGain(150)">
-                    <span class="yt-opt-title">150% Boosted Gain</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-audiogain="200" onclick="handleAudioBoostGain(200)">
-                    <span class="yt-opt-title">200% Super Boost (2x)</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-audiogain="300" onclick="handleAudioBoostGain(300)">
-                    <span class="yt-opt-title">300% Maximum Boost (3x)</span>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-
-                  <div class="yt-group-label">EQUALIZER ACOUSTIC PROFILES</div>
-                  <div
-                    class="yt-submenu-item active"
-                    data-audioprofile="standard"
-                    onclick="setAudioProfile('standard')"
-                  >
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Standard Reference</span>
-                      <span class="yt-opt-desc">Untouched original acoustics</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-audioprofile="dialogue" onclick="setAudioProfile('dialogue')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Dialogue Clarifier</span>
-                      <span class="yt-opt-desc">+6dB Vocal frequencies for quiet speech</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-audioprofile="bass" onclick="setAudioProfile('bass')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Movie Bass Rumble</span>
-                      <span class="yt-opt-desc">Low-end cinematic punch</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                  <div class="yt-submenu-item" data-audioprofile="night" onclick="setAudioProfile('night')">
-                    <div class="yt-submenu-item-main">
-                      <span class="yt-opt-title">Night Mode Compression</span>
-                      <span class="yt-opt-desc">Compresses loud action & boosts speech</span>
-                    </div>
-                    <span class="yt-check-icon"><i data-lucide="check"></i></span>
-                  </div>
-                </div>
-              </div>
             </div>
 
             <!-- ================================================= -->
@@ -1026,18 +949,6 @@
                       aria-label="Toggle subtitles"
                     >
                       <i data-lucide="captions"></i>
-                    </button>
-
-                    <!-- Audio Track Direct Selector -->
-                    <button
-                      class="cp-btn"
-                      id="btnCustomAudioTrack"
-                      onclick="openAudioTrackDirectMenu(event)"
-                      title="Audio Tracks (Hindi, Eng, Bangla)"
-                      aria-label="Audio Tracks"
-                    >
-                      <i data-lucide="mic"></i>
-                      <span class="cp-audio-track-count" id="cpAudioTrackCountBadge" style="display: none">1</span>
                     </button>
 
                     <!-- Settings Gear (YouTube Popup Trigger) -->

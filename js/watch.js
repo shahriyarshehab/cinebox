@@ -2890,24 +2890,6 @@ function updateYouTubeMenuState() {
   document.querySelectorAll('.yt-chip[data-subsize]').forEach((chip) => {
     chip.classList.toggle('active', parseInt(chip.getAttribute('data-subsize'), 10) === (playerSettings.subSize || 18));
   });
-
-  // 4. Audio Booster & EQ
-  const ytValBoost = document.getElementById('ytValAudioBoost');
-  if (ytValBoost) {
-    if (playerSettings.audioBoostGain > 100) {
-      ytValBoost.textContent = `${playerSettings.audioBoostGain}% (Boost)`;
-    } else {
-      ytValBoost.textContent = `${playerSettings.audioProfile.charAt(0).toUpperCase() + playerSettings.audioProfile.slice(1)}`;
-    }
-  }
-  document.querySelectorAll('#ytSubAudioBoost .yt-submenu-item[data-audiogain]').forEach((item) => {
-    const gain = parseInt(item.getAttribute('data-audiogain'), 10);
-    item.classList.toggle('active', gain === (playerSettings.audioBoostGain || 100));
-  });
-  document.querySelectorAll('#ytSubAudioBoost .yt-submenu-item[data-audioprofile]').forEach((item) => {
-    const prof = item.getAttribute('data-audioprofile');
-    item.classList.toggle('active', prof === (playerSettings.audioProfile || 'standard'));
-  });
 }
 
 function selectVideoQuality(qualityKey) {
