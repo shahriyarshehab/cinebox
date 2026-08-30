@@ -1252,6 +1252,7 @@ header {
   gap: 14px;
   overflow-x: auto;
   scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
   padding-bottom: 8px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -1264,6 +1265,8 @@ header {
 .row-slider .movie-card {
   flex: 0 0 160px;
   width: 160px;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 /* Movie Card & Grid */
@@ -5814,4 +5817,26 @@ kbd {
     box-shadow: 0 0 16px rgba(0, 230, 118, 0.85);
   }
 }
+
+/* ==========================================================================
+   ✨ Modern View Transitions & Page Morphing
+   ========================================================================== */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.28s;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.mb-hero-section {
+  view-transition-name: media-hero;
+}
+
+.player-cinema-box {
+  view-transition-name: player-cinema;
+}
+
 

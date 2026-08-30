@@ -53,6 +53,19 @@ function isInWatchlist(title) {
   return list.some((m) => (m.title || '').toLowerCase().trim() === clean);
 }
 
+function triggerConfettiBurst() {
+  try {
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 50,
+        spread: 60,
+        origin: { y: 0.8 },
+        colors: ['#00e5ff', '#ff2a5f', '#ffb800', '#ffffff']
+      });
+    }
+  } catch (e) {}
+}
+
 function toggleWatchlist(movieObj) {
   if (!movieObj || !movieObj.title) return false;
   const list = getWatchlist();
@@ -65,7 +78,8 @@ function toggleWatchlist(movieObj) {
     showToast('Removed from Watchlist');
   } else {
     list.unshift(movieObj);
-    showToast('Added to Watchlist');
+    showToast('💖 Added to Watchlist');
+    triggerConfettiBurst();
     isAdded = true;
   }
 
@@ -105,6 +119,7 @@ function toggleMarkedUpdate(movieObj) {
   } else {
     list.unshift(movieObj);
     showToast('🔔 Marked for Future Updates! Tracking new releases.');
+    triggerConfettiBurst();
     isMarked = true;
   }
 

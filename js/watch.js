@@ -1156,6 +1156,8 @@ function setupPlayerListeners() {
   });
 }
 
+let hlsPlayerInstance = null;
+
 function startStream(url, title) {
   const player = document.getElementById('videoPlayer');
   if (!player) return;
@@ -1173,7 +1175,24 @@ function startStream(url, title) {
   player.volume = 1.0;
   updateVolumeUI();
 
-  player.src = url;
+  // Modern Hls.js Adaptive Bitrate Streaming Support
+  if (hlsPlayerInstance) {
+    hlsPlayerInstance.destroy();
+    hlsPlayerInstance = null;
+  }
+
+  const isHls = (url || '').includes('.m3u8') || (url || '').includes('/hls/') || (url || '').includes('live');
+  if (isHls && typeof Hls !== 'undefined' && Hls.isSupported()) {
+    hlsPlayerInstance = new Hls({
+      enableWorker: true,
+      lowLatencyMode: true,
+      backBufferLength: 90
+    });
+    hlsPlayerInstance.loadSource(url);
+    hlsPlayerInstance.attachMedia(player);
+  } else {
+    player.src = url;
+  }
 
   // Auto-resume from last saved time
   if (playerSettings.autoResume) {
