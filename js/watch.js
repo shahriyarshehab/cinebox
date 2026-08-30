@@ -2947,50 +2947,6 @@ function updateYouTubeMenuState() {
     const prof = item.getAttribute('data-audioprofile');
     item.classList.toggle('active', prof === (playerSettings.audioProfile || 'standard'));
   });
-
-  // 6. Visual Filters
-  const filterName = playerSettings.videoFilter.charAt(0).toUpperCase() + playerSettings.videoFilter.slice(1);
-  const ytValVisuals = document.getElementById('ytValVisuals');
-  if (ytValVisuals) ytValVisuals.textContent = filterName;
-  document.querySelectorAll('#ytSubVisuals .yt-submenu-item').forEach((item) => {
-    const f = item.getAttribute('data-videofilter');
-    item.classList.toggle('active', f === playerSettings.videoFilter);
-  });
-
-  // 7. Aspect Ratio
-  const ytValAspect = document.getElementById('ytValAspect');
-  let aspName = 'Fit Screen';
-  if (playerSettings.aspectRatio === 'cover') aspName = 'Fill Screen';
-  if (playerSettings.aspectRatio === '16/9') aspName = '16:9 Cinema';
-  if (playerSettings.aspectRatio === '4/3') aspName = '4:3 Retro';
-  if (playerSettings.aspectRatio === '21/9') aspName = '21:9 Ultrawide';
-  if (ytValAspect) ytValAspect.textContent = aspName;
-  document.querySelectorAll('#ytSubAspect .yt-submenu-item').forEach((item) => {
-    const asp = item.getAttribute('data-aspect');
-    item.classList.toggle('active', asp === playerSettings.aspectRatio);
-  });
-
-  // 8. Ambient Glow
-  const ytValAmbient = document.getElementById('ytValAmbient');
-  let ambLabel = 'Dynamic Sync';
-  if (playerSettings.ambientMode === 'accent') ambLabel = 'Theme Glow';
-  if (playerSettings.ambientMode === 'off') ambLabel = 'Off';
-  if (ytValAmbient) ytValAmbient.textContent = ambLabel;
-  document.querySelectorAll('#ytSubAmbient .yt-submenu-item').forEach((item) => {
-    const amb = item.getAttribute('data-ambient');
-    item.classList.toggle('active', amb === playerSettings.ambientMode);
-  });
-
-  // 9. Sleep Timer
-  const ytValSleep = document.getElementById('ytValSleep');
-  let sleepLabel = 'Off';
-  if (playerSettings.sleepTimer === 'end') sleepLabel = 'End of Video';
-  else if (playerSettings.sleepTimer > 0) sleepLabel = `${playerSettings.sleepTimer} Min`;
-  if (ytValSleep) ytValSleep.textContent = sleepLabel;
-  document.querySelectorAll('#ytSubSleep .yt-submenu-item').forEach((item) => {
-    const sl = item.getAttribute('data-sleep');
-    item.classList.toggle('active', String(sl) === String(playerSettings.sleepTimer));
-  });
 }
 
 function selectVideoQuality(qualityKey) {
