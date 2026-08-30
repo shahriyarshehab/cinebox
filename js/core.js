@@ -146,6 +146,78 @@ function removeWatchHistory(url, event) {
   if (typeof renderView === 'function') renderView();
 }
 
+// ==========================================================================
+// 🎬 Real Movie Name & Clean Title Sanitizer Engine
+// Normalizes messy raw mother-server folder names into clean real titles
+// e.g., "001. The.Shawshank.Redemption.1994.1080p.BluRay.Dual.Audio" -> "The Shawshank Redemption (1994)"
+// ==========================================================================
+function getCleanMovieTitle(rawTitle) {
+  if (!rawTitle) return '';
+  let title = String(rawTitle).trim();
+
+  // 1. Remove file extensions (.mkv, .mp4, .avi, .webm, .m4v, .ts)
+  title = title.replace(/\.(mp4|mkv|avi|webm|m4v|ts)$/i, '');
+
+  // 2. Remove leading ranking/index numbers like "001. ", "012 - ", "1. "
+  title = title.replace(/^\d{1,4}[\.\s\-–—]+\s*/, '');
+
+  // 3. Clean up "(TV Series ...)", "(TV Mini Series ...)", "(TV Special ...)"
+  title = title.replace(/\(TV\s*(?:Mini\s*|Special\s*)?Series\s*([^)]*)\)/gi, '($1)');
+
+  // 4. Remove brackets and tags like [Dual Audio], [Multi Audio], [Hindi], [1080p], [HQ], etc.
+  title = title.replace(/\[[^\]]*\]/g, ' ');
+
+  // 5. Replace underscores with spaces
+  title = title.replace(/_/g, ' ');
+
+  // 6. Replace dots between words (e.g. Iron.Man.3 -> Iron Man 3)
+  title = title.replace(/([a-zA-Z0-9])\.([a-zA-Z0-9])/g, '$1 $2');
+  title = title.replace(/([a-zA-Z0-9])\.([a-zA-Z0-9])/g, '$1 $2');
+
+  // 7. Remove resolution, quality, codec, source and release junk words
+  const junkPatterns = [
+    /\b(?:1080p|720p|576p|480p|360p|2160p|4k|uhd|fhd|hd|sd)\b/gi,
+    /\b(?:bluray|brrip|bdrip|web-dl|webrip|web|dvdrip|hdtc|hdts|hd-ts|camrip|cam|telesync|ts|dvd|remux|hdtv)\b/gi,
+    /\b(?:x264|x265|hevc|h264|h265|10bit|8bit|avc|xvid|divx)\b/gi,
+    /\b(?:aac(?:[\.\s]?[0-9]\.[0-9])?|ac3|ddp?5\.1|dd5\.1|dts(?:-hd)?|truehd|atmos|mp3|flac|2ch|6ch)\b/gi,
+    /\b(?:dual[\s\-]?audio|multi[\s\-]?audio|multi[\s\-]?dub|hindi[\s\-]?dubbed|tamil[\s\-]?dubbed|telugu[\s\-]?dubbed|bengali[\s\-]?dubbed|english[\s\-]?dubbed|dubbed)\b/gi,
+    /\b(?:esub|esubs|subtitles|subs|msubs|softsub|hardsub)\b/gi,
+    /\b(?:uncut|extended(?:\s*cut)?|director'?s(?:\s*cut)?|remastered|imax|proper|repack|unrated|theatrical(?:\s*cut)?|clean)\b/gi,
+    /\b(?:amzn|nflx|ds4k|dsnp|hmax|zee5|hotstar|sonyliv|jiocinema|voot|aha|aha-web|jhs|mkvcinemas|hdhub(?:4u)?|katmoviehd|vegamovies|yify|yts|pahe(?:\.in)?|rarbg|psa|galaxyrg|tgx|fgt|olam|3xo|tigole|anoXmous|sartre|joy|sujaidr|sungeorge|msmod)\b/gi
+  ];
+
+  junkPatterns.forEach((pattern) => {
+    title = title.replace(pattern, ' ');
+  });
+
+  // 8. Fix hyphenated subtitles like "Insidious-Out of the Further" -> "Insidious: Out of the Further"
+  title = title.replace(/([a-zA-Z0-9])\s*-\s*([A-Z][a-z]+)/g, '$1: $2');
+
+  // 9. Extract or normalize Year (YYYY) or (YYYY–YYYY)
+  const yearMatch = title.match(/\b(19\d\d|20\d\d)(?:\s*[–—\-]\s*(19\d\d|20\d\d|present|\s*))?\b/i);
+  let yearStr = '';
+  if (yearMatch) {
+    yearStr = yearMatch[0].trim();
+    title = title.replace(yearMatch[0], ' ');
+  }
+
+  // 10. Clean up residual punctuation and whitespace
+  title = title
+    .replace(/[\[\]\(\)\{\}]/g, ' ')
+    .replace(/[\s\-–—:_]+$/, '')
+    .replace(/^[\s\-–—:_]+/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  // 11. Append clean year if found
+  if (yearStr) {
+    const cleanYear = yearStr.replace(/\s+/g, '').replace(/-/g, '–');
+    title = `${title} (${cleanYear})`;
+  }
+
+  return title.trim() || rawTitle;
+}
+
 // ==========================================
 //  Recent Searches Manager
 // ==========================================

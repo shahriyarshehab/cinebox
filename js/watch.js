@@ -713,10 +713,11 @@ async function loadAndApplyOnlineMetadata(item) {
 }
 
 function renderWatchPage(item) {
-  document.title = `${item.title} — CineBox`;
+  const cleanDisplayTitle = typeof getCleanMovieTitle === 'function' ? getCleanMovieTitle(item.title) : item.title;
+  document.title = `${cleanDisplayTitle} — CineBox`;
 
   // Backdrop & Poster
-  document.getElementById('wTitle').textContent = item.title;
+  document.getElementById('wTitle').textContent = cleanDisplayTitle;
   document.getElementById('wPoster').src = item.poster;
   document.getElementById('mbBackdrop').style.backgroundImage = `url('${item.poster}')`;
 
@@ -3785,7 +3786,8 @@ async function loadRelatedMedia(tag, currentTitle) {
             }
           : item;
         const rawTitle = obj.title || '';
-        const safeTitle = escapeQuotes(rawTitle);
+        const cleanTitle = typeof getCleanMovieTitle === 'function' ? getCleanMovieTitle(rawTitle) : rawTitle;
+        const safeTitle = escapeQuotes(cleanTitle);
         const itemData = encodeURIComponent(JSON.stringify(obj));
         const isSeries = obj.tag === 'TV Series' || obj.tag === 'K-Drama' || (obj.url && obj.url.endsWith('/'));
         const linkUrl = `watch.html?title=${encodeURIComponent(rawTitle)}&data=${itemData}`;
@@ -3816,7 +3818,7 @@ async function loadRelatedMedia(tag, currentTitle) {
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="card-title" title="${safeTitle}">${obj.title}</div>
+                        <div class="card-title" title="${safeTitle}">${cleanTitle}</div>
                         <div class="card-meta">
                             <span>${obj.size || 'HD'}</span>
                             <span>${obj.date || ''}</span>

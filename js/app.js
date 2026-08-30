@@ -396,6 +396,7 @@ function setupCarousel(moviesList) {
       const itemData = encodeURIComponent(JSON.stringify(m));
       const linkUrl = `watch.html?title=${encodeURIComponent(m.title)}&data=${itemData}`;
       const inWatchlist = isInWatchlist(m.title);
+      const cleanTitle = typeof getCleanMovieTitle === 'function' ? getCleanMovieTitle(m.title) : m.title;
 
       return `
         <div class="carousel-slide ${idx === 0 ? 'active' : ''}" id="slide-${idx}">
@@ -404,7 +405,7 @@ function setupCarousel(moviesList) {
             <div class="slide-container">
                 <div class="slide-content">
                     <div class="slide-tag">Featured • ${m.tag || 'Latest'}</div>
-                    <h2 class="slide-title" title="${escapeQuotes(m.title)}">${m.title}</h2>
+                    <h2 class="slide-title" title="${escapeQuotes(cleanTitle)}">${cleanTitle}</h2>
                     <div class="slide-meta">
                         <span style="color: var(--accent-gold); font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><i data-lucide="star" style="color: #ffb800; fill: #ffb800; width: 12px; height: 12px;"></i> 8.9</span>
                         <span>•</span>
@@ -512,19 +513,20 @@ function renderContinueWatchingHtml() {
                     const itemData = encodeURIComponent(JSON.stringify(item));
                     const linkUrl = `watch.html?title=${encodeURIComponent(item.title)}&data=${itemData}`;
                     const timeLeft = Math.max(1, Math.round((item.duration - item.time) / 60));
+                    const cleanTitle = typeof getCleanMovieTitle === 'function' ? getCleanMovieTitle(item.title) : item.title;
 
                     return `
                         <div class="continue-card">
                             <button class="btn-remove-history" onclick="removeWatchHistory('${item.url}', event)" title="Remove" aria-label="Remove"><i data-lucide="x"></i></button>
                             <a href="${linkUrl}" style="text-decoration: none; color: inherit;">
                                 <div class="continue-thumb-wrap">
-                                    <img src="${item.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300'}" alt="${escapeQuotes(item.title)}" loading="lazy">
+                                    <img src="${item.poster || 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=300'}" alt="${escapeQuotes(cleanTitle)}" loading="lazy">
                                     <div class="progress-bar-container">
                                         <div class="progress-bar-fill" style="width: ${item.percent || 10}%;"></div>
                                     </div>
                                 </div>
                                 <div class="card-body">
-                                    <div class="card-title" title="${item.title}">${item.title}</div>
+                                    <div class="card-title" title="${escapeQuotes(cleanTitle)}">${cleanTitle}</div>
                                     <div class="card-meta">
                                         <span style="color: var(--primary); font-weight: 700;">${item.percent}%</span>
                                         <span>${timeLeft}m left</span>
@@ -1541,7 +1543,8 @@ function getMediaReleaseMarker(dateStr) {
 
 function renderMovieCardHtml(item) {
   const rawTitle = item.title || '';
-  const safeTitle = escapeQuotes(rawTitle);
+  const displayTitle = typeof getCleanMovieTitle === 'function' ? getCleanMovieTitle(rawTitle) : rawTitle;
+  const safeTitle = escapeQuotes(displayTitle);
   const itemData = encodeURIComponent(JSON.stringify(item));
   const isSeries =
     typeof isMediaSeries === 'function'
@@ -1578,7 +1581,7 @@ function renderMovieCardHtml(item) {
                 </div>
             </div>
             <div class="card-body">
-                <div class="card-title" title="${safeTitle}">${item.title}</div>
+                <div class="card-title" title="${safeTitle}">${displayTitle}</div>
                 <div class="card-meta">
                     <span>${item.size || 'HD'}</span>
                     <span style="${isRecent ? 'color: var(--primary); font-weight: 700;' : ''}">${item.date || ''}</span>

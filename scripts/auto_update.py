@@ -150,6 +150,50 @@ def fetch_folder(url):
         })
     return items
 
+def clean_movie_title(raw_title):
+    if not raw_title:
+        return ""
+    t = str(raw_title).strip()
+    t = re.sub(r'\.(mp4|mkv|avi|webm|m4v|ts)$', '', t, flags=re.I)
+    t = re.sub(r'^\d{1,4}[\.\s\-–—]+\s*', '', t)
+    t = re.sub(r'\(TV\s*(?:Mini\s*|Special\s*)?Series\s*([^)]*)\)', r'(\1)', t, flags=re.I)
+    t = re.sub(r'\[[^\]]*\]', ' ', t)
+    t = t.replace('_', ' ')
+    t = re.sub(r'([a-zA-Z0-9])\.([a-zA-Z0-9])', r'\1 \2', t)
+    t = re.sub(r'([a-zA-Z0-9])\.([a-zA-Z0-9])', r'\1 \2', t)
+    
+    junk = [
+        r'\b(?:1080p|720p|576p|480p|360p|2160p|4k|uhd|fhd|hd|sd)\b',
+        r'\b(?:bluray|brrip|bdrip|web-dl|webrip|web|dvdrip|hdtc|hdts|hd-ts|camrip|cam|telesync|ts|dvd|remux|hdtv)\b',
+        r'\b(?:x264|x265|hevc|h264|h265|10bit|8bit|avc|xvid|divx)\b',
+        r'\b(?:aac(?:[\.\s]?[0-9]\.[0-9])?|ac3|ddp?5\.1|dd5\.1|dts(?:-hd)?|truehd|atmos|mp3|flac|2ch|6ch)\b',
+        r'\b(?:dual[\s\-]?audio|multi[\s\-]?audio|multi[\s\-]?dub|hindi[\s\-]?dubbed|tamil[\s\-]?dubbed|telugu[\s\-]?dubbed|bengali[\s\-]?dubbed|english[\s\-]?dubbed|dubbed)\b',
+        r'\b(?:esub|esubs|subtitles|subs|msubs|softsub|hardsub)\b',
+        r'\b(?:uncut|extended(?:\s*cut)?|director\'?s(?:\s*cut)?|remastered|imax|proper|repack|unrated|theatrical(?:\s*cut)?|clean)\b',
+        r'\b(?:amzn|nflx|ds4k|dsnp|hmax|zee5|hotstar|sonyliv|jiocinema|voot|aha|aha-web|jhs|mkvcinemas|hdhub(?:4u)?|katmoviehd|vegamovies|yify|yts|pahe(?:\.in)?|rarbg|psa|galaxyrg|tgx|fgt|olam|3xo|tigole|anoXmous|sartre|joy|sujaidr|sungeorge|msmod)\b'
+    ]
+    for p in junk:
+        t = re.sub(p, ' ', t, flags=re.I)
+        
+    t = re.sub(r'([a-zA-Z0-9])\s*-\s*([A-Z][a-z]+)', r'\1: \2', t)
+    
+    year_match = re.search(r'\b(19\d\d|20\d\d)(?:\s*[–—\-]\s*(19\d\d|20\d\d|present|\s*))?\b', t, re.I)
+    year_str = ""
+    if year_match:
+        year_str = year_match.group(0).strip()
+        t = t[:year_match.start()] + " " + t[year_match.end():]
+        
+    t = re.sub(r'[\[\]\(\)\{\}]', ' ', t)
+    t = re.sub(r'[\s\-–—:_]+$', '', t)
+    t = re.sub(r'^[\s\-–—:_]+', '', t)
+    t = re.sub(r'\s+', ' ', t).strip()
+    
+    if year_str:
+        clean_yr = re.sub(r'\s+', '', year_str).replace('-', '–')
+        t = f"{t} ({clean_yr})"
+        
+    return t.strip() or raw_title
+
 def process_movie_folder(md, cat_name, tag):
     name_clean = md['name'].strip()
     if not name_clean or name_clean.lower() in ['parent directory', '..', '.']:
@@ -169,7 +213,7 @@ def process_movie_folder(md, cat_name, tag):
             if s.get('size') and s['size'] != 'File':
                 file_size = s['size']
 
-    clean_name = re.sub(r'\.(mp4|mkv|avi|webm)$', '', name_clean, flags=re.I)
+    clean_name = clean_movie_title(name_clean)
     return [
         clean_name,
         poster_url,
