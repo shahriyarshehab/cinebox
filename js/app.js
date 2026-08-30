@@ -141,6 +141,16 @@ async function init() {
   updateWatchlistNavBadge();
   const page = detectPageType();
 
+  // Daily First Load Detection - Clear stale session cache on a new day to pull fresh mother server updates
+  const todayStr = new Date().toISOString().split('T')[0];
+  const lastClientDate = localStorage.getItem('cinebox_client_last_date');
+  if (lastClientDate !== todayStr) {
+    localStorage.setItem('cinebox_client_last_date', todayStr);
+    try {
+      sessionStorage.removeItem('cinebox_home_v3');
+    } catch (e) {}
+  }
+
   // 1. Check client cached home_data or fetch home_data.json immediately for 0ms instant render
   const cachedHome = sessionStorage.getItem('cinebox_home_v3');
   if (cachedHome) {

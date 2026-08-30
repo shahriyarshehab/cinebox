@@ -227,6 +227,38 @@ function getLocalIpAddresses() {
   return addresses;
 }
 
+const SYNC_TRACKER_FILE = path.join(ROOT, '.last_daily_sync');
+
+function checkAndRunDailyAutoUpdate() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  let lastSync = '';
+  try {
+    if (fs.existsSync(SYNC_TRACKER_FILE)) {
+      lastSync = fs.readFileSync(SYNC_TRACKER_FILE, 'utf8').trim();
+    }
+  } catch (e) {}
+
+  if (lastSync !== todayStr) {
+    console.log(`\x1b[33m[Daily Auto-Update]\x1b[0m 📅 First load of the day (${todayStr}) detected.`);
+    console.log(`\x1b[33m[Daily Auto-Update]\x1b[0m 🔄 Automatically fetching new files from mother server...`);
+
+    const pyCmd = process.platform === 'win32' ? 'python' : 'python3';
+    exec(`${pyCmd} "${path.join(ROOT, 'scripts', 'auto_update.py')}"`, (err, stdout, stderr) => {
+      if (err) {
+        console.warn(`\x1b[31m[Daily Auto-Update Warning]\x1b[0m Mother server crawler skipped (${err.message}). Local catalog active.`);
+      } else {
+        try {
+          fs.writeFileSync(SYNC_TRACKER_FILE, todayStr, 'utf8');
+        } catch (e) {}
+        console.log(`\x1b[32m[Daily Auto-Update Success]\x1b[0m ✅ Mother server releases successfully synced!`);
+        broadcastLiveReload();
+      }
+    });
+  } else {
+    console.log(`\x1b[90m[Daily Auto-Update]\x1b[0m 📅 Already synchronized for today (${todayStr}).`);
+  }
+}
+
 function startServer(port) {
   server.removeAllListeners('error');
   server.once('error', (err) => {
@@ -252,6 +284,9 @@ function startServer(port) {
     console.log(`\n  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   \x1b[36m${localUrl}\x1b[0m`);
     console.log(`  \x1b[32m➜\x1b[0m  \x1b[1mNetwork:\x1b[0m \x1b[36m${networkUrl}\x1b[0m`);
     console.log(`\n  \x1b[90mReady to stream! Press \x1b[1mCtrl + C\x1b[0m\x1b[90m to stop.\x1b[0m\n`);
+
+    // Check & trigger daily first load update in background
+    checkAndRunDailyAutoUpdate();
 
     if (shouldOpen) {
       openBrowser(localUrl);
