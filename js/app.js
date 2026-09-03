@@ -26,6 +26,7 @@ let isFullCatalogLoaded = false;
 const CATEGORY_ROWS = [
   { name: "Today's Updates", tag: 'Today', limit: 14 },
   { name: 'IMDb Top 250', tag: 'Top Rated', limit: 14 },
+  { name: 'Elaach BDIX Releases', tag: 'Elaach BDIX', limit: 14 },
   { name: 'Animation & Anime', tag: 'Animation', limit: 14 },
   { name: 'Hollywood 1080p', tag: 'Hollywood 1080p', limit: 14 },
   { name: 'Bollywood (Hindi)', tag: 'Bollywood', limit: 14 },
@@ -53,7 +54,8 @@ const ALL_CATEGORY_PILLS = [
   { label: 'Bangla Movies', tag: 'Bangla' },
   { label: 'Foreign Cinema', tag: 'Foreign Movies' },
   { label: '3D Movies', tag: '3D Movies' },
-  { label: 'English Classic', tag: 'English Movies' }
+  { label: 'English Classic', tag: 'English Movies' },
+  { label: 'Elaach BDIX', tag: 'Elaach BDIX' }
 ];
 
 const TV_CATEGORY_PILLS = [
@@ -75,7 +77,8 @@ const MOVIES_CATEGORY_PILLS = [
   { label: 'Foreign & Asian', tag: 'Foreign Movies' },
   { label: 'IMDb Top 250', tag: 'Top Rated' },
   { label: '3D Cinema', tag: '3D Movies' },
-  { label: 'English Classic', tag: 'English Movies' }
+  { label: 'English Classic', tag: 'English Movies' },
+  { label: 'Elaach BDIX', tag: 'Elaach BDIX' }
 ];
 
 const ANIMATION_CATEGORY_PILLS = [
@@ -117,7 +120,8 @@ const CATEGORY_JSON_MAP = {
   'Foreign Movies': 'data/foreign.json',
   '3D Movies': 'data/3d.json',
   'English Movies': 'data/english.json',
-  'Top Rated': 'data/top_rated.json'
+  'Top Rated': 'data/top_rated.json',
+  'Elaach BDIX': 'data/elaach.json'
 };
 
 const categoryCache = {};
@@ -1163,6 +1167,14 @@ function matchesCategory(m, tag) {
   if (tag === 'Top Rated') {
     return (
       m.tag === 'Top Rated' || (m.category && m.category.includes('Top 250')) || (m.url && m.url.includes('Top-250'))
+    );
+  }
+  if (tag === 'Elaach BDIX') {
+    return (
+      m.tag === 'Elaach BDIX' ||
+      m.category === 'Elaach BDIX' ||
+      (m.url && m.url.includes('elaach.com')) ||
+      (m.poster && m.poster.includes('elaach.com'))
     );
   }
   return m.category && m.category.toLowerCase().includes(tag.toLowerCase());

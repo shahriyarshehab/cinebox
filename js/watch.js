@@ -1155,6 +1155,25 @@ function generateAvailableServerMirrors(primaryUrl, movieObj) {
   const rawUrl = primaryUrl || (movieObj ? movieObj.url : '');
   if (!rawUrl) return mirrors;
 
+  if (rawUrl.includes('elaach.com')) {
+    mirrors.push({
+      name: 'Server 1 (Elaach BDIX)',
+      desc: 'Triangle Services BDIX Mirror',
+      url: rawUrl
+    });
+    mirrors.push({
+      name: 'Server 2 (DhakaFlix)',
+      desc: 'DhakaFlix BDIX Mirror',
+      url: rawUrl
+    });
+    mirrors.push({
+      name: 'Server 3 (SamOnline)',
+      desc: 'SamOnline BDIX Mirror',
+      url: rawUrl
+    });
+    return mirrors;
+  }
+
   // 1. Primary Node (DhakaFlix 1080p Web-DL)
   mirrors.push({
     name: 'Server 1 (DhakaFlix)',
