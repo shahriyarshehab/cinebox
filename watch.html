@@ -542,6 +542,39 @@
               </div>
             </div>
 
+            <!-- Mother Server Connection Error Overlay -->
+            <div class="mother-server-overlay" id="motherServerErrorOverlay" style="display: none">
+              <div class="mother-server-card">
+                <div class="mother-server-icon-wrap">
+                  <i data-lucide="wifi-off" style="width: 26px; height: 26px; color: #ff5252;"></i>
+                </div>
+                <div class="mother-server-title">Cannot Connect to Mother Server</div>
+                <div class="mother-server-desc" id="motherServerErrorMessage">
+                  Unable to establish connection with the BDIX media mother server. Please ensure you are connected to a BDIX broadband network, or switch to an alternate server mirror.
+                </div>
+                <div class="mother-server-target" id="motherServerTargetInfo" style="display: none;"></div>
+                <div class="mother-server-actions">
+                  <button class="btn btn-primary" onclick="retryMotherServerConnection()">
+                    <i data-lucide="rotate-cw" style="width: 13px; height: 13px;"></i>
+                    <span>Retry Connection</span>
+                  </button>
+                  <button class="btn btn-ghost" onclick="tryNextServerMirror()">
+                    <i data-lucide="server" style="width: 13px; height: 13px;"></i>
+                    <span>Next Server Mirror</span>
+                  </button>
+                  <button class="btn btn-ghost" onclick="openExternalPlayerModal()">
+                    <i data-lucide="external-link" style="width: 13px; height: 13px;"></i>
+                    <span>Play in VLC / MX</span>
+                  </button>
+                  <button class="btn btn-ghost" onclick="openDownloadModal()">
+                    <i data-lucide="download" style="width: 13px; height: 13px;"></i>
+                    <span>Download Hub</span>
+                  </button>
+                </div>
+                <button class="mother-server-dismiss-btn" onclick="hideMotherServerErrorOverlay()">Dismiss</button>
+              </div>
+            </div>
+
             <!-- Backdrop Scrim for Mobile Settings Popup -->
             <div
               class="yt-settings-backdrop"

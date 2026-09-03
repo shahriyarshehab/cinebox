@@ -1222,10 +1222,32 @@ function updateServerSelectorUI() {
   }
 }
 
+let motherServerWatchdogTimer = null;
+
+function clearMotherServerWatchdog() {
+  if (motherServerWatchdogTimer) {
+    clearTimeout(motherServerWatchdogTimer);
+    motherServerWatchdogTimer = null;
+  }
+}
+
+function startMotherServerWatchdog(player) {
+  clearMotherServerWatchdog();
+  // 12-second watchdog for unresponsive private BDIX IPs (e.g. mobile data / non-BDIX users)
+  motherServerWatchdogTimer = setTimeout(() => {
+    if (player && player.readyState < 2 && (!player.currentTime || player.currentTime === 0) && !player.ended) {
+      handleStreamConnectionError('Connection to mother server timed out. You may be on a network without BDIX routing, or the server is unresponsive.');
+    }
+  }, 12000);
+}
+
 function switchMediaServer(serverIdx) {
   if (!availableServerMirrors[serverIdx]) return;
   const player = document.getElementById('videoPlayer');
   if (!player) return;
+
+  clearMotherServerWatchdog();
+  hideMotherServerErrorOverlay();
 
   const prevTime = player.currentTime;
   const wasPlaying = !player.paused;
@@ -1243,22 +1265,110 @@ function switchMediaServer(serverIdx) {
     hlsPlayerInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
     hlsPlayerInstance.loadSource(targetServer.url);
     hlsPlayerInstance.attachMedia(player);
+    hlsPlayerInstance.on(Hls.Events.ERROR, (event, data) => {
+      if (data && data.fatal) {
+        handleStreamConnectionError();
+      }
+    });
   } else {
     player.src = targetServer.url;
   }
 
+  player.onerror = () => {
+    clearMotherServerWatchdog();
+    handleStreamConnectionError();
+  };
+
+  const onDataLoaded = () => {
+    clearMotherServerWatchdog();
+    hideMotherServerErrorOverlay();
+  };
+  player.onloadeddata = onDataLoaded;
+  player.oncanplay = onDataLoaded;
+
   player.addEventListener('loadedmetadata', () => {
+    clearMotherServerWatchdog();
+    hideMotherServerErrorOverlay();
     if (prevTime > 0) player.currentTime = prevTime;
     if (wasPlaying) player.play().catch(() => {});
   }, { once: true });
 
+  startMotherServerWatchdog(player);
   updateServerSelectorUI();
-  showToast(`⚡ Switched to ${targetServer.name}`);
+  showToast(`Switched to ${targetServer.name}`);
+}
+
+function handleStreamConnectionError(customMsg) {
+  clearMotherServerWatchdog();
+  if (availableServerMirrors.length > currentActiveServerIdx + 1) {
+    const nextIdx = currentActiveServerIdx + 1;
+    showToast(`Server ${currentActiveServerIdx + 1} unavailable. Trying Server ${nextIdx + 1}...`);
+    switchMediaServer(nextIdx);
+  } else {
+    showMotherServerErrorOverlay(customMsg);
+  }
+}
+
+function showMotherServerErrorOverlay(customMsg) {
+  clearMotherServerWatchdog();
+  const overlay = document.getElementById('motherServerErrorOverlay');
+  if (!overlay) return;
+
+  const msgEl = document.getElementById('motherServerErrorMessage');
+  if (msgEl) {
+    msgEl.textContent =
+      customMsg ||
+      'Unable to establish connection with the BDIX media mother server. Please ensure you are connected to a BDIX broadband network, or switch to an alternate server mirror.';
+  }
+
+  const targetEl = document.getElementById('motherServerTargetInfo');
+  if (targetEl && currentActiveStreamUrl) {
+    try {
+      const parsed = new URL(currentActiveStreamUrl);
+      const srv = availableServerMirrors[currentActiveServerIdx];
+      const srvName = srv ? srv.name : 'Mother Server';
+      targetEl.textContent = `${srvName} • ${parsed.hostname}`;
+      targetEl.style.display = 'inline-block';
+    } catch (e) {
+      targetEl.style.display = 'none';
+    }
+  }
+
+  overlay.style.display = 'flex';
+  if (typeof refreshLucideIcons === 'function') refreshLucideIcons();
+  showToast('Cannot connect to mother server. Check BDIX network or switch mirror.');
+}
+
+function hideMotherServerErrorOverlay() {
+  clearMotherServerWatchdog();
+  const overlay = document.getElementById('motherServerErrorOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function retryMotherServerConnection() {
+  hideMotherServerErrorOverlay();
+  showToast('Retrying connection to mother server...');
+  if (currentActiveStreamUrl) {
+    startStream(currentActiveStreamUrl, currentActiveStreamTitle);
+  }
+}
+
+function tryNextServerMirror() {
+  if (availableServerMirrors && availableServerMirrors.length > 1) {
+    const nextIdx = (currentActiveServerIdx + 1) % availableServerMirrors.length;
+    hideMotherServerErrorOverlay();
+    switchMediaServer(nextIdx);
+  } else {
+    showToast('No alternate server mirrors found for this media.');
+  }
 }
 
 function startStream(url, title) {
   const player = document.getElementById('videoPlayer');
   if (!player) return;
+
+  clearMotherServerWatchdog();
+  hideMotherServerErrorOverlay();
 
   currentActiveStreamUrl = url;
   currentActiveStreamTitle = title || 'Playing Media';
@@ -1301,18 +1411,30 @@ function startStream(url, title) {
       detectAndRenderAudioTracks();
       updateYouTubeMenuState();
     });
+    hlsPlayerInstance.on(Hls.Events.ERROR, (event, data) => {
+      if (data && data.fatal) {
+        clearMotherServerWatchdog();
+        handleStreamConnectionError();
+      }
+    });
   } else {
     player.src = url;
   }
 
-  // Auto fallback to secondary server on stream error
+  // Handle stream errors & mother server connection failures
   player.onerror = () => {
-    if (availableServerMirrors.length > currentActiveServerIdx + 1) {
-      const nextIdx = currentActiveServerIdx + 1;
-      showToast(`⚠️ Server ${currentActiveServerIdx + 1} unavailable. Auto-switching to Server ${nextIdx + 1}...`);
-      switchMediaServer(nextIdx);
-    }
+    clearMotherServerWatchdog();
+    handleStreamConnectionError();
   };
+
+  const onDataLoaded = () => {
+    clearMotherServerWatchdog();
+    hideMotherServerErrorOverlay();
+  };
+  player.onloadeddata = onDataLoaded;
+  player.oncanplay = onDataLoaded;
+
+  startMotherServerWatchdog(player);
 
   // Auto-resume from last saved time
   if (playerSettings.autoResume) {
