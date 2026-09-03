@@ -21,30 +21,32 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      tailwind.config = {
-        darkMode: ['class', '[data-theme="dark"]'],
-        theme: {
-          extend: {
-            colors: {
-              primary: '#00e5ff',
-              'primary-glow': 'rgba(0, 229, 255, 0.25)',
-              accent: '#ff2a5f',
-              'accent-gold': '#ffb800',
-              'accent-green': '#00e676',
-              'bg-base': '#07090e',
-              'bg-surface': '#0e121a',
-              'bg-card': '#131924'
-            },
-            fontFamily: {
-              display: ['Space Grotesk', '-apple-system', 'sans-serif'],
-              body: ['Plus Jakarta Sans', '-apple-system', 'sans-serif']
+      window.tailwind = {
+        config: {
+          darkMode: ['class', '[data-theme="dark"]'],
+          theme: {
+            extend: {
+              colors: {
+                primary: '#00e5ff',
+                'primary-glow': 'rgba(0, 229, 255, 0.25)',
+                accent: '#ff2a5f',
+                'accent-gold': '#ffb800',
+                'accent-green': '#00e676',
+                'bg-base': '#07090e',
+                'bg-surface': '#0e121a',
+                'bg-card': '#131924'
+              },
+              fontFamily: {
+                display: ['Space Grotesk', '-apple-system', 'sans-serif'],
+                body: ['Plus Jakarta Sans', '-apple-system', 'sans-serif']
+              }
             }
           }
         }
       };
     </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
@@ -613,7 +615,21 @@
                     </div>
                   </div>
 
-                  <!-- 4. Server Source (Multi-Server Mirrors) -->
+                  <!-- 4. Audio Track (Multi-Audio & Dual Audio) -->
+                  <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubAudioTrack')">
+                    <div class="yt-item-left">
+                      <span class="yt-item-icon">
+                        <i data-lucide="headphones"></i>
+                      </span>
+                      <span class="yt-item-label">Audio Track</span>
+                    </div>
+                    <div class="yt-item-right">
+                      <span class="yt-item-val" id="ytValAudio">Default (Stereo)</span>
+                      <i data-lucide="chevron-right" class="yt-chevron"></i>
+                    </div>
+                  </div>
+
+                  <!-- 5. Server Source (Multi-Server Mirrors) -->
                   <div class="yt-menu-item" onclick="openYouTubeSubmenu('ytSubServer')">
                     <div class="yt-item-left">
                       <span class="yt-item-icon">
@@ -877,6 +893,27 @@
                   </div>
                 </div>
               </div>
+
+              <!-- SUBMENU: AUDIO TRACK (MULTI-AUDIO & DUAL DUB) -->
+              <div class="yt-menu-panel" id="ytSubAudioTrack">
+                <div class="yt-submenu-header">
+                  <button class="yt-back-btn" onclick="backToYouTubeMainMenu()" aria-label="Back">
+                    <i data-lucide="chevron-left"></i>
+                  </button>
+                  <span class="yt-submenu-title">Audio Track</span>
+                </div>
+                <div class="yt-menu-list" id="dynamicAudioTracksContainer">
+                  <!-- Populated dynamically by detectAndRenderAudioTracks() -->
+                </div>
+                <div class="yt-action-item" onclick="openExternalAudioPicker()">
+                  <i data-lucide="upload"></i>
+                  <span>Load External Audio (.mp3, .aac)</span>
+                </div>
+                <div class="yt-action-item" onclick="promptExternalAudioUrl()">
+                  <i data-lucide="link"></i>
+                  <span>Load Audio from URL</span>
+                </div>
+              </div>
             </div>
 
             <!-- ================================================= -->
@@ -1021,8 +1058,27 @@
                     </div>
                   </div>
 
-                  <!-- Right Control Group (Subtitles CC, Settings Gear, PiP, Fullscreen) -->
+                  <!-- Right Control Group (Audio, Subtitles CC, Settings Gear, PiP, Fullscreen) -->
                   <div class="cp-controls-right">
+                    <!-- Audio Track Quick Selector -->
+                    <input
+                      type="file"
+                      id="externalAudioFileInput"
+                      accept=".mp3,.aac,.m4a,.wav,.ogg"
+                      style="display: none"
+                      onchange="handleExternalAudioFileSelect(event)"
+                    />
+                    <button
+                      class="cp-btn"
+                      id="btnAudioTrack"
+                      onclick="openAudioTrackDirectMenu(event)"
+                      title="Audio Track (B)"
+                      aria-label="Audio track selection"
+                    >
+                      <i data-lucide="headphones"></i>
+                      <span class="cp-audio-count-badge" id="cpAudioTrackCountBadge" style="display: none"></span>
+                    </button>
+
                     <!-- Subtitle Toggle & File Picker -->
                     <input
                       type="file"
@@ -2275,6 +2331,7 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script src="js/lucide.min.js"></script>
     <script src="js/core.js"></script>
+    <script src="js/audio-engine.js"></script>
     <script src="js/watch.js"></script>
     <script>
       if ('serviceWorker' in navigator) {

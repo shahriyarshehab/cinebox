@@ -21,30 +21,32 @@
       href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      tailwind.config = {
-        darkMode: ['class', '[data-theme="dark"]'],
-        theme: {
-          extend: {
-            colors: {
-              primary: '#00e5ff',
-              'primary-glow': 'rgba(0, 229, 255, 0.25)',
-              accent: '#ff2a5f',
-              'accent-gold': '#ffb800',
-              'accent-green': '#00e676',
-              'bg-base': '#07090e',
-              'bg-surface': '#0e121a',
-              'bg-card': '#131924'
-            },
-            fontFamily: {
-              display: ['Space Grotesk', '-apple-system', 'sans-serif'],
-              body: ['Plus Jakarta Sans', '-apple-system', 'sans-serif']
+      window.tailwind = {
+        config: {
+          darkMode: ['class', '[data-theme="dark"]'],
+          theme: {
+            extend: {
+              colors: {
+                primary: '#00e5ff',
+                'primary-glow': 'rgba(0, 229, 255, 0.25)',
+                accent: '#ff2a5f',
+                'accent-gold': '#ffb800',
+                'accent-green': '#00e676',
+                'bg-base': '#07090e',
+                'bg-surface': '#0e121a',
+                'bg-card': '#131924'
+              },
+              fontFamily: {
+                display: ['Space Grotesk', '-apple-system', 'sans-serif'],
+                body: ['Plus Jakarta Sans', '-apple-system', 'sans-serif']
+              }
             }
           }
         }
       };
     </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
@@ -223,6 +225,7 @@
           <div class="shortcut-item"><kbd>T</kbd> <span>Toggle Theater Mode</span></div>
           <div class="shortcut-item"><kbd>V</kbd> <span>Cycle Video Filters (HDR/Cinema)</span></div>
           <div class="shortcut-item"><kbd>C</kbd> <span>Toggle Subtitles (CC)</span></div>
+          <div class="shortcut-item"><kbd>B</kbd> <span>Audio Track (Multi-Audio / Dub)</span></div>
           <div class="shortcut-item"><kbd>F</kbd> <span>Toggle Fullscreen</span></div>
           <div class="shortcut-item"><kbd>M</kbd> <span>Mute / Unmute Audio</span></div>
           <div class="shortcut-item"><kbd>N</kbd> / <kbd>P</kbd> <span>Next / Previous Episode</span></div>

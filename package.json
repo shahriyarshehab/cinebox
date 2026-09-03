@@ -10,7 +10,7 @@
     "start": "node server.js",
     "dev": "node server.js --open",
     "serve": "node server.js --open",
-    "lint": "node -c js/core.js js/app.js js/watch.js server.js",
+    "lint": "node -c js/core.js js/audio-engine.js js/app.js js/watch.js server.js",
     "update": "python scripts/auto_update.py"
   },
   "keywords": [

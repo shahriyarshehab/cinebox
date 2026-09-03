@@ -1559,7 +1559,9 @@ function getMediaReleaseMarker(dateStr) {
 function renderMovieCardHtml(item) {
   const rawTitle = item.title || '';
   const displayTitle = typeof getCleanMovieTitle === 'function' ? getCleanMovieTitle(rawTitle) : rawTitle;
-  const safeTitle = escapeQuotes(displayTitle);
+  const safeTitle = typeof escapeQuotes === 'function' ? escapeQuotes(displayTitle) : displayTitle;
+  const escapedDisplayTitle = typeof escapeHtml === 'function' ? escapeHtml(displayTitle) : displayTitle;
+  const safePoster = typeof sanitizeUrl === 'function' ? sanitizeUrl(item.poster) : item.poster;
   const itemData = encodeURIComponent(JSON.stringify(item));
   const isSeries =
     typeof isMediaSeries === 'function'
@@ -1584,14 +1586,14 @@ function renderMovieCardHtml(item) {
   return `
         <a class="movie-card" href="${linkUrl}">
             <div class="card-cover">
-                <img src="${item.poster}" alt="${safeTitle}" loading="lazy" decoding="async"
+                <img src="${safePoster}" alt="${safeTitle}" loading="lazy" decoding="async"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                 <div class="cover-fallback" style="display: none;">
                     ${fallbackIconSvg}
                     <div style="font-size: 10px; font-weight: 600;">${safeTitle}</div>
                 </div>
                 ${markerHtml}
-                <div class="tag-badge">${item.tag || (isSeries ? 'Series' : 'HD')}</div>
+                <div class="tag-badge">${typeof escapeHtml === 'function' ? escapeHtml(item.tag || (isSeries ? 'Series' : 'HD')) : (item.tag || 'HD')}</div>
                 <div class="cover-overlay">
                     <div class="play-button-symbol" style="${isSeries ? 'background: linear-gradient(135deg, #00e5ff 0%, #0077b6 100%);' : ''}">
                         ${playIconSvg}
@@ -1600,10 +1602,10 @@ function renderMovieCardHtml(item) {
                 </div>
             </div>
             <div class="card-body">
-                <div class="card-title" title="${safeTitle}">${displayTitle}</div>
+                <div class="card-title" title="${safeTitle}">${escapedDisplayTitle}</div>
                 <div class="card-meta">
-                    <span>${item.size || 'HD'}</span>
-                    <span style="${isRecent ? 'color: var(--primary); font-weight: 700;' : ''}">${item.date || ''}</span>
+                    <span>${typeof escapeHtml === 'function' ? escapeHtml(item.size || 'HD') : (item.size || 'HD')}</span>
+                    <span style="${isRecent ? 'color: var(--primary); font-weight: 700;' : ''}">${typeof escapeHtml === 'function' ? escapeHtml(item.date || '') : (item.date || '')}</span>
                 </div>
             </div>
         </a>

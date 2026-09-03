@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cinebox-v20';
+const CACHE_NAME = 'cinebox-v21';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
   './css/style.css',
   './js/lucide.min.js',
   './js/core.js',
+  './js/audio-engine.js',
   './js/app.js',
   './js/watch.js',
   './icons/icon.svg',
@@ -65,7 +66,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-First for static UI assets
+  // Stale-While-Revalidate for static UI assets (Instant load + background refresh)
   if (
     url.origin === location.origin &&
     (url.pathname.endsWith('.html') ||
@@ -77,7 +78,17 @@ self.addEventListener('fetch', (event) => {
   ) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
-        return cachedResponse || fetch(event.request);
+        const fetchPromise = fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const clone = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+            }
+            return networkResponse;
+          })
+          .catch(() => cachedResponse);
+
+        return cachedResponse || fetchPromise;
       })
     );
   }

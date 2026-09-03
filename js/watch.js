@@ -75,16 +75,6 @@ let sleepTimeoutId = null;
 let wakeLockSentinel = null;
 let isYouTubeSettingsOpen = false;
 
-// Web Audio API & Multi-Audio Track Engine
-let audioCtx = null;
-let audioSourceNode = null;
-let audioGainNode = null;
-let audioFilterNode = null;
-let audioCompressorNode = null;
-let channelSplitterNode = null;
-let channelMergerNode = null;
-let isAudioEngineInitialized = false;
-let externalAudioPlayer = null;
 
 // Official VLC & MX Player Lucide Icons
 const VLC_ICON_SVG = `<i data-lucide="cone" style="width: 14px; height: 14px; vertical-align: middle;"></i>`;
@@ -768,7 +758,7 @@ function renderWatchPage(item) {
             </button>
         `
             : `
-            <button class="mb-btn-primary" onclick="enterPlayerMode('${item.url}', '${escapeQuotes(item.title)}')">
+            <button class="mb-btn-primary" onclick="enterPlayerMode()">
                 <i data-lucide="play" style="fill: currentColor; width: 16px; height: 16px;"></i>
                 <span>Watch Online</span>
             </button>
@@ -783,7 +773,7 @@ function renderWatchPage(item) {
             </button>
         `
             : `
-            <button class="mb-btn-action" onclick="openDownloadModal('${item.url}', '${escapeQuotes(item.title)}')">
+            <button class="mb-btn-action" onclick="openDownloadModal()">
                 <i data-lucide="download" style="width: 15px; height: 15px;"></i>
                 <span>Download</span>
             </button>
@@ -1303,6 +1293,14 @@ function startStream(url, title) {
     });
     hlsPlayerInstance.loadSource(url);
     hlsPlayerInstance.attachMedia(player);
+    hlsPlayerInstance.on(Hls.Events.AUDIO_TRACKS_UPDATED, () => {
+      detectAndRenderAudioTracks();
+      updateYouTubeMenuState();
+    });
+    hlsPlayerInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+      detectAndRenderAudioTracks();
+      updateYouTubeMenuState();
+    });
   } else {
     player.src = url;
   }
@@ -2430,509 +2428,9 @@ function applyAspectRatioCss() {
 }
 
 // ==========================================
-//  Audio Booster, Multi-Audio Tracks & Web Audio API Engine
+//  Audio Booster & Multi-Audio Track Engine
+//  (Modularized into js/audio-engine.js)
 // ==========================================
-function setupAudioBooster() {
-  const player = document.getElementById('videoPlayer');
-  if (!player || isAudioEngineInitialized) return;
-
-  try {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return;
-
-    audioCtx = new AudioContextClass();
-    audioSourceNode = audioCtx.createMediaElementSource(player);
-    channelSplitterNode = audioCtx.createChannelSplitter(2);
-    channelMergerNode = audioCtx.createChannelMerger(2);
-    audioFilterNode = audioCtx.createBiquadFilter();
-    audioCompressorNode = audioCtx.createDynamicsCompressor();
-    audioGainNode = audioCtx.createGain();
-
-    // Connect chain: source -> splitter -> [routing] -> merger -> filter -> compressor -> gain -> destination
-    audioSourceNode.connect(channelSplitterNode);
-    applyAudioChannelRouting();
-
-    channelMergerNode.connect(audioFilterNode);
-    audioFilterNode.connect(audioCompressorNode);
-    audioCompressorNode.connect(audioGainNode);
-    audioGainNode.connect(audioCtx.destination);
-
-    isAudioEngineInitialized = true;
-    applyAudioSettings();
-  } catch (e) {
-    console.warn('Audio Context initialization fallback', e);
-  }
-}
-
-function applyAudioChannelRouting() {
-  if (!channelSplitterNode || !channelMergerNode) return;
-
-  try {
-    channelSplitterNode.disconnect();
-  } catch (e) {}
-
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {});
-  }
-
-  const mode = playerSettings.stereoChannelMode || playerSettings.audioTrackMode || 'stereo';
-
-  if (mode === 'left-channel') {
-    // Route Left input channel (0) to both Left (0) and Right (1) outputs (Dual Audio Dub 1 / Hindi)
-    channelSplitterNode.connect(channelMergerNode, 0, 0);
-    channelSplitterNode.connect(channelMergerNode, 0, 1);
-  } else if (mode === 'right-channel') {
-    // Route Right input channel (1) to both Left (0) and Right (1) outputs (Dual Audio Dub 2 / English)
-    channelSplitterNode.connect(channelMergerNode, 1, 0);
-    channelSplitterNode.connect(channelMergerNode, 1, 1);
-  } else {
-    // Standard Stereo (0->0, 1->1)
-    channelSplitterNode.connect(channelMergerNode, 0, 0);
-    channelSplitterNode.connect(channelMergerNode, 1, 1);
-  }
-}
-
-function selectStereoChannelMode(mode) {
-  playerSettings.stereoChannelMode = mode;
-  savePlayerSettings();
-  setupAudioBooster();
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {});
-  }
-  applyAudioChannelRouting();
-  updateCustomizerUIState();
-  updateYouTubeMenuState();
-  const label =
-    mode === 'left-channel'
-      ? 'Left Channel (Dub 1)'
-      : mode === 'right-channel'
-        ? 'Right Channel (Dub 2)'
-        : 'Stereo (Master)';
-  showToast(`Stereo Mode: ${label}`);
-}
-
-function selectAudioTrackMode(mode, title, nativeTrackIdx = -1) {
-  const player = document.getElementById('videoPlayer');
-  if (!player) return;
-
-  playerSettings.audioTrackMode = mode;
-  playerSettings.audioTrackTitle = title || 'Default Audio';
-
-  if (mode === 'disable') {
-    player.muted = true;
-    if (externalAudioPlayer) {
-      externalAudioPlayer.pause();
-    }
-  } else if (nativeTrackIdx >= 0 && player.audioTracks && player.audioTracks.length > 0) {
-    for (let i = 0; i < player.audioTracks.length; i++) {
-      player.audioTracks[i].enabled = i === nativeTrackIdx;
-    }
-    player.muted = false;
-    if (externalAudioPlayer) {
-      externalAudioPlayer.pause();
-      externalAudioPlayer = null;
-    }
-  } else if (mode === 'external') {
-    // Handled in loadExternalAudio
-  } else {
-    // Standard stereo or dual-channel mode
-    if (externalAudioPlayer) {
-      externalAudioPlayer.pause();
-      externalAudioPlayer = null;
-    }
-    player.muted = false;
-    playerSettings.stereoChannelMode = mode;
-    setupAudioBooster();
-    if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume().catch(() => {});
-    }
-    applyAudioChannelRouting();
-  }
-
-  savePlayerSettings();
-  updateCustomizerUIState();
-  updateYouTubeMenuState();
-  showToast(`Audio Track: ${playerSettings.audioTrackTitle}`);
-}
-
-// ==========================================================================
-//  SMART MULTI-LANGUAGE AUDIO TRACK ENGINE (Hindi, English, Bangla, etc.)
-// ==========================================================================
-const CINEBOX_AUDIO_LANGUAGES = [
-  { key: 'hindi', label: 'Hindi', flag: '🇮🇳', nativeName: 'हिन्दी', regex: /\b(hindi|hin|হিন্দি)\b/i },
-  { key: 'english', label: 'English', flag: '🇬🇧', nativeName: 'English', regex: /\b(english|eng|ইংরেজি)\b/i },
-  { key: 'bangla', label: 'Bangla', flag: '🇧🇩', nativeName: 'বাংলা', regex: /\b(bangla|bengali|ben|বাংলা)\b/i },
-  { key: 'tamil', label: 'Tamil', flag: '🇮🇳', nativeName: 'தமிழ்', regex: /\b(tamil|tam|தமிழ்)\b/i },
-  { key: 'telugu', label: 'Telugu', flag: '🇮🇳', nativeName: 'తెలుగు', regex: /\b(telugu|tel|తెలుగు)\b/i },
-  { key: 'malayalam', label: 'Malayalam', flag: '🇮🇳', nativeName: 'മലയാളം', regex: /\b(malayalam|mal|മലയാളം)\b/i },
-  { key: 'kannada', label: 'Kannada', flag: '🇮🇳', nativeName: 'ಕನ್ನಡ', regex: /\b(kannada|kan|ಕನ್ನಡ)\b/i },
-  { key: 'japanese', label: 'Japanese', flag: '🇯🇵', nativeName: '日本語', regex: /\b(japanese|jap|jpn|anime|日本語)\b/i },
-  { key: 'korean', label: 'Korean', flag: '🇰🇷', nativeName: '한국어', regex: /\b(korean|kor|k-drama|한국어)\b/i },
-  { key: 'spanish', label: 'Spanish', flag: '🇪🇸', nativeName: 'Español', regex: /\b(spanish|esp|español)\b/i },
-  { key: 'french', label: 'French', flag: '🇫🇷', nativeName: 'Français', regex: /\b(french|fr|français)\b/i },
-  { key: 'chinese', label: 'Chinese', flag: '🇨🇳', nativeName: '中文', regex: /\b(chinese|mandarin|cantonese|chi|中文)\b/i },
-  { key: 'arabic', label: 'Arabic', flag: '🇸🇦', nativeName: 'العربية', regex: /\b(arabic|ara|العربية)\b/i },
-  { key: 'russian', label: 'Russian', flag: '🇷🇺', nativeName: 'Русский', regex: /\b(russian|rus|русский)\b/i }
-];
-
-function getAvailableAudioTracks() {
-  const player = document.getElementById('videoPlayer');
-  const detectedTracks = [];
-
-  // 1. Check Native HTML5 Video audioTracks
-  if (player && player.audioTracks && player.audioTracks.length > 0) {
-    for (let i = 0; i < player.audioTracks.length; i++) {
-      const tr = player.audioTracks[i];
-      let langName = tr.label || tr.language || `Track ${i + 1}`;
-      let flag = '🎧';
-      for (const kl of CINEBOX_AUDIO_LANGUAGES) {
-        if (kl.regex.test(langName) || (tr.language && kl.regex.test(tr.language))) {
-          langName = kl.label;
-          flag = kl.flag;
-          break;
-        }
-      }
-      detectedTracks.push({
-        id: `native-${i}`,
-        type: 'native',
-        nativeIdx: i,
-        label: langName,
-        flag: flag,
-        desc: `Embedded Track ${i + 1} (${tr.language || 'Multi-channel'})`,
-        enabled: tr.enabled
-      });
-    }
-    return detectedTracks;
-  }
-
-  // 2. Parse language metadata from Title & URL
-  const titleToCheck = `${currentActiveStreamTitle || ''} ${currentItem ? currentItem.title : ''} ${currentItem ? currentItem.url : ''}`;
-  const foundLanguages = [];
-
-  for (const kl of CINEBOX_AUDIO_LANGUAGES) {
-    if (kl.regex.test(titleToCheck)) {
-      if (!foundLanguages.some((l) => l.key === kl.key)) {
-        foundLanguages.push(kl);
-      }
-    }
-  }
-
-  const isDualAudio = /\b(dual\s*audio|multi\s*audio|multi\s*dub|dual)\b/i.test(titleToCheck);
-
-  // If multiple languages are detected (e.g. Hindi, English, Bangla)
-  if (foundLanguages.length > 1) {
-    foundLanguages.forEach((lang, idx) => {
-      const channelMode = idx === 0 ? 'left-channel' : idx === 1 ? 'right-channel' : 'stereo';
-      detectedTracks.push({
-        id: `lang-${lang.key}`,
-        type: 'channel',
-        channelMode: channelMode,
-        label: `${lang.label} (Dual Audio)`,
-        flag: lang.flag,
-        nativeName: lang.nativeName,
-        desc:
-          idx === 0
-            ? `Dual Audio Track 1 (Left Channel) • ${lang.nativeName}`
-            : idx === 1
-              ? `Dual Audio Track 2 (Right Channel) • ${lang.nativeName}`
-              : `Track ${idx + 1} (${lang.label}) • ${lang.nativeName}`
-      });
-    });
-
-    // Also offer Combined Stereo Master
-    detectedTracks.push({
-      id: 'stereo',
-      type: 'channel',
-      channelMode: 'stereo',
-      label: 'Stereo Master (All Channels)',
-      flag: '🎧',
-      desc: 'Combined stereo mix'
-    });
-
-    return detectedTracks;
-  }
-
-  // If Dual Audio keyword is found but language names weren't explicitly listed:
-  if (isDualAudio && foundLanguages.length === 0) {
-    return [
-      {
-        id: 'lang-hindi',
-        type: 'channel',
-        channelMode: 'left-channel',
-        label: 'Hindi (Dual Audio Dub 1)',
-        flag: '🇮🇳',
-        desc: 'Left Audio Channel • Hindi Dub'
-      },
-      {
-        id: 'lang-english',
-        type: 'channel',
-        channelMode: 'right-channel',
-        label: 'English (Dual Audio Dub 2)',
-        flag: '🇬🇧',
-        desc: 'Right Audio Channel • English Original'
-      },
-      {
-        id: 'stereo',
-        type: 'channel',
-        channelMode: 'stereo',
-        label: 'Stereo Master (All Channels)',
-        flag: '🎧',
-        desc: 'Combined original audio output'
-      }
-    ];
-  }
-
-  // If only ONE language is matched (e.g. Hindi or English or Bangla) OR Single Audio movie:
-  let singleLang = foundLanguages.length === 1 ? foundLanguages[0] : null;
-  if (!singleLang) {
-    if (currentItem && currentItem.tag && /bangla|natok/i.test(currentItem.tag)) {
-      singleLang = { key: 'bangla', label: 'Bangla', flag: '🇧🇩', nativeName: 'বাংলা' };
-    } else if (currentItem && currentItem.tag && /hindi|bollywood/i.test(currentItem.tag)) {
-      singleLang = { key: 'hindi', label: 'Hindi', flag: '🇮🇳', nativeName: 'हिन्दी' };
-    } else {
-      singleLang = { key: 'original', label: 'Original Audio (Main)', flag: '🎧', nativeName: 'Main Audio' };
-    }
-  }
-
-  // Single Audio Track Output
-  return [
-    {
-      id: 'stereo',
-      type: 'channel',
-      channelMode: 'stereo',
-      label: `${singleLang.label} (Original Master)`,
-      flag: singleLang.flag,
-      isSingle: true,
-      desc: `Single Audio Track Available • Stereo 2.0 / 5.1 Surround`
-    }
-  ];
-}
-
-function detectAndRenderAudioTracks() {
-  const container = document.getElementById('dynamicAudioTracksContainer');
-  if (!container) return;
-
-  const tracks = getAvailableAudioTracks();
-  const isSingle = tracks.length === 1 || (tracks.length === 1 && tracks[0].isSingle);
-  const isDisabled = playerSettings.audioTrackMode === 'disable';
-
-  // Update button badge count
-  const badgeEl = document.getElementById('cpAudioTrackCountBadge');
-  if (badgeEl) {
-    if (tracks.length > 1) {
-      badgeEl.textContent = tracks.length;
-      badgeEl.style.display = 'inline-flex';
-    } else {
-      badgeEl.style.display = 'none';
-    }
-  }
-
-  let html = `
-    <div class="yt-group-label">AUDIO TRACK (VLC TRACK SELECTOR)</div>
-    <!-- VLC Disable Option -->
-    <div class="yt-submenu-item ${isDisabled ? 'active' : ''}" data-audiomode="disable" onclick="selectAudioTrackMode('disable', 'Disabled (Mute)')">
-      <div class="yt-submenu-item-main">
-        <span class="yt-opt-title">Disable</span>
-        <span class="yt-opt-desc">Mute all audio playback</span>
-      </div>
-      <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
-    </div>
-  `;
-
-  if (isSingle) {
-    const tr = tracks[0];
-    const isSelected =
-      !isDisabled &&
-      (!playerSettings.audioTrackMode ||
-        playerSettings.audioTrackMode === 'stereo' ||
-        playerSettings.audioTrackMode === tr.id);
-    html += `
-      <div class="yt-submenu-item ${isSelected ? 'active' : ''}" data-audiomode="${tr.id}" onclick="selectAudioTrackMode('${tr.channelMode || 'stereo'}', '${escapeQuotes(tr.label)}')">
-        <div class="yt-submenu-item-main">
-          <span class="yt-opt-title">${tr.flag} Track 1: ${tr.label}</span>
-          <span class="yt-opt-desc">${tr.desc}</span>
-        </div>
-        <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
-      </div>
-    `;
-  } else {
-    tracks.forEach((tr, idx) => {
-      const modeVal = tr.channelMode || tr.id;
-      let isSelected = false;
-      if (!isDisabled) {
-        if (playerSettings.audioTrackMode === modeVal) {
-          isSelected = true;
-        } else if (playerSettings.audioTrackMode === tr.id) {
-          isSelected = true;
-        } else if (!playerSettings.audioTrackMode && idx === 0) {
-          isSelected = true;
-        }
-      }
-
-      const trackNum = idx + 1;
-      html += `
-        <div class="yt-submenu-item ${isSelected ? 'active' : ''}" data-audiomode="${modeVal}" onclick="selectAudioTrackMode('${modeVal}', '${escapeQuotes(tr.label)}', ${tr.nativeIdx !== undefined ? tr.nativeIdx : -1})">
-          <div class="yt-submenu-item-main">
-            <span class="yt-opt-title">${tr.flag} Track ${trackNum}: ${tr.label}</span>
-            <span class="yt-opt-desc">${tr.desc}</span>
-          </div>
-          <span class="yt-check-icon"><i data-lucide="check" style="width: 15px; height: 15px;"></i></span>
-        </div>
-      `;
-    });
-  }
-
-  container.innerHTML = html;
-  refreshLucideIcons();
-}
-
-function openAudioTrackDirectMenu(e) {
-  if (e && e.stopPropagation) e.stopPropagation();
-  openYouTubeSettingsPopup();
-  openYouTubeSubmenu('ytSubAudioTrack');
-}
-
-function promptExternalAudioUrl() {
-  const defaultUrl = playerSettings.externalAudioUrl || '';
-  const url = prompt('Enter direct audio stream URL (e.g. .mp3, .m4a, .aac link):', defaultUrl);
-  if (url && url.trim()) {
-    const cleanUrl = url.trim();
-    const title = cleanUrl.split('/').pop().split('?')[0] || 'Custom Audio Track';
-    loadExternalAudio(cleanUrl, title);
-  }
-}
-
-function openExternalAudioPicker() {
-  const fileInput = document.getElementById('externalAudioFileInput');
-  if (fileInput) fileInput.click();
-}
-
-function handleExternalAudioFileSelect(e) {
-  const file = e.target.files && e.target.files[0];
-  if (!file) return;
-  const blobUrl = URL.createObjectURL(file);
-  loadExternalAudio(blobUrl, file.name);
-  e.target.value = '';
-}
-
-function loadExternalAudio(url, title = 'External Audio Track') {
-  const player = document.getElementById('videoPlayer');
-  if (!player || !url) return;
-
-  if (externalAudioPlayer) {
-    externalAudioPlayer.pause();
-    externalAudioPlayer = null;
-  }
-
-  externalAudioPlayer = new Audio(url);
-  externalAudioPlayer.preload = 'auto';
-  externalAudioPlayer.volume = player.volume;
-  externalAudioPlayer.playbackRate = player.playbackRate;
-  externalAudioPlayer.currentTime = Math.max(0, player.currentTime + (playerSettings.externalAudioOffset || 0));
-
-  // Mute original video element so only the external track plays
-  player.muted = true;
-  updateVolumeUI();
-
-  if (!player.paused) {
-    externalAudioPlayer.play().catch(() => {});
-  }
-
-  playerSettings.audioTrackMode = 'external';
-  playerSettings.audioTrackTitle = `External: ${title}`;
-  playerSettings.externalAudioUrl = url;
-  playerSettings.externalAudioTitle = title;
-  savePlayerSettings();
-  updateCustomizerUIState();
-  updateYouTubeMenuState();
-  showToast(`Loaded external audio: ${title}`);
-}
-
-function nudgeAudioSync(delta) {
-  playerSettings.externalAudioOffset = Math.round(((playerSettings.externalAudioOffset || 0) + delta) * 10) / 10;
-  savePlayerSettings();
-
-  const valEl = document.getElementById('ytAudioSyncVal');
-  if (valEl) {
-    valEl.textContent = `${playerSettings.externalAudioOffset > 0 ? '+' : ''}${playerSettings.externalAudioOffset}s`;
-  }
-
-  const player = document.getElementById('videoPlayer');
-  if (externalAudioPlayer && player) {
-    externalAudioPlayer.currentTime = Math.max(0, player.currentTime + playerSettings.externalAudioOffset);
-  }
-
-  showToast(
-    `Audio sync offset: ${playerSettings.externalAudioOffset > 0 ? '+' : ''}${playerSettings.externalAudioOffset}s`
-  );
-}
-
-function resetAudioSync() {
-  playerSettings.externalAudioOffset = 0.0;
-  savePlayerSettings();
-  const valEl = document.getElementById('ytAudioSyncVal');
-  if (valEl) valEl.textContent = '0.0s';
-  const player = document.getElementById('videoPlayer');
-  if (externalAudioPlayer && player) {
-    externalAudioPlayer.currentTime = player.currentTime;
-  }
-  showToast('Audio sync offset reset to 0.0s');
-}
-
-function handleAudioBoostGain(val) {
-  const gainNum = parseInt(val, 10);
-  playerSettings.audioBoostGain = gainNum;
-  savePlayerSettings();
-  setupAudioBooster();
-  applyAudioSettings();
-  updateCustomizerUIState();
-  updateYouTubeMenuState();
-  showToast(`Volume Gain: ${gainNum}%`);
-}
-
-function setAudioProfile(profile) {
-  playerSettings.audioProfile = profile;
-  savePlayerSettings();
-  setupAudioBooster();
-  applyAudioSettings();
-  updateCustomizerUIState();
-  updateYouTubeMenuState();
-  showToast(`Audio Profile: ${profile.toUpperCase()}`);
-}
-
-function applyAudioSettings() {
-  if (!isAudioEngineInitialized || !audioGainNode) return;
-
-  // 1. Apply Gain
-  const gainMultiplier = (playerSettings.audioBoostGain || 100) / 100;
-  audioGainNode.gain.value = gainMultiplier;
-
-  // 2. Apply Profile Filters
-  if (audioFilterNode && audioCompressorNode) {
-    const prof = playerSettings.audioProfile || 'standard';
-    if (prof === 'dialogue') {
-      audioFilterNode.type = 'peaking';
-      audioFilterNode.frequency.value = 2500;
-      audioFilterNode.Q.value = 1.4;
-      audioFilterNode.gain.value = 6.0;
-    } else if (prof === 'bass') {
-      audioFilterNode.type = 'lowshelf';
-      audioFilterNode.frequency.value = 110;
-      audioFilterNode.gain.value = 6.5;
-    } else {
-      audioFilterNode.type = 'allpass';
-      audioFilterNode.gain.value = 0;
-    }
-
-    if (prof === 'night') {
-      audioCompressorNode.threshold.value = -24;
-      audioCompressorNode.ratio.value = 12;
-    } else {
-      audioCompressorNode.threshold.value = -10;
-      audioCompressorNode.ratio.value = 3;
-    }
-  }
-}
 
 // ==========================================
 //  YouTube-Style Settings Popup & Quick Controls
@@ -3032,7 +2530,13 @@ function updateYouTubeMenuState() {
     chip.classList.toggle('active', parseInt(chip.getAttribute('data-subsize'), 10) === (playerSettings.subSize || 18));
   });
 
-  // 4. Server Mirror Source
+  // 4. Audio Track
+  const ytValAudio = document.getElementById('ytValAudio');
+  if (ytValAudio) {
+    ytValAudio.textContent = playerSettings.audioTrackTitle || 'Default (Stereo)';
+  }
+
+  // 5. Server Mirror Source
   const ytValServer = document.getElementById('ytValServer');
   if (ytValServer && availableServerMirrors[currentActiveServerIdx]) {
     ytValServer.textContent = availableServerMirrors[currentActiveServerIdx].name;
@@ -3746,6 +3250,9 @@ function setupSearchKeybindings() {
       playPrevEpisode();
     } else if (e.key === 'c' || e.key === 'C') {
       toggleSubtitles();
+    } else if (e.key === 'b' || e.key === 'B') {
+      e.preventDefault();
+      openAudioTrackDirectMenu(e);
     } else if (e.key === 'Escape') {
       const ytPopup = document.getElementById('ytSettingsPopup');
       const customModal = document.getElementById('playerCustomModal');
@@ -4101,14 +3608,21 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
   const cleanFileName = (title || 'media').replace(/[/\\?%*:|"<>]/g, '_');
   const tag = currentItem && currentItem.tag ? currentItem.tag : '1080p HD';
 
+  const safePoster = typeof sanitizeUrl === 'function' ? sanitizeUrl(poster) : poster;
+  const safeUrl = typeof sanitizeUrl === 'function' ? sanitizeUrl(url) : url;
+  const escapedTitle = typeof escapeHtml === 'function' ? escapeHtml(title) : title;
+  const safeTitleAttr = typeof escapeQuotes === 'function' ? escapeQuotes(title) : title;
+  const safeTag = typeof escapeHtml === 'function' ? escapeHtml(tag) : tag;
+  const safeFileName = typeof escapeHtml === 'function' ? escapeHtml(cleanFileName) : cleanFileName;
+
   let html = `
         <!-- Active Media Preview Header -->
         <div class="dl-preview-card">
-            ${poster ? `<img class="dl-preview-thumb" src="${poster}" alt="${escapeQuotes(title)}" onerror="this.style.display='none'">` : ''}
+            ${poster ? `<img class="dl-preview-thumb" src="${safePoster}" alt="${safeTitleAttr}" onerror="this.style.display='none'">` : ''}
             <div class="dl-preview-info">
-                <div class="dl-preview-title" title="${escapeQuotes(title)}">${title}</div>
+                <div class="dl-preview-title" title="${safeTitleAttr}">${escapedTitle}</div>
                 <div class="dl-preview-sub">
-                    <span class="dl-tag-badge">${tag}</span>
+                    <span class="dl-tag-badge">${safeTag}</span>
                     <span style="color: var(--accent-green); font-weight: 600;">Direct BDIX CDN</span>
                 </div>
             </div>
@@ -4117,7 +3631,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
         <!-- Download Channels Grid -->
         <div class="dl-options-grid">
             <!-- 1. Direct Browser / Native Download -->
-            <a class="dl-action-card primary-dl" href="${url}" download="${cleanFileName}.mp4" onclick="showToast('Starting high-speed download...');">
+            <a class="dl-action-card primary-dl" href="${safeUrl}" download="${safeFileName}.mp4" onclick="showToast('Starting high-speed download...');">
                 <div class="dl-action-icon" style="background: rgba(0, 229, 255, 0.2); color: var(--primary);">
                     <i data-lucide="download" style="width: 18px; height: 18px;"></i>
                 </div>
@@ -4128,7 +3642,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             </a>
 
             <!-- 2. 1DM / IDM for Android -->
-            <button class="dl-action-card" onclick="downloadVia1DM('${url}', '${escapeQuotes(title)}')">
+            <button class="dl-action-card" onclick="downloadVia1DM('${safeUrl}', '${safeTitleAttr}')">
                 <div class="dl-action-icon" style="background: rgba(0, 230, 118, 0.15); color: var(--accent-green);">
                     <i data-lucide="zap" style="width: 18px; height: 18px;"></i>
                 </div>
@@ -4139,7 +3653,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             </button>
 
             <!-- 3. ADM (Advanced Download Manager) -->
-            <button class="dl-action-card" onclick="downloadViaADM('${url}', '${escapeQuotes(title)}')">
+            <button class="dl-action-card" onclick="downloadViaADM('${safeUrl}', '${safeTitleAttr}')">
                 <div class="dl-action-icon" style="background: rgba(255, 42, 95, 0.15); color: var(--accent);">
                     <i data-lucide="download-cloud" style="width: 18px; height: 18px;"></i>
                 </div>
@@ -4150,7 +3664,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
             </button>
 
             <!-- 4. Copy Direct Stream Link -->
-            <button class="dl-action-card" onclick="copySpecificUrl('${url}')">
+            <button class="dl-action-card" onclick="copySpecificUrl('${safeUrl}')">
                 <div class="dl-action-icon" style="background: rgba(255, 184, 0, 0.15); color: var(--accent-gold);">
                     <i data-lucide="link" style="width: 18px; height: 18px;"></i>
                 </div>
@@ -4169,7 +3683,7 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
                 <div class="dl-batch-header">
                     <span style="display: inline-flex; align-items: center; gap: 6px;">
                         <i data-lucide="layers" style="width: 15px; height: 15px;"></i>
-                        <span>${currentSeasonName || 'Season'} Batch Downloader</span>
+                        <span>${typeof escapeHtml === 'function' ? escapeHtml(currentSeasonName || 'Season') : (currentSeasonName || 'Season')} Batch Downloader</span>
                     </span>
                     <span style="font-size: 11px; color: var(--primary);">${currentSeasonEpisodes.length} Episodes</span>
                 </div>
@@ -4187,15 +3701,21 @@ function openDownloadModal(targetUrl, targetTitle, isBatch) {
                 <div class="dl-ep-quick-list">
                     ${currentSeasonEpisodes
                       .map(
-                        (ep, idx) => `
+                        (ep, idx) => {
+                          const cleanName = (ep.name || '').replace(/\.(mp4|mkv|avi|webm)$/i, '');
+                          const safeEpName = typeof escapeHtml === 'function' ? escapeHtml(cleanName) : cleanName;
+                          const safeEpAttr = typeof escapeQuotes === 'function' ? escapeQuotes(ep.name) : ep.name;
+                          const safeEpUrl = typeof sanitizeUrl === 'function' ? sanitizeUrl(ep.url) : ep.url;
+                          return `
                         <div class="dl-ep-quick-item">
-                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;">${ep.name.replace(/\.(mp4|mkv|avi|webm)$/i, '')}</span>
+                            <span style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%;">${safeEpName}</span>
                             <div style="display: flex; gap: 6px;">
-                                <a class="btn btn-primary" style="padding: 4px 10px; font-size: 11px; border-radius: 12px; text-decoration: none;" href="${ep.url}" download>Download</a>
-                                <button class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-radius: 12px;" onclick="downloadVia1DM('${ep.url}', '${escapeQuotes(ep.name)}')">1DM</button>
+                                <a class="btn btn-primary" style="padding: 4px 10px; font-size: 11px; border-radius: 12px; text-decoration: none;" href="${safeEpUrl}" download>Download</a>
+                                <button class="btn btn-ghost" style="padding: 4px 8px; font-size: 11px; border-radius: 12px;" onclick="downloadVia1DM('${safeEpUrl}', '${safeEpAttr}')">1DM</button>
                             </div>
                         </div>
-                    `
+                    `;
+                        }
                       )
                       .join('')}
                 </div>

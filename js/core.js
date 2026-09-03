@@ -225,8 +225,7 @@ function getCleanMovieTitle(rawTitle) {
   title = title.replace(/_/g, ' ');
 
   // 6. Replace dots between words (e.g. Iron.Man.3 -> Iron Man 3)
-  title = title.replace(/([a-zA-Z0-9])\.([a-zA-Z0-9])/g, '$1 $2');
-  title = title.replace(/([a-zA-Z0-9])\.([a-zA-Z0-9])/g, '$1 $2');
+  title = title.replace(/\./g, ' ');
 
   // 7. Remove resolution, quality, codec, source and release junk words
   const junkPatterns = [
@@ -429,8 +428,32 @@ function srtToVtt(srtContent) {
 }
 
 // ==========================================
-//  String, UI & Formatting Helpers
+//  String, UI & Security Formatting Helpers
 // ==========================================
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function sanitizeUrl(url) {
+  if (!url) return '';
+  const trimmed = String(url).trim();
+  // Safe protocols or relative URLs
+  if (/^(?:https?:\/\/|\/|\.\/|\.\.\/|blob:|data:image\/)/i.test(trimmed)) {
+    return trimmed;
+  }
+  // Safe custom player schemes
+  if (/^(?:vlc:\/\/|intent:\/\/|potplayer:\/\/)/i.test(trimmed)) {
+    return trimmed;
+  }
+  return '#';
+}
+
 function escapeQuotes(str) {
   return (str || '').replace(/'/g, "\\\\'").replace(/"/g, '&quot;');
 }

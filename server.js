@@ -98,16 +98,27 @@ const server = http.createServer((req, res) => {
   let filePath = path.join(ROOT, pathname);
 
   // Safety check against directory traversal
-  if (!filePath.startsWith(ROOT)) {
+  const relativePath = path.relative(ROOT, filePath);
+  if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
     res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
     res.end('403 Forbidden');
     return;
   }
 
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   fs.stat(filePath, (err, stats) => {
     if (err) {
       res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>404 Not Found</title></head><body style="font-family:sans-serif;background:#07090e;color:#fff;text-align:center;padding:50px;"><h1>404 - Not Found</h1><p>File <code>${pathname}</code> was not found.</p><p><a href="/" style="color:#00e5ff;text-decoration:none;font-weight:bold;">← Return to CineBox</a></p></body></html>`);
+      const safePath = escapeHtml(pathname);
+      res.end(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>404 Not Found</title></head><body style="font-family:sans-serif;background:#07090e;color:#fff;text-align:center;padding:50px;"><h1>404 - Not Found</h1><p>File <code>${safePath}</code> was not found.</p><p><a href="/" style="color:#00e5ff;text-decoration:none;font-weight:bold;">← Return to CineBox</a></p></body></html>`);
       return;
     }
 
@@ -267,7 +278,6 @@ function startServer(port) {
       server.close(() => {
         startServer(port + 1);
       });
-      setTimeout(() => startServer(port + 1), 100);
     } else {
       console.error('\x1b[31m[!] Server error:\x1b[0m', err);
     }
