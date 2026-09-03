@@ -168,7 +168,11 @@ async function init() {
     .then((fresh) => {
       if (fresh) {
         homeData = fresh;
-        sessionStorage.setItem('cinebox_home_v3', JSON.stringify(fresh));
+        try {
+          sessionStorage.setItem('cinebox_home_v3', JSON.stringify(fresh));
+        } catch (e) {
+          console.warn('Session cache save notice:', e);
+        }
         if (currentView === 'home' && page === 'home') {
           applyHomeData(fresh);
         }

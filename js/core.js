@@ -88,6 +88,23 @@ function toggleWatchlist(movieObj) {
   return isAdded;
 }
 
+function updateWatchlistNavBadge() {
+  try {
+    const list = getWatchlist();
+    const count = list.length;
+    const badge = document.getElementById('watchlistNavCount');
+    if (badge) {
+      badge.textContent = count;
+      badge.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+    const mobBadge = document.getElementById('mobWatchlistNavCount');
+    if (mobBadge) {
+      mobBadge.textContent = count;
+      mobBadge.style.display = count > 0 ? 'inline-block' : 'none';
+    }
+  } catch (e) {}
+}
+
 // ==========================================
 // 🔔 Future Updates & Release Tracker System
 // ==========================================

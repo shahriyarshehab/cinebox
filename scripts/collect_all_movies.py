@@ -188,16 +188,16 @@ def main():
         "Top Rated": [],
         "3D Movies": [],
         "English Movies": [],
-        "Elaach BDIX": elaach_movies[:200]
+        "Elaach BDIX": elaach_movies[:20]
     }
     
     # Extract Latest / Today from newly harvested and recent
-    categories["Today's Updates"] = (elaach_movies[:30] + master_list[:20])[:35]
+    categories["Today's Updates"] = (elaach_movies[:20] + master_list[:15])[:25]
     categories["Today"] = categories["Today's Updates"]
     
     for item in master_list:
         tag = item[3] if len(item) > 3 else ''
-        if tag in categories and len(categories[tag]) < 400:
+        if tag in categories and len(categories[tag]) < 20:
             categories[tag].append(item)
             
     # Ensure all categories have items
