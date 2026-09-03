@@ -105,6 +105,21 @@ function updateWatchlistNavBadge() {
   } catch (e) {}
 }
 
+function cleanItem(item) {
+  if (Array.isArray(item)) {
+    return {
+      title: item[0] || '',
+      poster: item[1] || '',
+      url: item[2] || '',
+      tag: item[3] || 'HD',
+      category: item[4] || 'Cinema',
+      size: item[5] || 'HD',
+      date: item[6] || ''
+    };
+  }
+  return item || {};
+}
+
 // ==========================================
 // 🔔 Future Updates & Release Tracker System
 // ==========================================

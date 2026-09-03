@@ -93,7 +93,7 @@ async function initWatch() {
   // 1. Match from query parameter or sessionStorage
   if (dataParam) {
     try {
-      currentItem = JSON.parse(decodeURIComponent(dataParam));
+      currentItem = cleanItem(JSON.parse(decodeURIComponent(dataParam)));
     } catch (e) {}
   }
 
@@ -180,8 +180,7 @@ async function initWatch() {
         'data/foreign.json',
         'data/top_rated.json',
         'data/3d.json',
-        'data/english.json',
-        'data/elaach.json'
+        'data/english.json'
       ];
 
       for (const f of categoryFiles) {
@@ -703,7 +702,10 @@ async function loadAndApplyOnlineMetadata(item) {
   }
 }
 
-function renderWatchPage(item) {
+function renderWatchPage(rawItem) {
+  const item = cleanItem(rawItem);
+  if (!item || !item.title) return;
+  currentItem = item;
   const cleanDisplayTitle = typeof getCleanMovieTitle === 'function' ? getCleanMovieTitle(item.title) : item.title;
   document.title = `${cleanDisplayTitle} — CineBox`;
 
