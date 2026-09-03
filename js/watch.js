@@ -97,7 +97,7 @@ async function initWatch() {
     } catch (e) {}
   }
 
-  const cachedHome = sessionStorage.getItem('cinebox_home_v2');
+  const cachedHome = sessionStorage.getItem('cinebox_home_v3') || sessionStorage.getItem('cinebox_home_v2');
   if (!currentItem && targetTitle && cachedHome) {
     try {
       const hData = JSON.parse(cachedHome);
@@ -180,7 +180,8 @@ async function initWatch() {
         'data/foreign.json',
         'data/top_rated.json',
         'data/3d.json',
-        'data/english.json'
+        'data/english.json',
+        'data/elaach.json'
       ];
 
       for (const f of categoryFiles) {
@@ -822,7 +823,22 @@ function toggleCurrentMarkedUpdate() {
 function enterPlayerMode(url, title) {
   if (!url && currentItem) url = currentItem.url;
   if (!title && currentItem) title = currentItem.title;
-  if (!url) return;
+  if (!url) {
+    showToast('Media stream link unavailable for this title');
+    return;
+  }
+
+  const isWebPage =
+    typeof url === 'string' &&
+    url.startsWith('http') &&
+    !url.match(/\.(mp4|mkv|webm|m3u8|avi|ts|mov)(\?|$)/i) &&
+    (url.includes('/movies/') || url.includes('/tv-series/'));
+
+  if (isWebPage) {
+    showToast('Opening media server streaming page...');
+    window.open(url, '_blank');
+    return;
+  }
 
   isPlayerMode = true;
   currentActiveStreamUrl = url;
