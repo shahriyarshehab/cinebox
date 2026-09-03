@@ -151,11 +151,14 @@ async function init() {
     } catch (e) {}
   }
 
-  // 1. Check client cached home_data or fetch home_data.json immediately for 0ms instant render
-  const cachedHome = sessionStorage.getItem('cinebox_home_v3') || sessionStorage.getItem('cinebox_home_v2');
+  // 1. Instant 0ms Paint: Check persistent localStorage or sessionStorage cache first
+  const cachedHome = localStorage.getItem('cinebox_home_cache') || sessionStorage.getItem('cinebox_home_v3') || sessionStorage.getItem('cinebox_home_v2');
   if (cachedHome) {
     try {
       homeData = JSON.parse(cachedHome);
+      if (currentView === 'home' && page === 'home') {
+        applyHomeData(homeData);
+      }
     } catch (e) {}
   }
 
@@ -165,6 +168,7 @@ async function init() {
       if (res.ok) {
         homeData = await res.json();
         try {
+          localStorage.setItem('cinebox_home_cache', JSON.stringify(homeData));
           sessionStorage.setItem('cinebox_home_v3', JSON.stringify(homeData));
         } catch (e) {}
       }
@@ -172,16 +176,18 @@ async function init() {
       console.warn('Home data load notice:', e);
     }
   } else {
-    // If cached, fetch fresh updates in background
+    // If cached, fetch fresh updates in background without blocking initial paint
     fetch('./home_data.json?v=' + Date.now())
       .then((res) => (res.ok ? res.json() : null))
       .then((fresh) => {
         if (fresh) {
+          const isChanged = !homeData || fresh.last_updated !== homeData.last_updated || fresh.total !== homeData.total;
           homeData = fresh;
           try {
+            localStorage.setItem('cinebox_home_cache', JSON.stringify(fresh));
             sessionStorage.setItem('cinebox_home_v3', JSON.stringify(fresh));
           } catch (e) {}
-          if (currentView === 'home' && page === 'home') {
+          if (isChanged && currentView === 'home' && page === 'home') {
             applyHomeData(fresh);
           }
         }
@@ -321,11 +327,36 @@ async function init() {
   } else if (tabParam && page === 'home') {
     switchNavTab(tabParam);
   } else {
-    setTimeout(loadFullCatalogInBackground, 300);
+    scheduleIdleCatalogLoad();
   }
 
   setupGlobalShortcuts();
   setupSearchFocusEvents();
+}
+
+function scheduleIdleCatalogLoad() {
+  const loadWhenIdle = () => {
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(() => {
+        loadFullCatalogInBackground();
+      }, { timeout: 8000 });
+    } else {
+      setTimeout(loadFullCatalogInBackground, 4000);
+    }
+  };
+
+  if (document.readyState === 'complete') {
+    loadWhenIdle();
+  } else {
+    window.addEventListener('load', loadWhenIdle, { once: true });
+  }
+
+  const sInput = document.getElementById('searchInput');
+  if (sInput) {
+    sInput.addEventListener('focus', () => {
+      if (!isFullCatalogLoaded) loadFullCatalogInBackground();
+    }, { once: true });
+  }
 }
 
 function applyHomeData(data) {
@@ -662,10 +693,10 @@ function renderHomeRowsFromPayload(categoriesMap) {
                     </div>
                     <div class="row-controls">
                         <button class="row-nav-btn prev" onclick="slideRow('${rowSliderId}', -1)" aria-label="Previous">
-                            <i data-lucide="chevron-left"></i>
+                            ${getLucideSvg('chevron-left', { width: 16, height: 16 })}
                         </button>
                         <button class="row-nav-btn next" onclick="slideRow('${rowSliderId}', 1)" aria-label="Next">
-                            <i data-lucide="chevron-right"></i>
+                            ${getLucideSvg('chevron-right', { width: 16, height: 16 })}
                         </button>
                     </div>
                 </div>

@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const zlib = require('zlib');
 
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = 'localhost';
@@ -175,13 +176,27 @@ const server = http.createServer((req, res) => {
       });
       fileStream.pipe(res);
     } else {
-      res.writeHead(200, {
-        'Content-Length': fileSize,
-        'Content-Type': contentType,
-        'Accept-Ranges': 'bytes',
-        'Cache-Control': 'no-cache'
-      });
-      fs.createReadStream(filePath).pipe(res);
+      const acceptEncoding = (req.headers['accept-encoding'] || '').toLowerCase();
+      const isCompressible = ['.json', '.js', '.css', '.html', '.svg'].includes(ext) && fileSize > 512;
+
+      if (isCompressible && acceptEncoding.includes('gzip')) {
+        res.writeHead(200, {
+          'Content-Type': contentType,
+          'Content-Encoding': 'gzip',
+          'Vary': 'Accept-Encoding',
+          'Cache-Control': ext === '.json' ? 'public, max-age=60' : 'public, max-age=86400'
+        });
+        const gzip = zlib.createGzip({ level: 6 });
+        fs.createReadStream(filePath).pipe(gzip).pipe(res);
+      } else {
+        res.writeHead(200, {
+          'Content-Length': fileSize,
+          'Content-Type': contentType,
+          'Accept-Ranges': 'bytes',
+          'Cache-Control': ext === '.json' ? 'public, max-age=60' : 'no-cache'
+        });
+        fs.createReadStream(filePath).pipe(res);
+      }
     }
   });
 });
